@@ -6,6 +6,9 @@
 #include "Crunch/Public/Characters/CCharacter.h"
 #include "CPlayerCharacter.generated.h"
 
+struct FInputActionValue;
+class UInputAction;
+class UInputMappingContext;
 class USpringArmComponent;
 class UCameraComponent;
 
@@ -17,10 +20,23 @@ class CRUNCH_API ACPlayerCharacter : public ACCharacter
 public:
 	ACPlayerCharacter();
 
+	virtual void PawnClientRestart() override;
+	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
 private:
 	UPROPERTY(VisibleDefaultsOnly, Category="View")
 	USpringArmComponent* CameraBoom;
 	
 	UPROPERTY(VisibleDefaultsOnly, Category="View")
 	UCameraComponent* ViewCamera;
+	
+	UPROPERTY(EditDefaultsOnly, Category="Input")
+	UInputAction* JumpInputAction;
+
+	UPROPERTY(EditDefaultsOnly, Category="Input")
+	UInputAction* LookInputAction;
+
+	UPROPERTY(EditDefaultsOnly, Category="Input")
+	UInputMappingContext* GameplayInputMappingContext;
+
+	void HandleLookInput(const FInputActionValue& InputActionValue);
 };
