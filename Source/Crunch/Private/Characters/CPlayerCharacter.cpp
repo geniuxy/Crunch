@@ -6,6 +6,7 @@
 #include "Camera/CameraComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "EnhancedInputComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 
 
@@ -20,6 +21,9 @@ ACPlayerCharacter::ACPlayerCharacter()
 
 	ViewCamera = CreateDefaultSubobject<UCameraComponent>("View Camera");
 	ViewCamera->SetupAttachment(CameraBoom);
+
+	GetCharacterMovement()->bOrientRotationToMovement = true;
+	GetCharacterMovement()->RotationRate = FRotator(0.f, 300.f, 0.f);
 }
 
 void ACPlayerCharacter::PawnClientRestart()
@@ -52,6 +56,9 @@ void ACPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 		EnhancedInputComponent->BindAction(
 			LookInputAction, ETriggerEvent::Triggered, this, &ACPlayerCharacter::HandleLookInput
 		);
+		EnhancedInputComponent->BindAction(
+			MoveInputAction, ETriggerEvent::Triggered, this, &ACPlayerCharacter::HandleMoveInput
+		);
 	}
 }
 
@@ -66,5 +73,24 @@ void ACPlayerCharacter::HandleLookInput(const FInputActionValue& InputActionValu
 	if (LookInputVector.X != 0.f)
 	{
 		AddControllerYawInput(LookInputVector.X);
+	}
+}
+
+void ACPlayerCharacter::HandleMoveInput(const FInputActionValue& InputActionValue)
+{
+	FVector2D MoveInputVector = InputActionValue.Get<FVector2D>();
+
+	const FRotator ControllerRotation(0.f, GetControlRotation().Yaw, 0.f);
+
+	if (MoveInputVector.Y != 0.f)
+	{
+		FVector TargetForwardDirection = ControllerRotation.RotateVector(FVector::ForwardVector);
+		AddMovementInput(TargetForwardDirection, MoveInputVector.Y);
+	}
+
+	if (MoveInputVector.X != 0.f)
+	{
+		FVector TargetRightDirection = ControllerRotation.RotateVector(FVector::RightVector);
+		AddMovementInput(TargetRightDirection, MoveInputVector.X);
 	}
 }
