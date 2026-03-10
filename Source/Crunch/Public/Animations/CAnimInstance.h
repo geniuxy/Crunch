@@ -38,6 +38,12 @@ public:
 	UFUNCTION(BlueprintPure, meta=(BlueprintThreadSafe))
 	FORCEINLINE bool GetIsOnGround() const { return !bIsFalling; }
 
+	UFUNCTION(BlueprintPure, meta=(BlueprintThreadSafe))
+	FORCEINLINE float GetLookYawOffset() const { return LookRotOffset.Yaw; }
+
+	UFUNCTION(BlueprintPure, meta=(BlueprintThreadSafe))
+	FORCEINLINE float GetLookPitchOffset() const { return LookRotOffset.Pitch; }
+
 private:
 	UPROPERTY()
 	ACharacter* OwnerCharacter;
@@ -59,5 +65,9 @@ private:
 
 	/* 跳跃相关 */
 	bool bIsFalling;
+	/********/
+
+	/* Look Offset */
+	FRotator LookRotOffset;
 	/********/
 };

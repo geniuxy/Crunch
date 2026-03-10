@@ -33,6 +33,9 @@ void UCAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 			YawLerpSpeed = YawSpeedLerpToZeroSpeed;
 		}
 		SmoothedYawSpeed = UKismetMathLibrary::FInterpTo(SmoothedYawSpeed, YawSpeed, DeltaSeconds, YawLerpSpeed);
+
+		FRotator ControlRot = OwnerCharacter->GetBaseAimRotation();
+		LookRotOffset = UKismetMathLibrary::NormalizedDeltaRotator(ControlRot, BodyRot);
 	}
 
 	if (OwnerMovementComp)
