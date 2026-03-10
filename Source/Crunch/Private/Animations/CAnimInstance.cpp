@@ -4,22 +4,34 @@
 #include "Animations/CAnimInstance.h"
 
 #include "GameFramework/Character.h"
+#include "Kismet/KismetMathLibrary.h"
 
 void UCAnimInstance::NativeInitializeAnimation()
 {
-	OwnerPlayerCharacter = Cast<ACharacter>(TryGetPawnOwner());
-	if (OwnerPlayerCharacter)
+	OwnerCharacter = Cast<ACharacter>(TryGetPawnOwner());
+	if (OwnerCharacter)
 	{
-		OwnerMovementComp = OwnerPlayerCharacter->GetCharacterMovement();
+		OwnerMovementComp = OwnerCharacter->GetCharacterMovement();
 	}
 }
 
 void UCAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 {
-	if (OwnerPlayerCharacter)
+	if (OwnerCharacter)
 	{
-		FVector Velocity = OwnerPlayerCharacter->GetVelocity();
+		FVector Velocity = OwnerCharacter->GetVelocity();
 		Speed = Velocity.Length();
+
+		FRotator BodyRot = OwnerCharacter->GetActorRotation();
+		FRotator BodyRotDelta = UKismetMathLibrary::NormalizedDeltaRotator(BodyRot, BodyPrevRot);
+		BodyPrevRot = BodyRot;
+		YawSpeed = BodyRotDelta.Yaw / DeltaSeconds;
+		float YawLerpSpeed = YawSpeedSmoothLerpSpeed;
+		if (YawSpeed)
+		{
+			YawLerpSpeed = YawSpeedLerpToZeroSpeed;
+		}
+		SmoothedYawSpeed = UKismetMathLibrary::FInterpTo(SmoothedYawSpeed, YawSpeed, DeltaSeconds, YawLerpSpeed);
 	}
 }
 

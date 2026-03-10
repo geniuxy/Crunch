@@ -26,12 +26,27 @@ public:
 	UFUNCTION(BlueprintPure, meta=(BlueprintThreadSafe))
 	FORCEINLINE bool IsMoving() const { return Speed != 0.f; }
 
+	UFUNCTION(BlueprintPure, meta=(BlueprintThreadSafe))
+	FORCEINLINE float GetYawSpeed() const { return YawSpeed; }
+
+	UFUNCTION(BlueprintPure, meta=(BlueprintThreadSafe))
+	FORCEINLINE float GetSmoothedYawSpeed() const { return SmoothedYawSpeed; }
 private:
 	UPROPERTY()
-	ACharacter* OwnerPlayerCharacter;
+	ACharacter* OwnerCharacter;
 
 	UPROPERTY()
 	UCharacterMovementComponent* OwnerMovementComp;
 
 	float Speed;
+	/* Yaw旋转速度 */
+	FRotator BodyPrevRot;
+	float YawSpeed;
+	float SmoothedYawSpeed;
+
+	UPROPERTY(EditAnywhere, Category = "Animation")
+	float YawSpeedSmoothLerpSpeed = 1.f;
+	UPROPERTY(EditAnywhere, Category = "Animation")
+	float YawSpeedLerpToZeroSpeed = 30.f;
+	/********/
 };
