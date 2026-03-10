@@ -14,7 +14,10 @@ public class Crunch : ModuleRules
 				"CoreUObject",
 				"Engine",
 				"InputCore",
-				"EnhancedInput"
+				"EnhancedInput",
+				"GameplayAbilities",
+				"GameplayTasks",
+				"GameplayTags"
 			}
 		);
 
