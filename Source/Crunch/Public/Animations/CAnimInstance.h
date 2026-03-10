@@ -31,6 +31,13 @@ public:
 
 	UFUNCTION(BlueprintPure, meta=(BlueprintThreadSafe))
 	FORCEINLINE float GetSmoothedYawSpeed() const { return SmoothedYawSpeed; }
+
+	UFUNCTION(BlueprintPure, meta=(BlueprintThreadSafe))
+	FORCEINLINE bool GetIsFalling() const { return bIsFalling; }
+
+	UFUNCTION(BlueprintPure, meta=(BlueprintThreadSafe))
+	FORCEINLINE bool GetIsOnGround() const { return !bIsFalling; }
+
 private:
 	UPROPERTY()
 	ACharacter* OwnerCharacter;
@@ -48,5 +55,9 @@ private:
 	float YawSpeedSmoothLerpSpeed = 1.f;
 	UPROPERTY(EditAnywhere, Category = "Animation")
 	float YawSpeedLerpToZeroSpeed = 30.f;
+	/********/
+
+	/* 跳跃相关 */
+	bool bIsFalling;
 	/********/
 };

@@ -4,6 +4,7 @@
 #include "Animations/CAnimInstance.h"
 
 #include "GameFramework/Character.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/KismetMathLibrary.h"
 
 void UCAnimInstance::NativeInitializeAnimation()
@@ -32,6 +33,11 @@ void UCAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 			YawLerpSpeed = YawSpeedLerpToZeroSpeed;
 		}
 		SmoothedYawSpeed = UKismetMathLibrary::FInterpTo(SmoothedYawSpeed, YawSpeed, DeltaSeconds, YawLerpSpeed);
+	}
+
+	if (OwnerMovementComp)
+	{
+		bIsFalling = OwnerMovementComp->IsFalling();
 	}
 }
 
