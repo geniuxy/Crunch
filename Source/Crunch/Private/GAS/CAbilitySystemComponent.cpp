@@ -3,3 +3,11 @@
 
 #include "GAS/CAbilitySystemComponent.h"
 
+void UCAbilitySystemComponent::InitializeBaseAttributes()
+{
+	for (const TSubclassOf<UGameplayEffect>& EffectClass : InitializeGameplayEffects)
+	{
+		FGameplayEffectSpecHandle SpecHandle = MakeOutgoingSpec(EffectClass, 1, MakeEffectContext());
+		ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
+	}
+}
