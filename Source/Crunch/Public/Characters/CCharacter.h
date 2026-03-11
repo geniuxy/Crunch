@@ -4,12 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
-#include "CCharacter.generated.h"
 #include "AbilitySystemInterface.h"
+#include "CCharacter.generated.h"
 
 class UCAttributeSet;
 class UCAbilitySystemComponent;
-class UAbilitySystemComponent;
 
 UCLASS()
 class CRUNCH_API ACCharacter : public ACharacter, public IAbilitySystemInterface
