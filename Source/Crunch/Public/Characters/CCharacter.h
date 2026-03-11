@@ -18,6 +18,9 @@ class CRUNCH_API ACCharacter : public ACharacter, public IAbilitySystemInterface
 public:
 	ACCharacter();
 
+	void ServerSideInit();
+	void ClientSideInit();
+
 	/**********************************************************************/
 	/*                         Gameplay Ability                           */
 	/**********************************************************************/
