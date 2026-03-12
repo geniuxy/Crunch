@@ -22,9 +22,12 @@ public:
 	void ServerSideInit();
 	void ClientSideInit();
 
+	bool IsLocallyControlledByPlayer();
+
 protected:
 	virtual void BeginPlay() override;
 
+	virtual void PossessedBy(AController* NewController) override;
 	/**********************************************************************/
 	/*                         Gameplay Ability                           */
 	/**********************************************************************/

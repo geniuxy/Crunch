@@ -33,10 +33,24 @@ void ACCharacter::ClientSideInit()
 	AbilitySystemComponent->InitAbilityActorInfo(this, this);
 }
 
+bool ACCharacter::IsLocallyControlledByPlayer()
+{
+	return GetController() && GetController()->IsLocalPlayerController();
+}
+
 void ACCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	ConfigureOverHeadStatsWidget();
+}
+
+void ACCharacter::PossessedBy(AController* NewController)
+{
+	Super::PossessedBy(NewController);
+	if (NewController && !NewController->IsPlayerController()) //专用于AICharacter在Server上的初始化
+	{
+		ServerSideInit();
+	}
 }
 
 UAbilitySystemComponent* ACCharacter::GetAbilitySystemComponent() const
@@ -48,6 +62,12 @@ void ACCharacter::ConfigureOverHeadStatsWidget()
 {
 	if (!OverHeadWidgetComponent)
 	{
+		return;
+	}
+
+	if (IsLocallyControlledByPlayer())
+	{
+		OverHeadWidgetComponent->SetHiddenInGame(true);
 		return;
 	}
 
