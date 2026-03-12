@@ -3,9 +3,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameplayEffectTypes.h"
 #include "Blueprint/UserWidget.h"
 #include "ValueGauge.generated.h"
 
+class UAbilitySystemComponent;
 class UTextBlock;
 class UProgressBar;
 /**
@@ -18,13 +20,23 @@ class CRUNCH_API UValueGauge : public UUserWidget
 
 public:
 	virtual void NativePreConstruct() override;
-
+	void SetAndBoundToGameplayAttribute(
+		UAbilitySystemComponent* AbilitySystemComponent,
+		const FGameplayAttribute& Attribute,
+		const FGameplayAttribute& MaxAttribute
+	);
 	void SetValue(float NewValue, float NewMaxValue);
 
 private:
+	void ValueChanged(const FOnAttributeChangeData& ChangedData);
+	void MaxValueChanged(const FOnAttributeChangeData& ChangedData);
+
+	float CachedValue;
+	float CachedMaxValue;
+	
 	UPROPERTY(EditAnywhere, Category="Visual")
 	FLinearColor BarColor;
-	
+
 	UPROPERTY(VisibleAnywhere, meta=(BindWidget))
 	UProgressBar* ProgressBar;
 
