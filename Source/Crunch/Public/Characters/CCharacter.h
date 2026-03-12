@@ -46,7 +46,18 @@ private:
 	/**********************************************************************/
 public:
 	void ConfigureOverHeadStatsWidget();
+
 private:
 	UPROPERTY(VisibleDefaultsOnly, Category="UI")
 	UWidgetComponent* OverHeadWidgetComponent;
+
+	UPROPERTY(EditDefaultsOnly, Category="UI")
+	float HeadStatsGaugeVisibilityCheckUpdateGap = 1.f;
+
+	UPROPERTY(EditDefaultsOnly, Category="UI")
+	float HeadStatsGaugeVisibilityRangeSquared = 1000000.f; // 头顶血条可视距离的平方
+
+	FTimerHandle HeadStatsGaugeVisibilityUpdateTimerHandle;
+
+	void UpdateHeadGaugeVisibility();
 };
