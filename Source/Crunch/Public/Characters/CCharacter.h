@@ -9,6 +9,7 @@
 
 class UCAttributeSet;
 class UCAbilitySystemComponent;
+class UWidgetComponent;
 
 UCLASS()
 class CRUNCH_API ACCharacter : public ACharacter, public IAbilitySystemInterface
@@ -20,6 +21,9 @@ public:
 
 	void ServerSideInit();
 	void ClientSideInit();
+
+protected:
+	virtual void BeginPlay() override;
 
 	/**********************************************************************/
 	/*                         Gameplay Ability                           */
@@ -33,4 +37,13 @@ private:
 
 	UPROPERTY()
 	UCAttributeSet* AttributeSet;
+
+	/**********************************************************************/
+	/*                                UI                                  */
+	/**********************************************************************/
+public:
+	void ConfigureOverHeadStatsWidget();
+private:
+	UPROPERTY(VisibleDefaultsOnly, Category="UI")
+	UWidgetComponent* OverHeadWidgetComponent;
 };

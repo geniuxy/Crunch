@@ -42,7 +42,7 @@ void UValueGauge::SetValue(float NewValue, float NewMaxValue)
 	
 	if (NewMaxValue == 0)
 	{
-		Debug::Print(FString::Printf(TEXT("Value Gauge : %s, NewMaxValue can't be 0"), *GetName()));
+		// Debug::Print(FString::Printf(TEXT("Value Gauge : %s, NewMaxValue can't be 0"), *GetName()));
 		return;
 	}
 
