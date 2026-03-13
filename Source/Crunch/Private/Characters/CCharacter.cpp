@@ -29,6 +29,7 @@ void ACCharacter::ServerSideInit()
 {
 	AbilitySystemComponent->InitAbilityActorInfo(this, this);
 	AbilitySystemComponent->InitializeBaseAttributes();
+	AbilitySystemComponent->GiveInitialAbilities();
 }
 
 void ACCharacter::ClientSideInit()
