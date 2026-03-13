@@ -3,7 +3,9 @@
 
 #include "Crunch/Public/Characters/CCharacter.h"
 
+#include "CrunchDebugHelper.h"
 #include "Components/WidgetComponent.h"
+#include "GameFramework/PlayerState.h"
 #include "GAS/CAbilitySystemComponent.h"
 #include "GAS/CAttributeSet.h"
 #include "Kismet/GameplayStatics.h"
@@ -42,6 +44,7 @@ bool ACCharacter::IsLocallyControlledByPlayer()
 void ACCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+
 	ConfigureOverHeadStatsWidget();
 }
 
@@ -72,6 +75,7 @@ void ACCharacter::ConfigureOverHeadStatsWidget()
 		return;
 	}
 
+	// Tips:仅能在Client上看到Screen状态的头顶血条，listenServer端看不到
 	UOverHeadStatsGauge* OverHeadStatsGauge = Cast<UOverHeadStatsGauge>(OverHeadWidgetComponent->GetUserWidgetObject());
 	if (OverHeadStatsGauge)
 	{
@@ -93,4 +97,115 @@ void ACCharacter::UpdateHeadGaugeVisibility()
 		float DistSquared = FVector::DistSquared(GetActorLocation(), LocalPlayerPawn->GetActorLocation());
 		OverHeadWidgetComponent->SetHiddenInGame(DistSquared > HeadStatsGaugeVisibilityRangeSquared);
 	}
+}
+
+void ACCharacter::GetNetworkDebugInfo() const
+{
+	if (!bDebugNetworkInfo) return;
+
+	// 1. NetMode (当前运行模式)
+	FString NetModeStr;
+	switch (GetNetMode())
+	{
+	case NM_Standalone: NetModeStr = TEXT("Standalone");
+		break;
+	case NM_DedicatedServer: NetModeStr = TEXT("DedicatedServer");
+		break;
+	case NM_ListenServer: NetModeStr = TEXT("ListenServer");
+		break;
+	case NM_Client: NetModeStr = TEXT("Client");
+		break;
+	default: NetModeStr = TEXT("Unknown");
+		break;
+	}
+
+	// 2. NetRole (本端的角色)
+	FString RoleStr;
+	switch (GetLocalRole())
+	{
+	case ROLE_None: RoleStr = TEXT("None");
+		break;
+	case ROLE_SimulatedProxy: RoleStr = TEXT("SimulatedProxy");
+		break;
+	case ROLE_AutonomousProxy: RoleStr = TEXT("AutonomousProxy");
+		break;
+	case ROLE_Authority: RoleStr = TEXT("Authority");
+		break;
+	default: RoleStr = TEXT("Unknown");
+		break;
+	}
+
+	// 3. RemoteRole (对端的角色)
+	FString RemoteRoleStr;
+	switch (GetRemoteRole())
+	{
+	case ROLE_None: RemoteRoleStr = TEXT("None");
+		break;
+	case ROLE_SimulatedProxy: RemoteRoleStr = TEXT("SimulatedProxy");
+		break;
+	case ROLE_AutonomousProxy: RemoteRoleStr = TEXT("AutonomousProxy");
+		break;
+	case ROLE_Authority: RemoteRoleStr = TEXT("Authority");
+		break;
+	default: RemoteRoleStr = TEXT("Unknown");
+		break;
+	}
+
+	// 4. 关键判断
+	bool bHasAuthority = HasAuthority();
+	bool bIsLocallyControlled = IsLocallyControlled();
+	bool bIsServer = (GetNetMode() == NM_DedicatedServer || GetNetMode() == NM_ListenServer);
+	bool bIsClientOnly = (GetNetMode() == NM_Client);
+	bool bIsStandalone = (GetNetMode() == NM_Standalone);
+
+	// 组装信息
+	const FString Info = FString::Printf(
+		TEXT("=== %s ===\n")
+		TEXT("NetMode: %s\n")
+		TEXT("LocalRole: %s | RemoteRole: %s\n")
+		TEXT("HasAuthority: %s\n")
+		TEXT("IsLocallyControlled: %s\n")
+		TEXT("IsServer: %s | IsClientOnly: %s | IsStandalone: %s\n")
+		TEXT("Controller: %s\n")
+		TEXT("PlayerState: %s"),
+		*GetName(),
+		*NetModeStr,
+		*RoleStr,
+		*RemoteRoleStr,
+		bHasAuthority ? TEXT("true") : TEXT("false"),
+		bIsLocallyControlled ? TEXT("true") : TEXT("false"),
+		bIsServer ? TEXT("true") : TEXT("false"),
+		bIsClientOnly ? TEXT("true") : TEXT("false"),
+		bIsStandalone ? TEXT("true") : TEXT("false"),
+		GetController() ? *GetController()->GetName() : TEXT("NULL"),
+		GetPlayerState() ? *GetPlayerState()->GetPlayerName() : TEXT("NULL")
+	);
+
+	Debug::Print(Info, -1, 30.f);
+}
+
+void ACCharacter::TestPlayerPawn()
+{
+	// 方法1：Index 0
+	APawn* PawnByIndex = UGameplayStatics::GetPlayerPawn(this, 0);
+
+	// 方法2：找本地
+	APawn* PawnByLocal = nullptr;
+	for (auto It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
+	{
+		if (APlayerController* PC = It->Get())
+		{
+			UE_LOG(LogTemp, Warning, TEXT("PC: %s | IsLocal: %s"),
+			       *PC->GetName(),
+			       PC->IsLocalPlayerController() ? TEXT("Yes") : TEXT("No"));
+
+			if (PC->IsLocalPlayerController())
+			{
+				PawnByLocal = PC->GetPawn();
+			}
+		}
+	}
+
+	Debug::Print(FString::Printf(TEXT("GetPlayerPawn(0): %s"), PawnByIndex ? *PawnByIndex->GetName() : TEXT("NULL")));
+	Debug::Print(FString::Printf(TEXT("Local Pawn: %s"), PawnByLocal ? *PawnByLocal->GetName() : TEXT("NULL")));
 }

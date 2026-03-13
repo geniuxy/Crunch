@@ -60,4 +60,15 @@ private:
 	FTimerHandle HeadStatsGaugeVisibilityUpdateTimerHandle;
 
 	void UpdateHeadGaugeVisibility();
+
+	/**********************************************************************/
+	/*                                UI                                  */
+	/**********************************************************************/
+protected:
+	UPROPERTY(EditDefaultsOnly, Category="Net")
+	bool bDebugNetworkInfo = false;
+	
+	void GetNetworkDebugInfo() const;
+
+	void TestPlayerPawn();
 };
