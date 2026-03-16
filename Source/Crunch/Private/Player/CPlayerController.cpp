@@ -32,7 +32,7 @@ void ACPlayerController::AcknowledgePossession(APawn* NewPawn)
 
 void ACPlayerController::SpawnGameplayWidget()
 {
-	if (!IsLocalPlayerController()) // 排除ListenServer的情况
+	if (!IsLocalPlayerController()) // 排除在Client端，Server的副本角色的情况
 	{
 		return;
 	}

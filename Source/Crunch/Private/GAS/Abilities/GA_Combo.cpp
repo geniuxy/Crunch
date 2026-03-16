@@ -2,7 +2,7 @@
 
 
 #include "GAS/Abilities/GA_Combo.h"
-
+#include "Abilities/Tasks//AbilityTask_PlayMontageAndWait.h"
 #include "CrunchDebugHelper.h"
 
 void UGA_Combo::ActivateAbility(
@@ -13,11 +13,21 @@ void UGA_Combo::ActivateAbility(
 {
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 
-	if (!CommitAbility(Handle, ActorInfo, ActivationInfo))
+	// 用K2_的简化蓝图版本接口，可以简化代码、同时也会调用底层c++方法
+	if (!K2_CommitAbility())
 	{
-		EndAbility(Handle, ActorInfo, ActivationInfo, true, false);
+		K2_EndAbility();
 		return;
 	}
 
-	Debug::Print(TEXT("能力被激活了"));
+	if (HasAuthorityOrPredictionKey(ActorInfo, &ActivationInfo))
+	{
+		UAbilityTask_PlayMontageAndWait* PlayComboMontageTask =
+			UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, NAME_None, ComboMontage);
+		PlayComboMontageTask->OnBlendOut.AddDynamic(this, &ThisClass::K2_EndAbility);
+		PlayComboMontageTask->OnCancelled.AddDynamic(this, &ThisClass::K2_EndAbility);
+		PlayComboMontageTask->OnCompleted.AddDynamic(this, &ThisClass::K2_EndAbility);
+		PlayComboMontageTask->OnInterrupted.AddDynamic(this, &ThisClass::K2_EndAbility);
+		PlayComboMontageTask->ReadyForActivation();
+	}
 }

@@ -21,4 +21,8 @@ public:
 		const FGameplayAbilityActivationInfo ActivationInfo,
 		const FGameplayEventData* TriggerEventData
 	) override;
+
+private:
+	UPROPERTY(EditDefaultsOnly, Category = "Animation")
+	UAnimMontage* ComboMontage;
 };
