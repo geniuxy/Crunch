@@ -76,7 +76,7 @@ void ACCharacter::ConfigureOverHeadStatsWidget()
 		return;
 	}
 
-	// Tips:仅能在Client上看到Screen状态的头顶血条，listenServer端看不到
+	// Tips: 不知道为什么UE5.5上，仅能在Client上看到Screen状态的头顶血条，listenServer端看不到
 	UOverHeadStatsGauge* OverHeadStatsGauge = Cast<UOverHeadStatsGauge>(OverHeadWidgetComponent->GetUserWidgetObject());
 	if (OverHeadStatsGauge)
 	{

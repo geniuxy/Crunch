@@ -2,8 +2,19 @@
 
 
 #include "GAS/Abilities/GA_Combo.h"
+
+#include "CGameplayTags.h"
+#include "Abilities/GameplayAbility.h"
 #include "Abilities/Tasks//AbilityTask_PlayMontageAndWait.h"
 #include "CrunchDebugHelper.h"
+
+UGA_Combo::UGA_Combo()
+{
+	// AbilityTags.AddTag(CGameplayTags::Crunch_Ability_BasicAttack);
+	// 设置AbilityTags
+	SetAssetTags(FGameplayTagContainer(CGameplayTags::Crunch_Ability_BasicAttack));
+	BlockAbilitiesWithTag.AddTag(CGameplayTags::Crunch_Ability_BasicAttack);
+}
 
 void UGA_Combo::ActivateAbility(
 	const FGameplayAbilitySpecHandle Handle,

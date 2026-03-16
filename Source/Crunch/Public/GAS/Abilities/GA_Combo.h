@@ -15,6 +15,8 @@ class CRUNCH_API UGA_Combo : public UCGameplayAbilityBase
 	GENERATED_BODY()
 
 public:
+	UGA_Combo();
+	
 	virtual void ActivateAbility(
 		const FGameplayAbilitySpecHandle Handle,
 		const FGameplayAbilityActorInfo* ActorInfo,
