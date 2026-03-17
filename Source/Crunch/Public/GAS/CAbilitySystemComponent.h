@@ -6,6 +6,7 @@
 #include "AbilitySystemComponent.h"
 #include "CAbilitySystemComponent.generated.h"
 
+enum class ECAbilityInputID : uint8;
 /**
  * 
  */
@@ -24,8 +25,8 @@ private:
 	TArray<TSubclassOf<UGameplayEffect>> InitializeGameplayEffects;
 	
 	UPROPERTY(EditDefaultsOnly, Category="Gameplay Ability")
-	TArray<TSubclassOf<UGameplayAbility>> Abilities;
+	TMap<ECAbilityInputID, TSubclassOf<UGameplayAbility>> Abilities;
 
 	UPROPERTY(EditDefaultsOnly, Category="Gameplay Ability")
-	TArray<TSubclassOf<UGameplayAbility>> BasicAbilities;
+	TMap<ECAbilityInputID, TSubclassOf<UGameplayAbility>> BasicAbilities;
 };
