@@ -8,6 +8,7 @@
 #include "Abilities/GameplayAbility.h"
 #include "Abilities/Tasks/AbilityTask_PlayMontageAndWait.h"
 #include "Abilities/Tasks/AbilityTask_WaitGameplayEvent.h"
+#include "Abilities/Tasks/AbilityTask_WaitInputPress.h"
 
 UGA_Combo::UGA_Combo()
 {
@@ -49,6 +50,42 @@ void UGA_Combo::ActivateAbility(
 		WaitGameplayEventTask->EventReceived.AddDynamic(this, &ThisClass::ComboChangedEventReceived);
 		WaitGameplayEventTask->ReadyForActivation();
 	}
+
+	SetupWaitComboInputPress();
+}
+
+void UGA_Combo::SetupWaitComboInputPress()
+{
+	UAbilityTask_WaitInputPress* WaitInputPress = UAbilityTask_WaitInputPress::WaitInputPress(this);
+	WaitInputPress->OnPress.AddDynamic(this, &ThisClass::HandleInputPress);
+	WaitInputPress->ReadyForActivation();
+}
+
+void UGA_Combo::HandleInputPress(float TimeWaited)
+{
+	SetupWaitComboInputPress();
+	TryCommitCombo();
+}
+
+void UGA_Combo::TryCommitCombo()
+{
+	if (NextComboName == NAME_None)
+	{
+		return;
+	}
+
+	UAnimInstance* OwnerAnimInstance = GetOwnerAnimInstance();
+	if (!OwnerAnimInstance)
+	{
+		return;
+	}
+
+	// woc 天才，这样子就可以不涉及动画之间的过渡，Combo1打完就会自动打Combo2
+	OwnerAnimInstance->Montage_SetNextSection(
+		OwnerAnimInstance->Montage_GetCurrentSection(ComboMontage),
+		NextComboName,
+		ComboMontage
+	);
 }
 
 void UGA_Combo::ComboChangedEventReceived(FGameplayEventData Data)

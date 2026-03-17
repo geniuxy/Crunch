@@ -25,6 +25,13 @@ public:
 	) override;
 
 private:
+	void SetupWaitComboInputPress();
+
+	UFUNCTION()
+	void HandleInputPress(float TimeWaited);
+	
+	void TryCommitCombo();
+	
 	UFUNCTION()
 	void ComboChangedEventReceived(FGameplayEventData Data);
 	
