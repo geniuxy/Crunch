@@ -6,6 +6,7 @@
 #include "Crunch/Public/Characters/CCharacter.h"
 #include "CPlayerCharacter.generated.h"
 
+enum class ECAbilityInputID : uint8;
 struct FInputActionValue;
 class UInputAction;
 class UInputMappingContext;
@@ -22,13 +23,18 @@ public:
 
 	virtual void PawnClientRestart() override;
 	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
+
 private:
 	UPROPERTY(VisibleDefaultsOnly, Category="View")
 	USpringArmComponent* CameraBoom;
-	
+
 	UPROPERTY(VisibleDefaultsOnly, Category="View")
 	UCameraComponent* ViewCamera;
-	
+
+	/**********************************************************************/
+	/*                              Input                                 */
+	/**********************************************************************/
+private:
 	UPROPERTY(EditDefaultsOnly, Category="Input")
 	UInputAction* JumpInputAction;
 
@@ -39,8 +45,13 @@ private:
 	UInputAction* MoveInputAction;
 
 	UPROPERTY(EditDefaultsOnly, Category="Input")
+	TMap<ECAbilityInputID, UInputAction*> GameplayAbilityInputActions;
+	
+	UPROPERTY(EditDefaultsOnly, Category="Input")
 	UInputMappingContext* GameplayInputMappingContext;
 
 	void HandleLookInput(const FInputActionValue& InputActionValue);
 	void HandleMoveInput(const FInputActionValue& InputActionValue);
+
+	void HandleAbilityInput(const FInputActionValue& InputActionValue, ECAbilityInputID InputID);
 };
