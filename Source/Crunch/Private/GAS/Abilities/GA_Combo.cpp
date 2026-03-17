@@ -4,9 +4,10 @@
 #include "GAS/Abilities/GA_Combo.h"
 
 #include "CGameplayTags.h"
-#include "Abilities/GameplayAbility.h"
-#include "Abilities/Tasks//AbilityTask_PlayMontageAndWait.h"
 #include "CrunchDebugHelper.h"
+#include "Abilities/GameplayAbility.h"
+#include "Abilities/Tasks/AbilityTask_PlayMontageAndWait.h"
+#include "Abilities/Tasks/AbilityTask_WaitGameplayEvent.h"
 
 UGA_Combo::UGA_Combo()
 {
@@ -14,6 +15,7 @@ UGA_Combo::UGA_Combo()
 	// 设置AbilityTags
 	SetAssetTags(FGameplayTagContainer(CGameplayTags::Crunch_Ability_BasicAttack));
 	BlockAbilitiesWithTag.AddTag(CGameplayTags::Crunch_Ability_BasicAttack);
+	InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerActor;
 }
 
 void UGA_Combo::ActivateAbility(
@@ -40,5 +42,28 @@ void UGA_Combo::ActivateAbility(
 		PlayComboMontageTask->OnCompleted.AddDynamic(this, &ThisClass::K2_EndAbility);
 		PlayComboMontageTask->OnInterrupted.AddDynamic(this, &ThisClass::K2_EndAbility);
 		PlayComboMontageTask->ReadyForActivation();
+
+		UAbilityTask_WaitGameplayEvent* WaitGameplayEventTask = UAbilityTask_WaitGameplayEvent::WaitGameplayEvent(
+			this, CGameplayTags::Crunch_Ability_BasicAttack_Change, nullptr, false, false
+		);
+		WaitGameplayEventTask->EventReceived.AddDynamic(this, &ThisClass::ComboChangedEventReceived);
+		WaitGameplayEventTask->ReadyForActivation();
 	}
+}
+
+void UGA_Combo::ComboChangedEventReceived(FGameplayEventData Data)
+{
+	FGameplayTag EventTag = Data.EventTag;
+
+	if (EventTag == CGameplayTags::Crunch_Ability_BasicAttack_Change_End)
+	{
+		NextComboName = NAME_None;
+		Debug::Print(TEXT("Next Combo Name清空了"));
+		return;
+	}
+
+	TArray<FName> TagNames;
+	UGameplayTagsManager::Get().SplitGameplayTagFName(EventTag, TagNames);
+	NextComboName = TagNames.Last();
+	Debug::Print(FString::Printf(TEXT("Next Combo Name:%s"), *NextComboName.ToString()));
 }

@@ -5,4 +5,10 @@
 namespace CGameplayTags
 {
 	CRUNCH_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Crunch_Ability_BasicAttack);
+	CRUNCH_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Crunch_Ability_BasicAttack_Change);
+	CRUNCH_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Crunch_Ability_BasicAttack_Change_Combo01);
+	CRUNCH_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Crunch_Ability_BasicAttack_Change_Combo02);
+	CRUNCH_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Crunch_Ability_BasicAttack_Change_Combo03);
+	CRUNCH_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Crunch_Ability_BasicAttack_Change_Combo04);
+	CRUNCH_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Crunch_Ability_BasicAttack_Change_End);
 }

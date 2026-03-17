@@ -25,6 +25,11 @@ public:
 	) override;
 
 private:
+	UFUNCTION()
+	void ComboChangedEventReceived(FGameplayEventData Data);
+	
 	UPROPERTY(EditDefaultsOnly, Category = "Animation")
 	UAnimMontage* ComboMontage;
+
+	FName NextComboName;
 };
