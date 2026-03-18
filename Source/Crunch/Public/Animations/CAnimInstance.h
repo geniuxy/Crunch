@@ -33,16 +33,19 @@ public:
 	FORCEINLINE float GetSmoothedYawSpeed() const { return SmoothedYawSpeed; }
 
 	UFUNCTION(BlueprintPure, meta=(BlueprintThreadSafe))
-	FORCEINLINE bool GetIsFalling() const { return bIsFalling; }
+	FORCEINLINE bool GetIsJumping() const { return bIsJumping; }
 
 	UFUNCTION(BlueprintPure, meta=(BlueprintThreadSafe))
-	FORCEINLINE bool GetIsOnGround() const { return !bIsFalling; }
+	FORCEINLINE bool GetIsOnGround() const { return !bIsJumping; }
 
 	UFUNCTION(BlueprintPure, meta=(BlueprintThreadSafe))
 	FORCEINLINE float GetLookYawOffset() const { return LookRotOffset.Yaw; }
 
 	UFUNCTION(BlueprintPure, meta=(BlueprintThreadSafe))
 	FORCEINLINE float GetLookPitchOffset() const { return LookRotOffset.Pitch; }
+
+	UFUNCTION(BlueprintCallable, meta=(BlueprintThreadSafe))
+	bool ShouldDoFullBody() const;
 
 private:
 	UPROPERTY()
@@ -64,7 +67,7 @@ private:
 	/********/
 
 	/* 跳跃相关 */
-	bool bIsFalling;
+	bool bIsJumping;
 	/********/
 
 	/* Look Offset */

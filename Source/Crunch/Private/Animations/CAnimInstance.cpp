@@ -40,10 +40,16 @@ void UCAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 
 	if (OwnerMovementComp)
 	{
-		bIsFalling = OwnerMovementComp->IsFalling();
+		bIsJumping = OwnerMovementComp->IsFalling();
 	}
 }
 
 void UCAnimInstance::NativeThreadSafeUpdateAnimation(float DeltaSeconds)
 {
+}
+
+bool UCAnimInstance::ShouldDoFullBody() const
+{
+	// return (GetSpeed() <= 0) && !(GetIsAimming());
+	return GetSpeed() <= 0;
 }
