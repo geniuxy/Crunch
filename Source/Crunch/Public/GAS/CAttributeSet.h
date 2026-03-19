@@ -2,9 +2,9 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
 #include "AttributeSet.h"
 #include "AbilitySystemComponent.h"
+#include "CoreMinimal.h"
 #include "CAttributeSet.generated.h"
 
 #define ATTRIBUTE_ACCESSORS(ClassName, PropertyName) \
@@ -13,7 +13,7 @@
 	GAMEPLAYATTRIBUTE_VALUE_SETTER(PropertyName) \
 	GAMEPLAYATTRIBUTE_VALUE_INITTER(PropertyName)
 /**
- * Tips: ¿ØÖÆÌ¨ÊäÈë AbilitySystem.DebugAttribute Health MaxHealth (ºóĞø¼ÓÉÏ¶ÔÓ¦ÊôĞÔµÄÃû¿ÉÒÔÊµÊ±debug)
+ * Tips: æ§åˆ¶å°è¾“å…¥ AbilitySystem.DebugAttribute Health MaxHealth (å¯ä»¥å®æ—¶debug)
  */
 UCLASS()
 class CRUNCH_API UCAttributeSet : public UAttributeSet
@@ -27,6 +27,12 @@ public:
 	ATTRIBUTE_ACCESSORS(UCAttributeSet, MaxMana)
 
 	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
+
+	// ç”¨äºGameplayEffectçš„Modifiersç›¸å…³è®¡ç®—Clamp
+	virtual void PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue) override;
+	// ç”¨äºGameplayEffectçš„Executionsç›¸å…³è®¡ç®—Clamp
+	virtual void PostGameplayEffectExecute(const FGameplayEffectModCallbackData& Data) override;
+
 private:
 	UPROPERTY(ReplicatedUsing = OnRep_Health)
 	FGameplayAttributeData Health;
