@@ -3,6 +3,7 @@
 
 #include "GAS/Abilities/GA_Combo.h"
 
+#include "AbilitySystemBlueprintLibrary.h"
 #include "CGameplayTags.h"
 #include "CrunchDebugHelper.h"
 #include "Abilities/GameplayAbility.h"
@@ -53,6 +54,7 @@ void UGA_Combo::ActivateAbility(
 
 	if (K2_HasAuthority())
 	{
+		// MontageTickType 设置为 BranchingPoint（立即执行Notify） 很重要，不然会造成两次伤害
 		UAbilityTask_WaitGameplayEvent* WaitTargetingEventTask = UAbilityTask_WaitGameplayEvent::WaitGameplayEvent(
 			this, CGameplayTags::Crunch_Ability_BasicAttack_Event_Damage
 		);
@@ -117,4 +119,34 @@ void UGA_Combo::ComboChangedEventReceived(FGameplayEventData Data)
 void UGA_Combo::DoDamage(FGameplayEventData Data)
 {
 	TArray<FHitResult> HitResults = GetHitResultFromSweepLocationTargetData(Data.TargetData, 30.f, true);
+
+	for (FHitResult HitResult : HitResults)
+	{
+		TSubclassOf<UGameplayEffect> EffectForCurrentCombo = GetCurrentEffectForCurrentCombo();
+		FGameplayEffectSpecHandle EffectSpecHandle = MakeOutgoingGameplayEffectSpec(
+			EffectForCurrentCombo,
+			GetAbilityLevel(GetCurrentAbilitySpecHandle(), GetCurrentActorInfo())
+		);
+
+		ApplyGameplayEffectSpecToTarget(
+			GetCurrentAbilitySpecHandle(),
+			GetCurrentActorInfo(),
+			GetCurrentActivationInfo(),
+			EffectSpecHandle,
+			UAbilitySystemBlueprintLibrary::AbilityTargetDataFromHitResult(HitResult)
+		);
+	}
+}
+
+TSubclassOf<UGameplayEffect> UGA_Combo::GetCurrentEffectForCurrentCombo() const
+{
+	if (UAnimInstance* OwnerAnimInstance = GetOwnerAnimInstance())
+	{
+		const FName CurrentSectionName = OwnerAnimInstance->Montage_GetCurrentSection(ComboMontage);
+		if (const TSubclassOf<UGameplayEffect>* FoundEffectPtr = DamageEffectMap.Find(CurrentSectionName))
+		{
+			return *FoundEffectPtr;
+		}
+	}
+	return DefaultGameplayEffect;
 }

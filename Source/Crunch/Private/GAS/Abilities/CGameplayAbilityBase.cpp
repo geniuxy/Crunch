@@ -3,6 +3,7 @@
 
 #include "GAS/Abilities/CGameplayAbilityBase.h"
 
+#include "AbilitySystemBlueprintLibrary.h"
 #include "Kismet/KismetSystemLibrary.h"
 
 UAnimInstance* UCGameplayAbilityBase::GetOwnerAnimInstance() const

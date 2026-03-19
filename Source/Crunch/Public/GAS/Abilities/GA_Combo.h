@@ -25,21 +25,36 @@ public:
 	) override;
 
 private:
+	/*
+	 * Combo
+	 */
 	void SetupWaitComboInputPress();
-
+	
 	UFUNCTION()
 	void HandleInputPress(float TimeWaited);
 	
 	void TryCommitCombo();
-	
-	UFUNCTION()
-	void ComboChangedEventReceived(FGameplayEventData Data);
-	
-	UFUNCTION()
-	void DoDamage(FGameplayEventData Data);
-	
+
 	UPROPERTY(EditDefaultsOnly, Category = "Animation")
 	UAnimMontage* ComboMontage;
 
 	FName NextComboName;
+	
+	UFUNCTION()
+	void ComboChangedEventReceived(FGameplayEventData Data);
+	
+	/*
+	 * Damage
+	 */
+	UPROPERTY(EditAnywhere, Category="Gameplay Effect")
+	TSubclassOf<UGameplayEffect> DefaultGameplayEffect;
+
+	UPROPERTY(EditAnywhere, Category="Gameplay Effect")
+	TMap<FName, TSubclassOf<UGameplayEffect>> DamageEffectMap;
+
+	UFUNCTION()
+	void DoDamage(FGameplayEventData Data);
+
+	TSubclassOf<UGameplayEffect> GetCurrentEffectForCurrentCombo() const;
+	
 };
