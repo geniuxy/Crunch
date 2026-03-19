@@ -31,6 +31,12 @@ namespace CGameplayTags
 	 * GameplayCue Tags
 	 */
 	UE_DEFINE_GAMEPLAY_TAG(
+		GameplayCue_CameraShake, "GameplayCue.CameraShake"
+	);
+	UE_DEFINE_GAMEPLAY_TAG(
 		GameplayCue_Hit_Crunch_Punch, "GameplayCue.Hit.Crunch.Punch"
+	);
+	UE_DEFINE_GAMEPLAY_TAG(
+		GameplayCue_Hit_Reaction, "GameplayCue.Hit.Reaction"
 	);
 }

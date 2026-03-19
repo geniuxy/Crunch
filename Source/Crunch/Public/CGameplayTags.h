@@ -16,5 +16,7 @@ namespace CGameplayTags
 	/*
 	 * GameplayCue Tags
 	 */
+	CRUNCH_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(GameplayCue_CameraShake);
 	CRUNCH_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(GameplayCue_Hit_Crunch_Punch);
+	CRUNCH_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(GameplayCue_Hit_Reaction);
 }
