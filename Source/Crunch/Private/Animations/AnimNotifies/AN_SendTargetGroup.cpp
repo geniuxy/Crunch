@@ -18,10 +18,10 @@ void UAN_SendTargetGroup::Notify(USkeletalMeshComponent* MeshComp, UAnimSequence
 	}
 
 	FGameplayEventData Data;
-	for (int i = 1; i<TargetSocketNames.Num(); ++i)
+	for (int i = 1; i < TargetSocketNames.Num(); ++i)
 	{
 		FGameplayAbilityTargetData_LocationInfo* LocationInfo = new FGameplayAbilityTargetData_LocationInfo();
-		FVector StartLoc = MeshComp->GetSocketLocation(TargetSocketNames[i-1]);
+		FVector StartLoc = MeshComp->GetSocketLocation(TargetSocketNames[i - 1]);
 		FVector EndLoc = MeshComp->GetSocketLocation(TargetSocketNames[i]);
 
 		LocationInfo->SourceLocation.LiteralTransform.SetLocation(StartLoc);

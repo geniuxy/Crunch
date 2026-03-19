@@ -16,7 +16,7 @@ class CRUNCH_API UGA_Combo : public UCGameplayAbilityBase
 
 public:
 	UGA_Combo();
-	
+
 	virtual void ActivateAbility(
 		const FGameplayAbilitySpecHandle Handle,
 		const FGameplayAbilityActorInfo* ActorInfo,
@@ -34,6 +34,9 @@ private:
 	
 	UFUNCTION()
 	void ComboChangedEventReceived(FGameplayEventData Data);
+	
+	UFUNCTION()
+	void DoDamage(FGameplayEventData Data);
 	
 	UPROPERTY(EditDefaultsOnly, Category = "Animation")
 	UAnimMontage* ComboMontage;

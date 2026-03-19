@@ -45,10 +45,19 @@ void UGA_Combo::ActivateAbility(
 		PlayComboMontageTask->ReadyForActivation();
 
 		UAbilityTask_WaitGameplayEvent* WaitGameplayEventTask = UAbilityTask_WaitGameplayEvent::WaitGameplayEvent(
-			this, CGameplayTags::Crunch_Ability_BasicAttack_Change, nullptr, false, false
+			this, CGameplayTags::Crunch_Ability_BasicAttack_Event_Change, nullptr, false, false
 		);
 		WaitGameplayEventTask->EventReceived.AddDynamic(this, &ThisClass::ComboChangedEventReceived);
 		WaitGameplayEventTask->ReadyForActivation();
+	}
+
+	if (K2_HasAuthority())
+	{
+		UAbilityTask_WaitGameplayEvent* WaitTargetingEventTask = UAbilityTask_WaitGameplayEvent::WaitGameplayEvent(
+			this, CGameplayTags::Crunch_Ability_BasicAttack_Event_Damage
+		);
+		WaitTargetingEventTask->EventReceived.AddDynamic(this, &ThisClass::DoDamage);
+		WaitTargetingEventTask->ReadyForActivation();
 	}
 
 	SetupWaitComboInputPress();
@@ -92,7 +101,7 @@ void UGA_Combo::ComboChangedEventReceived(FGameplayEventData Data)
 {
 	FGameplayTag EventTag = Data.EventTag;
 
-	if (EventTag == CGameplayTags::Crunch_Ability_BasicAttack_Change_End)
+	if (EventTag == CGameplayTags::Crunch_Ability_BasicAttack_Event_Change_End)
 	{
 		NextComboName = NAME_None;
 		Debug::Print(TEXT("Next Combo Name清空了"));
@@ -103,4 +112,9 @@ void UGA_Combo::ComboChangedEventReceived(FGameplayEventData Data)
 	UGameplayTagsManager::Get().SplitGameplayTagFName(EventTag, TagNames);
 	NextComboName = TagNames.Last();
 	Debug::Print(FString::Printf(TEXT("Next Combo Name:%s"), *NextComboName.ToString()));
+}
+
+void UGA_Combo::DoDamage(FGameplayEventData Data)
+{
+	TArray<FHitResult> HitResults = GetHitResultFromSweepLocationTargetData(Data.TargetData, 30.f, true);
 }
