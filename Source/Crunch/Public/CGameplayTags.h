@@ -12,4 +12,9 @@ namespace CGameplayTags
 	CRUNCH_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Crunch_Ability_BasicAttack_Event_Change_Combo04);
 	CRUNCH_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Crunch_Ability_BasicAttack_Event_Change_End);
 	CRUNCH_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Crunch_Ability_BasicAttack_Event_Damage);
+
+	/*
+	 * GameplayCue Tags
+	 */
+	CRUNCH_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(GameplayCue_Hit_Crunch_Punch);
 }

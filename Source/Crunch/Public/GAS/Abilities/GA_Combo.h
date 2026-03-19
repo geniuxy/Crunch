@@ -47,6 +47,9 @@ private:
 	 * Damage
 	 */
 	UPROPERTY(EditAnywhere, Category="Gameplay Effect")
+	float TargetSweepSphereRadius = 30.f;
+	
+	UPROPERTY(EditAnywhere, Category="Gameplay Effect")
 	TSubclassOf<UGameplayEffect> DefaultGameplayEffect;
 
 	UPROPERTY(EditAnywhere, Category="Gameplay Effect")

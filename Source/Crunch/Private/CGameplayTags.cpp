@@ -26,4 +26,11 @@ namespace CGameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(
 		Crunch_Ability_BasicAttack_Event_Damage, "Crunch.Ability.BasicAttack.Event.Damage"
 	);
+
+	/*
+	 * GameplayCue Tags
+	 */
+	UE_DEFINE_GAMEPLAY_TAG(
+		GameplayCue_Hit_Crunch_Punch, "GameplayCue.Hit.Crunch.Punch"
+	);
 }
