@@ -19,9 +19,15 @@ ACCharacter::ACCharacter()
 {
 	PrimaryActorTick.bCanEverTick = false;
 
+	// 总是会生成
+	SpawnCollisionHandlingMethod = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+	
 	// 需要把Mesh改成NoCollision,其余的Responses都可以改为Block
 	GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	GetMesh()->SetCollisionResponseToAllChannels(ECR_Block);
+
+	// CapsuleComponent不要挡摄像头
+	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
 
 	AbilitySystemComponent = CreateDefaultSubobject<UCAbilitySystemComponent>(TEXT("Ability System Component"));
 	AttributeSet = CreateDefaultSubobject<UCAttributeSet>(TEXT("AttributeSet"));

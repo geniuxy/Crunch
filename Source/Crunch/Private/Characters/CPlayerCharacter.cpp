@@ -19,7 +19,6 @@ ACPlayerCharacter::ACPlayerCharacter()
 	CameraBoom->SetupAttachment(GetRootComponent());
 	CameraBoom->TargetArmLength = 800.f;
 	CameraBoom->bUsePawnControlRotation = true;
-	CameraBoom->bDoCollisionTest = false;
 
 	ViewCamera = CreateDefaultSubobject<UCameraComponent>("View Camera");
 	ViewCamera->SetupAttachment(CameraBoom);
