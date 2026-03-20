@@ -72,8 +72,18 @@ private:
 	/*                        Death And Respawn                           */
 	/**********************************************************************/
 private:
+	FTransform MeshRelativeTransform; // 记录Mesh初始RelativeTransform，用于Ragdoll后恢复位置
+	
+	UPROPERTY(EditDefaultsOnly, Category="Death")
+	float DeathMontageFinishTimeShift = -0.8f;
+	
 	UPROPERTY(EditDefaultsOnly, Category="Death")
 	UAnimMontage* DeathMontage;
+
+	FTimerHandle DeathMontageTimerHandle;
+
+	void DeathMontageFinished();
+	void SetRagDollEnabled(bool bIsEnabled);
 
 	void PlayDeathAnimation();
 	

@@ -19,7 +19,9 @@ ACCharacter::ACCharacter()
 {
 	PrimaryActorTick.bCanEverTick = false;
 
+	// 需要把Mesh改成NoCollision,其余的Responses都可以改为Block
 	GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	GetMesh()->SetCollisionResponseToAllChannels(ECR_Block);
 
 	AbilitySystemComponent = CreateDefaultSubobject<UCAbilitySystemComponent>(TEXT("Ability System Component"));
 	AttributeSet = CreateDefaultSubobject<UCAttributeSet>(TEXT("AttributeSet"));
@@ -52,6 +54,8 @@ void ACCharacter::BeginPlay()
 	Super::BeginPlay();
 
 	ConfigureOverHeadStatsWidget();
+
+	MeshRelativeTransform = GetMesh()->GetRelativeTransform();
 }
 
 void ACCharacter::PossessedBy(AController* NewController)
@@ -141,11 +145,39 @@ void ACCharacter::SetStatusGaugeEnabled(bool bIsEnabled)
 	}
 }
 
+void ACCharacter::DeathMontageFinished()
+{
+	SetRagDollEnabled(true);
+}
+
+void ACCharacter::SetRagDollEnabled(bool bIsEnabled)
+{
+	if (bIsEnabled)
+	{
+		GetMesh()->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
+		GetMesh()->SetSimulatePhysics(true);
+		GetMesh()->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
+	}
+	else
+	{
+		GetMesh()->SetSimulatePhysics(false);
+		GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		GetMesh()->AttachToComponent(GetRootComponent(), FAttachmentTransformRules::KeepRelativeTransform);
+		GetMesh()->SetRelativeTransform(MeshRelativeTransform);
+	}
+}
+
 void ACCharacter::PlayDeathAnimation()
 {
 	if (DeathMontage)
 	{
-		PlayAnimMontage(DeathMontage);
+		float MontageDuration = PlayAnimMontage(DeathMontage);
+		GetWorldTimerManager().SetTimer(
+			DeathMontageTimerHandle,
+			this,
+			&ThisClass::DeathMontageFinished,
+			MontageDuration + DeathMontageFinishTimeShift
+		);
 	}
 }
 
@@ -160,8 +192,17 @@ void ACCharacter::StartDeathSequence()
 
 void ACCharacter::Respawn()
 {
-	Debug::Print("Respawn!");
 	OnRespawn();
+	SetRagDollEnabled(false);
+	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	GetCharacterMovement()->SetMovementMode(MOVE_Walking);
+	GetMesh()->GetAnimInstance()->StopAllMontages(0.f);
+	SetStatusGaugeEnabled(true);
+
+	if (AbilitySystemComponent)
+	{
+		AbilitySystemComponent->ApplyFullStatsEffect();
+	}
 }
 
 void ACCharacter::OnDeath()
