@@ -116,3 +116,21 @@ void ACPlayerCharacter::HandleAbilityInput(const FInputActionValue& InputActionV
 		GetAbilitySystemComponent()->AbilityLocalInputReleased((int32)InputID);
 	}
 }
+
+void ACPlayerCharacter::OnDeath()
+{
+	APlayerController* PlayerController = GetController<APlayerController>();
+	if (PlayerController)
+	{
+		DisableInput(PlayerController);
+	}
+}
+
+void ACPlayerCharacter::OnRespawn()
+{
+	APlayerController* PlayerController = GetController<APlayerController>();
+	if (PlayerController)
+	{
+		EnableInput(PlayerController);
+	}
+}

@@ -66,8 +66,32 @@ private:
 
 	void UpdateHeadGaugeVisibility();
 
+	void SetStatusGaugeEnabled(bool bIsEnabled);
+	
 	/**********************************************************************/
-	/*                                UI                                  */
+	/*                        Death And Respawn                           */
+	/**********************************************************************/
+private:
+	UPROPERTY(EditDefaultsOnly, Category="Death")
+	UAnimMontage* DeathMontage;
+
+	void PlayDeathAnimation();
+	
+	void StartDeathSequence();
+	void Respawn();
+
+	virtual void OnDeath();
+	virtual void OnRespawn();
+
+
+
+
+
+
+
+
+	/**********************************************************************/
+	/*                               Net                                  */
 	/**********************************************************************/
 protected:
 	UPROPERTY(EditDefaultsOnly, Category="Net")
@@ -76,11 +100,4 @@ protected:
 	void GetNetworkDebugInfo() const;
 
 	void TestPlayerPawn();
-
-	/**********************************************************************/
-	/*                        Death And Respawn                           */
-	/**********************************************************************/
-private:
-	void StartDeathSequence();
-	void Respawn();
 };

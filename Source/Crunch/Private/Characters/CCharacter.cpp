@@ -5,7 +5,9 @@
 
 #include "CGameplayTags.h"
 #include "CrunchDebugHelper.h"
+#include "Components/CapsuleComponent.h"
 #include "Components/WidgetComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/PlayerState.h"
 #include "GAS/CAbilitySystemComponent.h"
 #include "GAS/CAttributeSet.h"
@@ -125,6 +127,52 @@ void ACCharacter::UpdateHeadGaugeVisibility()
 	}
 }
 
+void ACCharacter::SetStatusGaugeEnabled(bool bIsEnabled)
+{
+	GetWorldTimerManager().ClearTimer(HeadStatsGaugeVisibilityUpdateTimerHandle);
+
+	if (bIsEnabled)
+	{
+		ConfigureOverHeadStatsWidget();
+	}
+	else
+	{
+		OverHeadWidgetComponent->SetHiddenInGame(true);
+	}
+}
+
+void ACCharacter::PlayDeathAnimation()
+{
+	if (DeathMontage)
+	{
+		PlayAnimMontage(DeathMontage);
+	}
+}
+
+void ACCharacter::StartDeathSequence()
+{
+	OnDeath();
+	PlayDeathAnimation();
+	SetStatusGaugeEnabled(false);
+	GetCharacterMovement()->SetMovementMode(MOVE_None);
+	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+}
+
+void ACCharacter::Respawn()
+{
+	Debug::Print("Respawn!");
+	OnRespawn();
+}
+
+void ACCharacter::OnDeath()
+{
+}
+
+void ACCharacter::OnRespawn()
+{
+}
+
+
 void ACCharacter::GetNetworkDebugInfo() const
 {
 	if (!bDebugNetworkInfo) return;
@@ -234,14 +282,4 @@ void ACCharacter::TestPlayerPawn()
 
 	Debug::Print(FString::Printf(TEXT("GetPlayerPawn(0): %s"), PawnByIndex ? *PawnByIndex->GetName() : TEXT("NULL")));
 	Debug::Print(FString::Printf(TEXT("Local Pawn: %s"), PawnByLocal ? *PawnByLocal->GetName() : TEXT("NULL")));
-}
-
-void ACCharacter::StartDeathSequence()
-{
-	Debug::Print("Start Death Sequence");
-}
-
-void ACCharacter::Respawn()
-{
-	Debug::Print("Respawn!");
 }
