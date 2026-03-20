@@ -16,11 +16,18 @@ class CRUNCH_API UCAbilitySystemComponent : public UAbilitySystemComponent
 	GENERATED_BODY()
 
 public:
+	UCAbilitySystemComponent();
+	
 	void InitializeBaseAttributes();
 
 	void GiveInitialAbilities();
 
 private:
+	void HealthUpdated(const FOnAttributeChangeData& ChangeData);
+	
+	UPROPERTY(EditDefaultsOnly, Category="Gameplay Effects")
+	TSubclassOf<UGameplayEffect> DeathEffect;
+	
 	UPROPERTY(EditDefaultsOnly, Category="Gameplay Ability")
 	TArray<TSubclassOf<UGameplayEffect>> InitializeGameplayEffects;
 	

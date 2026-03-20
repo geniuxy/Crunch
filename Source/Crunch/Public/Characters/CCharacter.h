@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "AbilitySystemInterface.h"
+#include "GameplayTagContainer.h"
 #include "CCharacter.generated.h"
 
 class UCAttributeSet;
@@ -35,6 +36,10 @@ public:
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 
 private:
+	void BindGASChangeDelegates();
+
+	void DeathTagUpdated(FGameplayTag Tag, int NewCount);
+
 	UPROPERTY(VisibleDefaultsOnly, Category = "Gameplay Ability")
 	UCAbilitySystemComponent* AbilitySystemComponent;
 
@@ -67,8 +72,15 @@ private:
 protected:
 	UPROPERTY(EditDefaultsOnly, Category="Net")
 	bool bDebugNetworkInfo = false;
-	
+
 	void GetNetworkDebugInfo() const;
 
 	void TestPlayerPawn();
+
+	/**********************************************************************/
+	/*                        Death And Respawn                           */
+	/**********************************************************************/
+private:
+	void StartDeathSequence();
+	void Respawn();
 };

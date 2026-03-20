@@ -3,6 +3,7 @@
 
 #include "Crunch/Public/Characters/CCharacter.h"
 
+#include "CGameplayTags.h"
 #include "CrunchDebugHelper.h"
 #include "Components/WidgetComponent.h"
 #include "GameFramework/PlayerState.h"
@@ -23,6 +24,8 @@ ACCharacter::ACCharacter()
 
 	OverHeadWidgetComponent = CreateDefaultSubobject<UWidgetComponent>(TEXT("Over Head Widget Component"));
 	OverHeadWidgetComponent->SetupAttachment(GetRootComponent());
+
+	BindGASChangeDelegates();
 }
 
 void ACCharacter::ServerSideInit()
@@ -61,6 +64,28 @@ void ACCharacter::PossessedBy(AController* NewController)
 UAbilitySystemComponent* ACCharacter::GetAbilitySystemComponent() const
 {
 	return AbilitySystemComponent;
+}
+
+void ACCharacter::BindGASChangeDelegates()
+{
+	if (AbilitySystemComponent)
+	{
+		AbilitySystemComponent->RegisterGameplayTagEvent(CGameplayTags::Crunch_Stats_Dead).AddUObject(
+			this, &ThisClass::DeathTagUpdated
+		);
+	}
+}
+
+void ACCharacter::DeathTagUpdated(FGameplayTag Tag, int NewCount)
+{
+	if (NewCount != 0)
+	{
+		StartDeathSequence();
+	}
+	else
+	{
+		Respawn();
+	}
 }
 
 void ACCharacter::ConfigureOverHeadStatsWidget()
@@ -209,4 +234,14 @@ void ACCharacter::TestPlayerPawn()
 
 	Debug::Print(FString::Printf(TEXT("GetPlayerPawn(0): %s"), PawnByIndex ? *PawnByIndex->GetName() : TEXT("NULL")));
 	Debug::Print(FString::Printf(TEXT("Local Pawn: %s"), PawnByLocal ? *PawnByLocal->GetName() : TEXT("NULL")));
+}
+
+void ACCharacter::StartDeathSequence()
+{
+	Debug::Print("Start Death Sequence");
+}
+
+void ACCharacter::Respawn()
+{
+	Debug::Print("Respawn!");
 }

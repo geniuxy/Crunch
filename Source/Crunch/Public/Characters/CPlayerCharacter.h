@@ -4,12 +4,12 @@
 
 #include "CoreMinimal.h"
 #include "Crunch/Public/Characters/CCharacter.h"
+#include "InputMappingContext.h"
 #include "CPlayerCharacter.generated.h"
 
 enum class ECAbilityInputID : uint8;
 struct FInputActionValue;
 class UInputAction;
-class UInputMappingContext;
 class USpringArmComponent;
 class UCameraComponent;
 

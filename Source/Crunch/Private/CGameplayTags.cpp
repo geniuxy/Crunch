@@ -3,6 +3,10 @@
 namespace CGameplayTags
 {
 	UE_DEFINE_GAMEPLAY_TAG(
+		Crunch_Stats_Dead, "Crunch.Stats.Dead"
+	);
+
+	UE_DEFINE_GAMEPLAY_TAG(
 		Crunch_Ability_BasicAttack, "Crunch.Ability.BasicAttack"
 	);
 	UE_DEFINE_GAMEPLAY_TAG(
