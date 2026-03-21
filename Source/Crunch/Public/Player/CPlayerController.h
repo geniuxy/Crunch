@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GenericTeamAgentInterface.h"
 #include "GameFramework/PlayerController.h"
 #include "CPlayerController.generated.h"
 
@@ -12,7 +13,7 @@ class ACPlayerCharacter;
  * 
  */
 UCLASS()
-class CRUNCH_API ACPlayerController : public APlayerController
+class CRUNCH_API ACPlayerController : public APlayerController, public IGenericTeamAgentInterface
 {
 	GENERATED_BODY()
 
@@ -21,6 +22,13 @@ public:
 	virtual void OnPossess(APawn* NewPawn) override;
 	// 只在Client上执行,也会在Listen Server(P2P 没有玩家当主机)上执行(其中一个玩家同时充当"服务器"角色)
 	virtual void AcknowledgePossession(APawn* NewPawn) override;
+
+	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
+
+	//~ Begin IGenericTeamAgentInterface Interface
+	virtual void SetGenericTeamId(const FGenericTeamId& NewTeamID) override;
+	virtual FGenericTeamId GetGenericTeamId() const override;
+	//~ End IGenericTeamAgentInterface Interface
 
 protected:
 	void SpawnGameplayWidget();
@@ -33,4 +41,7 @@ protected:
 	
 	UPROPERTY()
 	TObjectPtr<ACPlayerCharacter> OwningPlayerCharacter;
+
+	UPROPERTY(Replicated)
+	FGenericTeamId TeamID;
 };

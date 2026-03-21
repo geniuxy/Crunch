@@ -20,7 +20,8 @@ public class Crunch : ModuleRules
 				"GameplayTags",
 				"UMG",
 				"Slate",
-				"SlateCore"
+				"SlateCore",
+				"AIModule" // 
 			}
 		);
 
