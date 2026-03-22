@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "AIController.h"
+#include "Perception/AIPerceptionTypes.h"
 #include "CAIController.generated.h"
 
 class UAISenseConfig_Sight;
@@ -18,12 +19,28 @@ class CRUNCH_API ACAIController : public AAIController
 public:
 	ACAIController();
 
+protected:
 	virtual void OnPossess(APawn* NewPawn) override;
+	
+	virtual void BeginPlay() override;
 
 private:
-	UPROPERTY(VisibleAnywhere, Category="Perception")
-	UAIPerceptionComponent* AIPerceptionComponent;
+	UPROPERTY(EditDefaultsOnly, Category="AI Behavior")
+	FName TargetBlackboardKeyName = FName("Target");
+	
+	UPROPERTY(EditDefaultsOnly, Category="AI Behavior")
+	UBehaviorTree* BehaviorTree;
 	
 	UPROPERTY(VisibleAnywhere, Category="Perception")
+	UAIPerceptionComponent* AIPerceptionComponent;
+
+	UPROPERTY(VisibleAnywhere, Category="Perception")
 	UAISenseConfig_Sight* SightConfig;
+	
+	UFUNCTION()
+	void HandleTargetPerceptionUpdated(AActor* TargetActor, FAIStimulus Stimulus);
+
+	const UObject* GetCurrentTarget() const;
+
+	void SetCurrentTarget(AActor* NewTarget);
 };

@@ -3,9 +3,13 @@
 
 #include "AI/CAIController.h"
 
+#include "BehaviorTree/BlackboardComponent.h"
 #include "Perception/AIPerceptionComponent.h"
 #include "Perception/AISenseConfig_Sight.h"
 
+/*
+ * ' 号可以查看单位的ai信息，Num5可以查看
+ */
 ACAIController::ACAIController()
 {
 	AIPerceptionComponent = CreateDefaultSubobject<UAIPerceptionComponent>("AI Perception Component");
@@ -23,6 +27,7 @@ ACAIController::ACAIController()
 	SightConfig->PeripheralVisionAngleDegrees = 180.f;	// AI可看到的侧向范围
 
 	AIPerceptionComponent->ConfigureSense(*SightConfig);
+	AIPerceptionComponent->OnTargetPerceptionUpdated.AddDynamic(this, &ThisClass::HandleTargetPerceptionUpdated);
 }
 
 void ACAIController::OnPossess(APawn* NewPawn)
@@ -34,5 +39,55 @@ void ACAIController::OnPossess(APawn* NewPawn)
 	if (PawnTeamInterface)
 	{
 		PawnTeamInterface->SetGenericTeamId(GetGenericTeamId());
+	}
+}
+
+void ACAIController::BeginPlay()
+{
+	Super::BeginPlay();
+
+	RunBehaviorTree(BehaviorTree);
+}
+
+void ACAIController::HandleTargetPerceptionUpdated(AActor* TargetActor, FAIStimulus Stimulus)
+{
+	if (Stimulus.WasSuccessfullySensed())
+	{
+		if (!GetCurrentTarget())
+		{
+			SetCurrentTarget(TargetActor);
+		}
+	}
+	else
+	{
+		if (GetCurrentTarget() == TargetActor)
+		{
+			SetCurrentTarget(nullptr);
+		}
+	}
+}
+
+const UObject* ACAIController::GetCurrentTarget() const
+{
+	const UBlackboardComponent* BlackboardComponent = GetBlackboardComponent();
+	if (BlackboardComponent)
+	{
+		return BlackboardComponent->GetValueAsObject(TargetBlackboardKeyName);
+	}
+	return nullptr;
+}
+
+void ACAIController::SetCurrentTarget(AActor* NewTarget)
+{
+	UBlackboardComponent* BlackboardComponent = GetBlackboardComponent();
+	if (!BlackboardComponent) return;
+	
+	if (NewTarget)
+	{
+		BlackboardComponent->SetValueAsObject(TargetBlackboardKeyName, NewTarget);
+	}
+	else
+	{
+		BlackboardComponent->ClearValue(TargetBlackboardKeyName);
 	}
 }
