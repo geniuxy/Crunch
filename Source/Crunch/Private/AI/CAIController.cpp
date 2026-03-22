@@ -28,6 +28,8 @@ ACAIController::ACAIController()
 
 	AIPerceptionComponent->ConfigureSense(*SightConfig);
 	AIPerceptionComponent->OnTargetPerceptionUpdated.AddDynamic(this, &ThisClass::HandleTargetPerceptionUpdated);
+	// 要实现OnTargetPerceptionForgotten的触发，需要打开设置中的Forget Stale Actors
+	AIPerceptionComponent->OnTargetPerceptionForgotten.AddDynamic(this, &ThisClass::HandleTargetPerceptionForgotten);
 }
 
 void ACAIController::OnPossess(APawn* NewPawn)
@@ -60,10 +62,16 @@ void ACAIController::HandleTargetPerceptionUpdated(AActor* TargetActor, FAIStimu
 	}
 	else
 	{
-		if (GetCurrentTarget() == TargetActor)
-		{
-			SetCurrentTarget(nullptr);
-		}
+	}
+}
+
+void ACAIController::HandleTargetPerceptionForgotten(AActor* ForgottenActor)
+{
+	if (!ForgottenActor) return;
+
+	if (GetCurrentTarget() == ForgottenActor)
+	{
+		SetCurrentTarget(GetNextPerceivedActor());
 	}
 }
 
@@ -90,4 +98,19 @@ void ACAIController::SetCurrentTarget(AActor* NewTarget)
 	{
 		BlackboardComponent->ClearValue(TargetBlackboardKeyName);
 	}
+}
+
+AActor* ACAIController::GetNextPerceivedActor() const
+{
+	if (AIPerceptionComponent)
+	{
+		TArray<AActor*> Actors;
+		AIPerceptionComponent->GetPerceivedHostileActors(Actors);
+
+		if (Actors.Num() != 0)
+		{
+			return Actors[0];
+		}
+	}
+	return nullptr;
 }
