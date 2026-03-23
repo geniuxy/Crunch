@@ -3,7 +3,10 @@
 
 #include "AI/CAIController.h"
 
+#include "AbilitySystemComponent.h"
+#include "CGameplayTags.h"
 #include "BehaviorTree/BlackboardComponent.h"
+#include "FunctionLibrary/CAbilitySystemFunctionLibrary.h"
 #include "Perception/AIPerceptionComponent.h"
 #include "Perception/AISenseConfig_Sight.h"
 
@@ -24,7 +27,7 @@ ACAIController::ACAIController()
 
 	SightConfig->SetMaxAge(5.f); // 跑出检测范围后，仍然记得对应敌人的时间
 
-	SightConfig->PeripheralVisionAngleDegrees = 180.f;	// AI可看到的侧向范围
+	SightConfig->PeripheralVisionAngleDegrees = 180.f; // AI可看到的侧向范围
 
 	AIPerceptionComponent->ConfigureSense(*SightConfig);
 	AIPerceptionComponent->OnTargetPerceptionUpdated.AddDynamic(this, &ThisClass::HandleTargetPerceptionUpdated);
@@ -62,6 +65,7 @@ void ACAIController::HandleTargetPerceptionUpdated(AActor* TargetActor, FAIStimu
 	}
 	else
 	{
+		ForgetActorIfDead(TargetActor);
 	}
 }
 
@@ -89,7 +93,7 @@ void ACAIController::SetCurrentTarget(AActor* NewTarget)
 {
 	UBlackboardComponent* BlackboardComponent = GetBlackboardComponent();
 	if (!BlackboardComponent) return;
-	
+
 	if (NewTarget)
 	{
 		BlackboardComponent->SetValueAsObject(TargetBlackboardKeyName, NewTarget);
@@ -113,4 +117,29 @@ AActor* ACAIController::GetNextPerceivedActor() const
 		}
 	}
 	return nullptr;
+}
+
+void ACAIController::ForgetActorIfDead(AActor* ActorToForget)
+{
+	const UAbilitySystemComponent* ActorASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(ActorToForget);
+	if (!ActorASC) return;
+
+	// 当检测到目标 Actor 死亡时，强制让 AI 立即"遗忘"该目标
+	if (ActorASC->HasMatchingGameplayTag(CGameplayTags::Crunch_Stats_Dead))
+	{
+		for (UAIPerceptionComponent::TActorPerceptionContainer::TIterator
+		     Iter = AIPerceptionComponent->GetPerceptualDataIterator(); Iter; ++Iter)
+		{
+			if (Iter->Key != ActorToForget)
+			{
+				continue;
+			}
+
+			for (FAIStimulus& Stimulus : Iter->Value.LastSensedStimuli)
+			{
+				// 把遗忘阈值调到最大 == 自动清除
+				Stimulus.SetStimulusAge(TNumericLimits<float>::Max());
+			}
+		}
+	}
 }

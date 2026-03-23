@@ -13,6 +13,8 @@
 #include "GAS/CAttributeSet.h"
 #include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
+#include "Perception/AIPerceptionStimuliSourceComponent.h"
+#include "Perception/AISense_Sight.h"
 #include "Widgets/OverHeadStatsGauge.h"
 
 
@@ -22,7 +24,7 @@ ACCharacter::ACCharacter()
 
 	// 总是会生成
 	SpawnCollisionHandlingMethod = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
-	
+
 	// 需要把Mesh改成NoCollision,其余的Responses都可以改为Block
 	GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	GetMesh()->SetCollisionResponseToAllChannels(ECR_Block);
@@ -37,6 +39,9 @@ ACCharacter::ACCharacter()
 	OverHeadWidgetComponent->SetupAttachment(GetRootComponent());
 
 	BindGASChangeDelegates();
+
+	PerceptionStimuliSourceComponent =
+		CreateDefaultSubobject<UAIPerceptionStimuliSourceComponent>(TEXT("Perception Stimuli Source Component"));
 }
 
 void ACCharacter::ServerSideInit()
@@ -63,6 +68,8 @@ void ACCharacter::BeginPlay()
 	ConfigureOverHeadStatsWidget();
 
 	MeshRelativeTransform = GetMesh()->GetRelativeTransform();
+
+	PerceptionStimuliSourceComponent->RegisterForSense(UAISense_Sight::StaticClass());
 }
 
 void ACCharacter::PossessedBy(AController* NewController)
@@ -202,11 +209,14 @@ void ACCharacter::StartDeathSequence()
 	SetStatusGaugeEnabled(false);
 	GetCharacterMovement()->SetMovementMode(MOVE_None);
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+	SetAIPerceptionStimuliSourceEnabled(false);
 }
 
 void ACCharacter::Respawn()
 {
 	OnRespawn();
+	SetAIPerceptionStimuliSourceEnabled(true);
 	SetRagDollEnabled(false);
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 	GetCharacterMovement()->SetMovementMode(MOVE_Walking);
@@ -246,6 +256,22 @@ FGenericTeamId ACCharacter::GetGenericTeamId() const
 	return TeamID;
 }
 
+void ACCharacter::SetAIPerceptionStimuliSourceEnabled(bool bIsEnabled)
+{
+	if (!PerceptionStimuliSourceComponent)
+	{
+		return;
+	}
+
+	if (bIsEnabled)
+	{
+		PerceptionStimuliSourceComponent->RegisterWithPerceptionSystem();
+	}
+	else
+	{
+		PerceptionStimuliSourceComponent->UnregisterFromPerceptionSystem();
+	}
+}
 
 void ACCharacter::GetNetworkDebugInfo() const
 {
