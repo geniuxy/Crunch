@@ -65,6 +65,8 @@ void ACAIController::HandleTargetPerceptionUpdated(AActor* TargetActor, FAIStimu
 	}
 	else
 	{
+		// 要做到AI感应的敌人死了以后，AI感知不到
+		// 1. 需要Character死了之后关闭AI感知刺激源Comp；2. AIController感知源变化时，将对应Actor的阈值调最大以清除
 		ForgetActorIfDead(TargetActor);
 	}
 }

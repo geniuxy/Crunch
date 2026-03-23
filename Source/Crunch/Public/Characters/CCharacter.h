@@ -112,7 +112,8 @@ private:
 	/**********************************************************************/
 private:
 	void SetAIPerceptionStimuliSourceEnabled(bool bIsEnabled);
-	
+
+	// 赋予拥有该角色的演员一种自动注册为感知系统感觉刺激源
 	UPROPERTY()
 	class UAIPerceptionStimuliSourceComponent* PerceptionStimuliSourceComponent;
 

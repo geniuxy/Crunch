@@ -209,8 +209,7 @@ void ACCharacter::StartDeathSequence()
 	SetStatusGaugeEnabled(false);
 	GetCharacterMovement()->SetMovementMode(MOVE_None);
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-
-	SetAIPerceptionStimuliSourceEnabled(false);
+	SetAIPerceptionStimuliSourceEnabled(false); // 死了以后就不会被AI感知到
 }
 
 void ACCharacter::Respawn()
