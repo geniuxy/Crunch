@@ -4,6 +4,7 @@
 #include "AI/CAIController.h"
 
 #include "AbilitySystemComponent.h"
+#include "BrainComponent.h"
 #include "CGameplayTags.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "FunctionLibrary/CAbilitySystemFunctionLibrary.h"
@@ -44,6 +45,13 @@ void ACAIController::OnPossess(APawn* NewPawn)
 	if (PawnTeamInterface)
 	{
 		PawnTeamInterface->SetGenericTeamId(GetGenericTeamId());
+	}
+
+	if (UAbilitySystemComponent* OwningASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(GetPawn()))
+	{
+		OwningASC->RegisterGameplayTagEvent(CGameplayTags::Crunch_Stats_Dead).AddUObject(
+			this, &ThisClass::DeathTagUpdated
+		);
 	}
 }
 
@@ -143,5 +151,44 @@ void ACAIController::ForgetActorIfDead(AActor* ActorToForget)
 				Stimulus.SetStimulusAge(TNumericLimits<float>::Max());
 			}
 		}
+	}
+}
+
+void ACAIController::ClearAndDisableAllSenses()
+{
+	AIPerceptionComponent->AgeStimuli(TNumericLimits<float>::Max()); // 全部刺激源都设为过期
+
+	for (UAIPerceptionComponent::TAISenseConfigConstIterator SenseConfigIt =
+		     AIPerceptionComponent->GetSensesConfigIterator(); SenseConfigIt; ++SenseConfigIt)
+	{
+		AIPerceptionComponent->SetSenseEnabled((*SenseConfigIt)->GetSenseImplementation(), false);
+	}
+
+	if (GetBlackboardComponent())
+	{
+		GetBlackboardComponent()->ClearValue(TargetBlackboardKeyName);
+	}
+}
+
+void ACAIController::EnableAllSenses()
+{
+	for (UAIPerceptionComponent::TAISenseConfigConstIterator SenseConfigIt =
+				 AIPerceptionComponent->GetSensesConfigIterator(); SenseConfigIt; ++SenseConfigIt)
+	{
+		AIPerceptionComponent->SetSenseEnabled((*SenseConfigIt)->GetSenseImplementation(), true);
+	}
+}
+
+void ACAIController::DeathTagUpdated(FGameplayTag Tag, int NewCount)
+{
+	if (NewCount != 0)
+	{
+		GetBrainComponent()->StopLogic("Dead");
+		ClearAndDisableAllSenses();
+	}
+	else
+	{
+		GetBrainComponent()->StartLogic();
+		EnableAllSenses();
 	}
 }

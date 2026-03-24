@@ -38,10 +38,10 @@ namespace CGameplayTags
 		GameplayCue_CameraShake, "GameplayCue.CameraShake"
 	);
 	UE_DEFINE_GAMEPLAY_TAG(
-		GameplayCue_Hit_Crunch_Punch, "GameplayCue.Hit.Crunch.Punch"
+		GameplayCue_Hit_Impact_Crunch_Punch, "GameplayCue.Hit.Impact.Crunch.Punch"
 	);
 	UE_DEFINE_GAMEPLAY_TAG(
-		GameplayCue_Hit_Minion_Punch, "GameplayCue.Hit.Minion.Punch"
+		GameplayCue_Hit_Impact_Minion_Punch, "GameplayCue.Hit.Impact.Minion.Punch"
 	);
 	UE_DEFINE_GAMEPLAY_TAG(
 		GameplayCue_Hit_Reaction, "GameplayCue.Hit.Reaction"

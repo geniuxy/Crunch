@@ -205,6 +205,12 @@ void ACCharacter::PlayDeathAnimation()
 void ACCharacter::StartDeathSequence()
 {
 	OnDeath();
+
+	if (AbilitySystemComponent)
+	{
+		AbilitySystemComponent->CancelAllAbilities(); // 取消所有目前还激活着的Abilities
+	}
+	
 	PlayDeathAnimation();
 	SetStatusGaugeEnabled(false);
 	GetCharacterMovement()->SetMovementMode(MOVE_None);

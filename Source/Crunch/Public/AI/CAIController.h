@@ -7,6 +7,7 @@
 #include "Perception/AIPerceptionTypes.h"
 #include "CAIController.generated.h"
 
+struct FGameplayTag;
 class UAISenseConfig_Sight;
 /**
  * 
@@ -50,4 +51,9 @@ private:
 	AActor* GetNextPerceivedActor() const;
 
 	void ForgetActorIfDead(AActor* ActorToForget);
+
+	void ClearAndDisableAllSenses();
+	void EnableAllSenses();
+
+	void DeathTagUpdated(FGameplayTag Tag, int NewCount);
 };
