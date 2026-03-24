@@ -104,9 +104,12 @@ public:
 	virtual void SetGenericTeamId(const FGenericTeamId& NewTeamID) override;
 	virtual FGenericTeamId GetGenericTeamId() const override;
 	//~ End IGenericTeamAgentInterface Interface
-private:
-	UPROPERTY(Replicated)
+protected:
+	UPROPERTY(ReplicatedUsing=OnRep_TeamID)
 	FGenericTeamId TeamID;
+
+	UFUNCTION()
+	virtual void OnRep_TeamID();
 	/**********************************************************************/
 	/*                                UI                                  */
 	/**********************************************************************/
