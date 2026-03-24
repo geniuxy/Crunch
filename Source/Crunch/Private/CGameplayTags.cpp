@@ -41,6 +41,9 @@ namespace CGameplayTags
 		GameplayCue_Hit_Crunch_Punch, "GameplayCue.Hit.Crunch.Punch"
 	);
 	UE_DEFINE_GAMEPLAY_TAG(
+		GameplayCue_Hit_Minion_Punch, "GameplayCue.Hit.Minion.Punch"
+	);
+	UE_DEFINE_GAMEPLAY_TAG(
 		GameplayCue_Hit_Reaction, "GameplayCue.Hit.Reaction"
 	);
 }
