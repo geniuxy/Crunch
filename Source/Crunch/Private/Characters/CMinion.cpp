@@ -3,10 +3,25 @@
 
 #include "Characters/CMinion.h"
 
+#include "AbilitySystemComponent.h"
+#include "CGameplayTags.h"
+
 void ACMinion::SetGenericTeamId(const FGenericTeamId& InTeamID)
 {
 	Super::SetGenericTeamId(InTeamID);
 	PickSkinBasedOnTeamID();
+}
+
+bool ACMinion::IsActive() const
+{
+	return !GetAbilitySystemComponent()->HasMatchingGameplayTag(CGameplayTags::Crunch_Stats_Dead);
+}
+
+void ACMinion::Activate()
+{
+	GetAbilitySystemComponent()->RemoveActiveEffectsWithGrantedTags(
+		FGameplayTagContainer(CGameplayTags::Crunch_Stats_Dead)
+	);
 }
 
 void ACMinion::OnRep_TeamID()

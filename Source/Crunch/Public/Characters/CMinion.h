@@ -11,9 +11,13 @@ class CRUNCH_API ACMinion : public ACCharacter
 {
 	GENERATED_BODY()
 
-protected:
+public:
 	virtual void SetGenericTeamId(const FGenericTeamId& InTeamID) override;
+
+	bool IsActive() const;
+	void Activate();
 	
+protected:
 	virtual void OnRep_TeamID() override;
 
 private:
