@@ -13,6 +13,11 @@ void UValueGauge::NativePreConstruct()
 	Super::NativePreConstruct();
 
 	ProgressBar->SetFillColorAndOpacity(BarColor);
+
+	ValueText->SetFont(ValueTextFont);
+	ValueText->SetVisibility(bValueTextVisible ? ESlateVisibility::Visible : ESlateVisibility::Hidden);
+
+	ProgressBar->SetVisibility(bProgressBarVisible ? ESlateVisibility::Visible : ESlateVisibility::Hidden);
 }
 
 void UValueGauge::SetAndBoundToGameplayAttribute(
@@ -30,8 +35,12 @@ void UValueGauge::SetAndBoundToGameplayAttribute(
 			SetValue(Value, MaxValue);
 		}
 
-		AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(Attribute).AddUObject(this, &ThisClass::ValueChanged);
-		AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(MaxAttribute).AddUObject(this, &ThisClass::MaxValueChanged);
+		AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(Attribute).AddUObject(
+			this, &ThisClass::ValueChanged
+		);
+		AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(MaxAttribute).AddUObject(
+			this, &ThisClass::MaxValueChanged
+		);
 	}
 }
 
@@ -39,7 +48,7 @@ void UValueGauge::SetValue(float NewValue, float NewMaxValue)
 {
 	CachedValue = NewValue;
 	CachedMaxValue = NewMaxValue;
-	
+
 	if (NewMaxValue == 0)
 	{
 		// Debug::Print(FString::Printf(TEXT("Value Gauge : %s, NewMaxValue can't be 0"), *GetName()));
