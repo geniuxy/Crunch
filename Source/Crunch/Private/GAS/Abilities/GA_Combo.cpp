@@ -106,14 +106,14 @@ void UGA_Combo::ComboChangedEventReceived(FGameplayEventData Data)
 	if (EventTag == CGameplayTags::Crunch_Ability_BasicAttack_Event_Change_End)
 	{
 		NextComboName = NAME_None;
-		Debug::Print(TEXT("Next Combo Name清空了"));
+		// Debug::Print(TEXT("Next Combo Name清空了"));
 		return;
 	}
 
 	TArray<FName> TagNames;
 	UGameplayTagsManager::Get().SplitGameplayTagFName(EventTag, TagNames);
 	NextComboName = TagNames.Last();
-	Debug::Print(FString::Printf(TEXT("Next Combo Name:%s"), *NextComboName.ToString()));
+	// Debug::Print(FString::Printf(TEXT("Next Combo Name:%s"), *NextComboName.ToString()));
 }
 
 void UGA_Combo::DoDamage(FGameplayEventData Data)

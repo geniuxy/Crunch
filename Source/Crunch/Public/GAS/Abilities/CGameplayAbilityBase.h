@@ -25,4 +25,10 @@ protected:
 		bool bDrawDebug = false,
 		bool bIgnoreSelf = true
 	) const;
+
+	UPROPERTY(EditDefaultsOnly, Category="debug")
+	bool bShouldDrawDebug = false;
+	
+public:
+	FORCEINLINE bool ShouldDrawDebug() const { return bShouldDrawDebug; }
 };

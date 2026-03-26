@@ -23,6 +23,12 @@ public:
 	) override;
 
 private:
+	UPROPERTY(EditDefaultsOnly, Category="Targeting")
+	float TargetSweepSphereRadius = 120.f;
+	
 	UPROPERTY(EditDefaultsOnly, Category="Animation")
 	UAnimMontage* UpperCutMontage;
+
+	UFUNCTION()
+	void StartLaunching(FGameplayEventData EventData);
 };
