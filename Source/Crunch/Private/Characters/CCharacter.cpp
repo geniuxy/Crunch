@@ -166,9 +166,27 @@ void ACCharacter::SetStatusGaugeEnabled(bool bIsEnabled)
 	}
 }
 
+bool ACCharacter::IsDead() const
+{
+	return GetAbilitySystemComponent()->HasMatchingGameplayTag(CGameplayTags::Crunch_Stats_Dead);
+}
+
+void ACCharacter::RespawnImmediately()
+{
+	if (HasAuthority())
+	{
+		GetAbilitySystemComponent()->RemoveActiveEffectsWithGrantedTags(
+			FGameplayTagContainer(CGameplayTags::Crunch_Stats_Dead)
+		);
+	}
+}
+
 void ACCharacter::DeathMontageFinished()
 {
-	SetRagDollEnabled(true);
+	if (IsDead()) // 防止小兵在DeathMontageFinished触发前复活而导致的bug
+	{
+		SetRagDollEnabled(true);
+	}
 }
 
 void ACCharacter::SetRagDollEnabled(bool bIsEnabled)
@@ -210,7 +228,7 @@ void ACCharacter::StartDeathSequence()
 	{
 		AbilitySystemComponent->CancelAllAbilities(); // 取消所有目前还激活着的Abilities
 	}
-	
+
 	PlayDeathAnimation();
 	SetStatusGaugeEnabled(false);
 	GetCharacterMovement()->SetMovementMode(MOVE_None);

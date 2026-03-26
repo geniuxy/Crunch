@@ -16,14 +16,12 @@ void ACMinion::SetGenericTeamId(const FGenericTeamId& InTeamID)
 
 bool ACMinion::IsActive() const
 {
-	return !GetAbilitySystemComponent()->HasMatchingGameplayTag(CGameplayTags::Crunch_Stats_Dead);
+	return !IsDead();
 }
 
 void ACMinion::Activate()
 {
-	GetAbilitySystemComponent()->RemoveActiveEffectsWithGrantedTags(
-		FGameplayTagContainer(CGameplayTags::Crunch_Stats_Dead)
-	);
+	RespawnImmediately();
 }
 
 void ACMinion::SetGoal(AActor* InGoal)

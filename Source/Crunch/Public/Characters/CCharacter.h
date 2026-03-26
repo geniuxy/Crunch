@@ -74,6 +74,11 @@ private:
 	/**********************************************************************/
 	/*                        Death And Respawn                           */
 	/**********************************************************************/
+protected:
+	bool IsDead() const;
+
+	void RespawnImmediately();
+
 private:
 	FTransform MeshRelativeTransform; // 记录Mesh初始RelativeTransform，用于Ragdoll后恢复位置
 
