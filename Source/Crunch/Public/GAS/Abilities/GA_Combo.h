@@ -59,5 +59,4 @@ private:
 	void DoDamage(FGameplayEventData Data);
 
 	TSubclassOf<UGameplayEffect> GetCurrentEffectForCurrentCombo() const;
-	
 };
