@@ -72,6 +72,8 @@ void ACMinionBarrack::SpawnNewMinions(int Amount)
 		NewMinion->SetGenericTeamId(BarrackTeamID);
 		// FinishSpawning后，会调用AIController的OnPossess，需要在那之前些给Pawn SetGenericTeamId
 		NewMinion->FinishSpawning(SpawnTransform);
+		// 这个MinionGoal需要bCanEverAffectNavigation(Can Ever Affect Navigation) = false
+		NewMinion->SetGoal(MinionGoal);
 		MinionPool.Add(NewMinion);
 	}
 }

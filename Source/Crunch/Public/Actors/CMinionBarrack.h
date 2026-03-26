@@ -29,6 +29,9 @@ private:
 	float GroupSpawnInterval = 5.f;
 	
 	UPROPERTY(EditAnywhere, Category="Spawn")
+	AActor* MinionGoal;
+	
+	UPROPERTY(EditAnywhere, Category="Spawn")
 	TSubclassOf<ACMinion> MinionClass;
 
 	UPROPERTY(EditAnywhere, Category="Spawn")

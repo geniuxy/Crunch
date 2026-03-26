@@ -4,7 +4,9 @@
 #include "Characters/CMinion.h"
 
 #include "AbilitySystemComponent.h"
+#include "AIController.h"
 #include "CGameplayTags.h"
+#include "BehaviorTree/BlackboardComponent.h"
 
 void ACMinion::SetGenericTeamId(const FGenericTeamId& InTeamID)
 {
@@ -22,6 +24,17 @@ void ACMinion::Activate()
 	GetAbilitySystemComponent()->RemoveActiveEffectsWithGrantedTags(
 		FGameplayTagContainer(CGameplayTags::Crunch_Stats_Dead)
 	);
+}
+
+void ACMinion::SetGoal(AActor* InGoal)
+{
+	if (AAIController* AIController = GetController<AAIController>())
+	{
+		if (UBlackboardComponent* BlackboardComponent = AIController->GetBlackboardComponent())
+		{
+			BlackboardComponent->SetValueAsObject(GoalBlackboardKeyName, InGoal);
+		}
+	}
 }
 
 void ACMinion::OnRep_TeamID()
