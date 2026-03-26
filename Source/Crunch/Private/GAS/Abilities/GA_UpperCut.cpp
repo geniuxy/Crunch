@@ -11,7 +11,7 @@ void UGA_UpperCut::ActivateAbility(
 	const FGameplayAbilityActivationInfo ActivationInfo,
 	const FGameplayEventData* TriggerEventData)
 {
-	if (K2_CommitAbility())
+	if (!K2_CommitAbility())
 	{
 		K2_EndAbility();
 		return;
