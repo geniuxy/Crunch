@@ -4,34 +4,23 @@
 
 #include "CoreMinimal.h"
 #include "CGameplayAbilityBase.h"
-#include "GA_UpperCut.generated.h"
+#include "GA_Passive_Launched.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class CRUNCH_API UGA_UpperCut : public UCGameplayAbilityBase
+class CRUNCH_API UGA_Passive_Launched : public UCGameplayAbilityBase
 {
 	GENERATED_BODY()
 
 public:
+	UGA_Passive_Launched();
+
 	virtual void ActivateAbility(
 		const FGameplayAbilitySpecHandle Handle,
 		const FGameplayAbilityActorInfo* ActorInfo,
 		const FGameplayAbilityActivationInfo ActivationInfo,
 		const FGameplayEventData* TriggerEventData
 	) override;
-
-private:
-	UPROPERTY(EditDefaultsOnly, Category="Targeting")
-	float UpperCutLaunchSpeed = 1000.f;
-	
-	UPROPERTY(EditDefaultsOnly, Category="Targeting")
-	float TargetSweepSphereRadius = 120.f;
-	
-	UPROPERTY(EditDefaultsOnly, Category="Animation")
-	UAnimMontage* UpperCutMontage;
-
-	UFUNCTION()
-	void StartLaunching(FGameplayEventData EventData);
 };

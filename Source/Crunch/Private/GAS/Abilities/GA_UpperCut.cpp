@@ -30,12 +30,15 @@ void UGA_UpperCut::ActivateAbility(
 		PlayerUpperCutMontageTask->OnCompleted.AddDynamic(this, &ThisClass::K2_EndAbility);
 		PlayerUpperCutMontageTask->ReadyForActivation();
 	}
-	
-	UAbilityTask_WaitGameplayEvent* WaitLaunchingEventTask = UAbilityTask_WaitGameplayEvent::WaitGameplayEvent(
-		this, CGameplayTags::Crunch_Ability_UpperCut_Event_Damage
-	);
-	WaitLaunchingEventTask->EventReceived.AddDynamic(this, &ThisClass::StartLaunching);
-	WaitLaunchingEventTask->ReadyForActivation();
+
+	if (K2_HasAuthority())
+	{
+		UAbilityTask_WaitGameplayEvent* WaitLaunchingEventTask = UAbilityTask_WaitGameplayEvent::WaitGameplayEvent(
+			this, CGameplayTags::Crunch_Ability_UpperCut_Event_Damage
+		);
+		WaitLaunchingEventTask->EventReceived.AddDynamic(this, &ThisClass::StartLaunching);
+		WaitLaunchingEventTask->ReadyForActivation();
+	}
 }
 
 void UGA_UpperCut::StartLaunching(FGameplayEventData EventData)
@@ -43,12 +46,10 @@ void UGA_UpperCut::StartLaunching(FGameplayEventData EventData)
 	TArray<FHitResult> HitResults = GetHitResultFromSweepLocationTargetData(
 		EventData.TargetData, TargetSweepSphereRadius, ETeamAttitude::Hostile, ShouldDrawDebug()
 	);
-
-	if (K2_HasAuthority())
+	
+	PushTarget(GetAvatarActorFromActorInfo(), FVector::UpVector * UpperCutLaunchSpeed);
+	for (FHitResult HitResult : HitResults)
 	{
-		for (FHitResult HitResult : HitResults)
-		{
-			Debug::Print(FString::Printf(TEXT("I Hit: %s"), *HitResult.GetActor()->GetName()));
-		}
+		PushTarget(HitResult.GetActor(), FVector::UpVector * UpperCutLaunchSpeed);
 	}
 }

@@ -28,6 +28,14 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category="debug")
 	bool bShouldDrawDebug = false;
+
+	void PushSelf(const FVector& PushVel);
+	void PushTarget(AActor* Target, const FVector& PushVel);
+
+	ACharacter* GetOwnerAvatarCharacter();
+
+	UPROPERTY()
+	ACharacter* OwnerAvatarCharacter;
 	
 public:
 	FORCEINLINE bool ShouldDrawDebug() const { return bShouldDrawDebug; }
