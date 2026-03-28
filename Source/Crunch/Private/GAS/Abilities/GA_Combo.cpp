@@ -46,7 +46,7 @@ void UGA_Combo::ActivateAbility(
 		PlayComboMontageTask->ReadyForActivation();
 
 		UAbilityTask_WaitGameplayEvent* WaitGameplayEventTask = UAbilityTask_WaitGameplayEvent::WaitGameplayEvent(
-			this, CGameplayTags::Crunch_Ability_BasicAttack_Event_Change, nullptr, false, false
+			this, CGameplayTags::Crunch_Ability_Combo_Event_Change, nullptr, false, false
 		);
 		WaitGameplayEventTask->EventReceived.AddDynamic(this, &ThisClass::ComboChangedEventReceived);
 		WaitGameplayEventTask->ReadyForActivation();
@@ -103,7 +103,7 @@ void UGA_Combo::ComboChangedEventReceived(FGameplayEventData Data)
 {
 	FGameplayTag EventTag = Data.EventTag;
 
-	if (EventTag == CGameplayTags::Crunch_Ability_BasicAttack_Event_Change_End)
+	if (EventTag == CGameplayTags::Crunch_Ability_Combo_Event_Change_End)
 	{
 		NextComboName = NAME_None;
 		// Debug::Print(TEXT("Next Combo Name清空了"));

@@ -29,30 +29,54 @@ void UGA_UpperCut::ActivateAbility(
 		PlayerUpperCutMontageTask->OnInterrupted.AddDynamic(this, &ThisClass::K2_EndAbility);
 		PlayerUpperCutMontageTask->OnCompleted.AddDynamic(this, &ThisClass::K2_EndAbility);
 		PlayerUpperCutMontageTask->ReadyForActivation();
-	}
 
-	if (K2_HasAuthority())
-	{
 		UAbilityTask_WaitGameplayEvent* WaitLaunchingEventTask = UAbilityTask_WaitGameplayEvent::WaitGameplayEvent(
 			this, CGameplayTags::Crunch_Ability_UpperCut_Event_Damage
 		);
 		WaitLaunchingEventTask->EventReceived.AddDynamic(this, &ThisClass::StartLaunching);
 		WaitLaunchingEventTask->ReadyForActivation();
 	}
+
+	NextComboName = NAME_None;
 }
 
 void UGA_UpperCut::StartLaunching(FGameplayEventData EventData)
 {
-	TArray<FHitResult> HitResults = GetHitResultFromSweepLocationTargetData(
-		EventData.TargetData, TargetSweepSphereRadius, ETeamAttitude::Hostile, ShouldDrawDebug()
-	);
-	
-	PushTarget(GetAvatarActorFromActorInfo(), FVector::UpVector * UpperCutLaunchSpeed);
-	for (FHitResult HitResult : HitResults)
+	if (K2_HasAuthority())
 	{
-		PushTarget(HitResult.GetActor(), FVector::UpVector * UpperCutLaunchSpeed);
-		ApplyGameplayEffectToHitResultActor(
-			HitResult, LaunchDamageEffect, GetAbilityLevel(GetCurrentAbilitySpecHandle(), GetCurrentActorInfo())
+		TArray<FHitResult> HitResults = GetHitResultFromSweepLocationTargetData(
+			EventData.TargetData, TargetSweepSphereRadius, ETeamAttitude::Hostile, ShouldDrawDebug()
 		);
+
+		PushTarget(GetAvatarActorFromActorInfo(), FVector::UpVector * UpperCutLaunchSpeed);
+		for (FHitResult HitResult : HitResults)
+		{
+			PushTarget(HitResult.GetActor(), FVector::UpVector * UpperCutLaunchSpeed);
+			ApplyGameplayEffectToHitResultActor(
+				HitResult, LaunchDamageEffect, GetAbilityLevel(GetCurrentAbilitySpecHandle(), GetCurrentActorInfo())
+			);
+		}
 	}
+
+	UAbilityTask_WaitGameplayEvent* WaitComboChangeEvent = UAbilityTask_WaitGameplayEvent::WaitGameplayEvent(
+		this, CGameplayTags::Crunch_Ability_Combo_Event_Change, nullptr, false, false
+	);
+	WaitComboChangeEvent->EventReceived.AddDynamic(this, &ThisClass::UGA_UpperCut::HandleComboChangeEvent);
+	WaitComboChangeEvent->ReadyForActivation();
+}
+
+void UGA_UpperCut::HandleComboChangeEvent(FGameplayEventData EventData)
+{
+	FGameplayTag EventTag = EventData.EventTag;
+	if (EventTag == CGameplayTags::Crunch_Ability_Combo_Event_Change_End)
+	{
+		NextComboName = NAME_None;
+		Debug::Print(TEXT("Next Combo Name清空了"));
+		return;
+	}
+
+	TArray<FName> TagNames;
+	UGameplayTagsManager::Get().SplitGameplayTagFName(EventTag, TagNames);
+	NextComboName = TagNames.Last();
+	Debug::Print(FString::Printf(TEXT("Next Combo Name:%s"), *NextComboName.ToString()));
 }
