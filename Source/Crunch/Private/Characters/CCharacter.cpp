@@ -100,6 +100,9 @@ void ACCharacter::BindGASChangeDelegates()
 		AbilitySystemComponent->RegisterGameplayTagEvent(CGameplayTags::Crunch_Stats_Dead).AddUObject(
 			this, &ThisClass::DeathTagUpdated
 		);
+		AbilitySystemComponent->RegisterGameplayTagEvent(CGameplayTags::Crunch_Stats_Stun).AddUObject(
+			this, &ThisClass::StunTagUpdated
+		);
 	}
 }
 
@@ -112,6 +115,22 @@ void ACCharacter::DeathTagUpdated(FGameplayTag Tag, int NewCount)
 	else
 	{
 		Respawn();
+	}
+}
+
+void ACCharacter::StunTagUpdated(FGameplayTag Tag, int NewCount)
+{
+	if (!IsDead()) return;
+	
+	if (NewCount != 0)
+	{
+		OnStun();
+		PlayAnimMontage(StunMontage);
+	}
+	else
+	{
+		OnRecoverFromStun();
+		StopAnimMontage(StunMontage);
 	}
 }
 
@@ -266,6 +285,14 @@ void ACCharacter::OnDeath()
 }
 
 void ACCharacter::OnRespawn()
+{
+}
+
+void ACCharacter::OnStun()
+{
+}
+
+void ACCharacter::OnRecoverFromStun()
 {
 }
 

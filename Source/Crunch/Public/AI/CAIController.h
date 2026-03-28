@@ -56,4 +56,7 @@ private:
 	void EnableAllSenses();
 
 	void DeathTagUpdated(FGameplayTag Tag, int NewCount);
+	void StunTagUpdated(FGameplayTag Tag, int NewCount);
+
+	bool bIsPawnDead = false;
 };

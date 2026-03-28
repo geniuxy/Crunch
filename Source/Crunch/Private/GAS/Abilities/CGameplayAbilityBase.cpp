@@ -8,6 +8,11 @@
 #include "GameFramework/Character.h"
 #include "Kismet/KismetSystemLibrary.h"
 
+UCGameplayAbilityBase::UCGameplayAbilityBase()
+{
+	ActivationBlockedTags.AddTag(CGameplayTags::Crunch_Stats_Stun);
+}
+
 UAnimInstance* UCGameplayAbilityBase::GetOwnerAnimInstance() const
 {
 	USkeletalMeshComponent* OwnerSkeletalMeshComp = GetOwningComponentFromActorInfo();

@@ -13,6 +13,8 @@ UGA_Passive_Launched::UGA_Passive_Launched()
 	TriggerData.TriggerSource = EGameplayAbilityTriggerSource::GameplayEvent;
 	TriggerData.TriggerTag = CGameplayTags::Crunch_Ability_Passive_Launched_Event_Activate;
 	AbilityTriggers.Add(TriggerData);
+	
+	ActivationBlockedTags.RemoveTag(CGameplayTags::Crunch_Stats_Stun);
 }
 
 void UGA_Passive_Launched::ActivateAbility(

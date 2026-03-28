@@ -117,20 +117,37 @@ void ACPlayerCharacter::HandleAbilityInput(const FInputActionValue& InputActionV
 	}
 }
 
-void ACPlayerCharacter::OnDeath()
+void ACPlayerCharacter::SetInputEnabledFromPlayerController(bool bEnabled)
 {
 	APlayerController* PlayerController = GetController<APlayerController>();
-	if (PlayerController)
+	if (!PlayerController) return;
+
+	if (bEnabled)
+	{
+		EnableInput(PlayerController);
+	}
+	else
 	{
 		DisableInput(PlayerController);
 	}
 }
 
+void ACPlayerCharacter::OnDeath()
+{
+	SetInputEnabledFromPlayerController(false);
+}
+
 void ACPlayerCharacter::OnRespawn()
 {
-	APlayerController* PlayerController = GetController<APlayerController>();
-	if (PlayerController)
-	{
-		EnableInput(PlayerController);
-	}
+	SetInputEnabledFromPlayerController(true);
+}
+
+void ACPlayerCharacter::OnStun()
+{
+	SetInputEnabledFromPlayerController(false);
+}
+
+void ACPlayerCharacter::OnRecoverFromStun()
+{
+	SetInputEnabledFromPlayerController(true);
 }

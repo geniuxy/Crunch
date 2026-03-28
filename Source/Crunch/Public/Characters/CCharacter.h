@@ -42,6 +42,7 @@ private:
 	void BindGASChangeDelegates();
 
 	void DeathTagUpdated(FGameplayTag Tag, int NewCount);
+	void StunTagUpdated(FGameplayTag Tag, int NewCount);
 
 	UPROPERTY(VisibleDefaultsOnly, Category = "Gameplay Ability")
 	UCAbilitySystemComponent* AbilitySystemComponent;
@@ -98,8 +99,21 @@ private:
 	void StartDeathSequence();
 	void Respawn();
 
+protected:
 	virtual void OnDeath();
 	virtual void OnRespawn();
+
+	/**********************************************************************/
+	/*                               Stun                                 */
+	/**********************************************************************/
+
+private:
+	UPROPERTY(EditDefaultsOnly, Category="Stun")
+	UAnimMontage* StunMontage;
+
+protected:
+	virtual void OnStun();
+	virtual void OnRecoverFromStun();
 
 	/**********************************************************************/
 	/*                                Team                                */

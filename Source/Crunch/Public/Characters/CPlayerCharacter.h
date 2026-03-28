@@ -55,11 +55,21 @@ private:
 
 	void HandleAbilityInput(const FInputActionValue& InputActionValue, ECAbilityInputID InputID);
 
+	void SetInputEnabledFromPlayerController(bool bEnabled);
+	
 	/**********************************************************************/
-	/*                              Input                                 */
+	/*                         Death And Respawn                          */
 	/**********************************************************************/
 
-private:
+protected:
 	virtual void OnDeath() override;
 	virtual void OnRespawn() override;
+
+	/**********************************************************************/
+	/*                               Stun                                 */
+	/**********************************************************************/
+
+protected:
+	virtual void OnStun() override;
+	virtual void OnRecoverFromStun() override;
 };
