@@ -51,5 +51,8 @@ void UGA_UpperCut::StartLaunching(FGameplayEventData EventData)
 	for (FHitResult HitResult : HitResults)
 	{
 		PushTarget(HitResult.GetActor(), FVector::UpVector * UpperCutLaunchSpeed);
+		ApplyGameplayEffectToHitResultActor(
+			HitResult, LaunchDamageEffect, GetAbilityLevel(GetCurrentAbilitySpecHandle(), GetCurrentActorInfo())
+		);
 	}
 }

@@ -5,6 +5,9 @@ namespace CGameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(
 		Crunch_Stats_Dead, "Crunch.Stats.Dead"
 	);
+	UE_DEFINE_GAMEPLAY_TAG(
+		Crunch_Stats_Stun, "Crunch.Stats.Stun"
+	);
 
 	UE_DEFINE_GAMEPLAY_TAG(
 		Crunch_Ability_BasicAttack, "Crunch.Ability.BasicAttack"
@@ -34,7 +37,9 @@ namespace CGameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(
 		Crunch_Ability_UpperCut_Event_Damage, "Crunch.Ability.UpperCut.Event.Damage"
 	);
-
+	UE_DEFINE_GAMEPLAY_TAG(
+		Crunch_Ability_UpperCut_CoolDown, "Crunch.Ability.UpperCut.CoolDown"
+	);
 	UE_DEFINE_GAMEPLAY_TAG(
 		Crunch_Ability_Passive_Launched_Event_Activate, "Crunch.Ability.Passive.Launched.Event.Activate"
 	);

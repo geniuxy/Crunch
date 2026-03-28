@@ -123,22 +123,8 @@ void UGA_Combo::DoDamage(FGameplayEventData Data)
 	for (FHitResult HitResult : HitResults)
 	{
 		TSubclassOf<UGameplayEffect> EffectForCurrentCombo = GetCurrentEffectForCurrentCombo();
-		FGameplayEffectSpecHandle EffectSpecHandle = MakeOutgoingGameplayEffectSpec(
-			EffectForCurrentCombo,
-			GetAbilityLevel(GetCurrentAbilitySpecHandle(), GetCurrentActorInfo())
-		);
-
-		FGameplayEffectContextHandle EffectContext = MakeEffectContext(GetCurrentAbilitySpecHandle(), GetCurrentActorInfo());
-		EffectContext.AddHitResult(HitResult);
-
-		EffectSpecHandle.Data->SetContext(EffectContext);
-
-		ApplyGameplayEffectSpecToTarget(
-			GetCurrentAbilitySpecHandle(),
-			GetCurrentActorInfo(),
-			GetCurrentActivationInfo(),
-			EffectSpecHandle,
-			UAbilitySystemBlueprintLibrary::AbilityTargetDataFromHitResult(HitResult)
+		ApplyGameplayEffectToHitResultActor(
+			HitResult, EffectForCurrentCombo, GetAbilityLevel(GetCurrentAbilitySpecHandle(), GetCurrentActorInfo())
 		);
 	}
 }

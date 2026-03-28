@@ -36,7 +36,11 @@ protected:
 
 	UPROPERTY()
 	ACharacter* OwnerAvatarCharacter;
-	
+
+	void ApplyGameplayEffectToHitResultActor(
+		const FHitResult& HitResult, TSubclassOf<UGameplayEffect> GameplayEffect, int Level = 1
+	);
+
 public:
 	FORCEINLINE bool ShouldDrawDebug() const { return bShouldDrawDebug; }
 };

@@ -107,3 +107,23 @@ ACharacter* UCGameplayAbilityBase::GetOwnerAvatarCharacter()
 
 	return OwnerAvatarCharacter;
 }
+
+void UCGameplayAbilityBase::ApplyGameplayEffectToHitResultActor(
+	const FHitResult& HitResult, TSubclassOf<UGameplayEffect> GameplayEffect, int Level)
+{
+	FGameplayEffectSpecHandle EffectSpecHandle = MakeOutgoingGameplayEffectSpec(GameplayEffect, Level);
+
+	FGameplayEffectContextHandle EffectContext =
+		MakeEffectContext(GetCurrentAbilitySpecHandle(), GetCurrentActorInfo());
+	EffectContext.AddHitResult(HitResult);
+
+	EffectSpecHandle.Data->SetContext(EffectContext);
+
+	ApplyGameplayEffectSpecToTarget(
+		GetCurrentAbilitySpecHandle(),
+		GetCurrentActorInfo(),
+		GetCurrentActivationInfo(),
+		EffectSpecHandle,
+		UAbilitySystemBlueprintLibrary::AbilityTargetDataFromHitResult(HitResult)
+	);
+}
