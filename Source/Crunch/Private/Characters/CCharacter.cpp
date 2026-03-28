@@ -120,7 +120,7 @@ void ACCharacter::DeathTagUpdated(FGameplayTag Tag, int NewCount)
 
 void ACCharacter::StunTagUpdated(FGameplayTag Tag, int NewCount)
 {
-	if (!IsDead()) return;
+	if (IsDead()) return;
 	
 	if (NewCount != 0)
 	{
