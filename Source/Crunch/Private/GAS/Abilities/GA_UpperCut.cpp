@@ -76,6 +76,17 @@ void UGA_UpperCut::StartLaunching(FGameplayEventData EventData)
 		this, &ThisClass::UGA_UpperCut::HandleBasicAttackComboCommitEvent
 	);
 	WaitBasicAttackComboCommitEvent->ReadyForActivation();
+
+	if (K2_HasAuthority())
+	{
+		UAbilityTask_WaitGameplayEvent* WaitBasicAttackComboDamageEvent = UAbilityTask_WaitGameplayEvent::WaitGameplayEvent(
+			this, CGameplayTags::Crunch_Ability_BasicAttack_Event_Damage
+		);
+		WaitBasicAttackComboDamageEvent->EventReceived.AddDynamic(
+			this, &ThisClass::UGA_UpperCut::HandleBasicAttackComboDamageEvent
+		);
+		WaitBasicAttackComboDamageEvent->ReadyForActivation();
+	}
 }
 
 void UGA_UpperCut::HandleComboChangeEvent(FGameplayEventData EventData)
@@ -84,17 +95,50 @@ void UGA_UpperCut::HandleComboChangeEvent(FGameplayEventData EventData)
 	if (EventTag == CGameplayTags::Crunch_Ability_Combo_Event_Change_End)
 	{
 		NextComboName = NAME_None;
-		Debug::Print(TEXT("Next Combo Name清空了"));
 		return;
 	}
 
 	TArray<FName> TagNames;
 	UGameplayTagsManager::Get().SplitGameplayTagFName(EventTag, TagNames);
 	NextComboName = TagNames.Last();
-	Debug::Print(FString::Printf(TEXT("Next Combo Name:%s"), *NextComboName.ToString()));
 }
 
 void UGA_UpperCut::HandleBasicAttackComboCommitEvent(FGameplayEventData EventData)
 {
-	Debug::Print(FString::Printf(TEXT("Basic Attack Combo Commit")));
+	if (NextComboName == NAME_None)
+	{
+		return;
+	}
+
+	UAnimInstance* OwnerAnimInstance = GetOwnerAnimInstance();
+	if (!OwnerAnimInstance)
+	{
+		return;
+	}
+
+	// woc 天才，这样子就可以不涉及动画之间的过渡，Combo1打完就会自动打Combo2
+	OwnerAnimInstance->Montage_SetNextSection(
+		OwnerAnimInstance->Montage_GetCurrentSection(UpperCutMontage),
+		NextComboName,
+		UpperCutMontage
+	);
+}
+
+void UGA_UpperCut::HandleBasicAttackComboDamageEvent(FGameplayEventData EventData)
+{
+	if (K2_HasAuthority())
+	{
+		TArray<FHitResult> HitResults = GetHitResultFromSweepLocationTargetData(
+			EventData.TargetData, TargetSweepSphereRadius, ETeamAttitude::Hostile, ShouldDrawDebug()
+		);
+
+		PushTarget(GetAvatarActorFromActorInfo(), FVector::UpVector * UpperCutHoldSpeed);
+		for (FHitResult HitResult : HitResults)
+		{
+			PushTarget(HitResult.GetActor(), FVector::UpVector * UpperCutHoldSpeed);
+			ApplyGameplayEffectToHitResultActor(
+				HitResult, LaunchDamageEffect, GetAbilityLevel(GetCurrentAbilitySpecHandle(), GetCurrentActorInfo())
+			);
+		}
+	}
 }

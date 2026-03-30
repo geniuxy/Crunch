@@ -5,7 +5,9 @@
 
 #include "AbilitySystemBlueprintLibrary.h"
 #include "CGameplayTags.h"
+#include "CrunchDebugHelper.h"
 #include "GameFramework/Character.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/KismetSystemLibrary.h"
 
 UCGameplayAbilityBase::UCGameplayAbilityBase()

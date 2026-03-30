@@ -30,6 +30,9 @@ private:
 	
 	UPROPERTY(EditDefaultsOnly, Category="Launch")
 	float UpperCutLaunchSpeed = 1000.f;
+
+	UPROPERTY(EditDefaultsOnly, Category="Launch")
+	float UpperCutHoldSpeed = 100.f;
 	
 	UPROPERTY(EditDefaultsOnly, Category="Targeting")
 	float TargetSweepSphereRadius = 120.f;
@@ -44,6 +47,8 @@ private:
 	void HandleComboChangeEvent(FGameplayEventData EventData);
 	UFUNCTION()
 	void HandleBasicAttackComboCommitEvent(FGameplayEventData EventData);
+	UFUNCTION()
+	void HandleBasicAttackComboDamageEvent(FGameplayEventData EventData);
 
 	FName NextComboName;
 };
