@@ -261,7 +261,7 @@ void ACCharacter::StartDeathSequence()
 
 	PlayDeathAnimation();
 	SetStatusGaugeEnabled(false);
-	GetCharacterMovement()->SetMovementMode(MOVE_None);
+	// GetCharacterMovement()->SetMovementMode(MOVE_None); // 设置为MOVE_None便不会移动了，不适合被击飞的情况
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	SetAIPerceptionStimuliSourceEnabled(false); // 死了以后就不会被AI感知到
 }
@@ -272,7 +272,7 @@ void ACCharacter::Respawn()
 	SetAIPerceptionStimuliSourceEnabled(true);
 	SetRagDollEnabled(false);
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-	GetCharacterMovement()->SetMovementMode(MOVE_Walking);
+	// GetCharacterMovement()->SetMovementMode(MOVE_Walking);
 	GetMesh()->GetAnimInstance()->StopAllMontages(0.f);
 	SetStatusGaugeEnabled(true);
 

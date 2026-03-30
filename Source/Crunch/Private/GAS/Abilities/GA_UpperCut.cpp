@@ -4,7 +4,6 @@
 #include "GAS/Abilities/GA_UpperCut.h"
 
 #include "CGameplayTags.h"
-#include "CrunchDebugHelper.h"
 #include "Abilities/Tasks/AbilityTask_PlayMontageAndWait.h"
 #include "Abilities/Tasks/AbilityTask_WaitGameplayEvent.h"
 
@@ -43,6 +42,19 @@ void UGA_UpperCut::ActivateAbility(
 	}
 
 	NextComboName = NAME_None;
+}
+
+const FGenericDamageEffectDef* UGA_UpperCut::GetDamageEffectDefForCurrentCombo() const
+{
+	if (UAnimInstance* OwnerAnimInstance = GetOwnerAnimInstance())
+	{
+		const FName CurrentSectionName = OwnerAnimInstance->Montage_GetCurrentSection(UpperCutMontage);
+		if (const FGenericDamageEffectDef* FoundEffectPtr = ComboDamageMap.Find(CurrentSectionName))
+		{
+			return FoundEffectPtr;
+		}
+	}
+	return nullptr;
 }
 
 void UGA_UpperCut::StartLaunching(FGameplayEventData EventData)
@@ -133,9 +145,14 @@ void UGA_UpperCut::HandleBasicAttackComboDamageEvent(FGameplayEventData EventDat
 		);
 
 		PushTarget(GetAvatarActorFromActorInfo(), FVector::UpVector * UpperCutHoldSpeed);
+		const FGenericDamageEffectDef* EffectDef = GetDamageEffectDefForCurrentCombo();
+		if (!EffectDef) return;
+		
 		for (FHitResult HitResult : HitResults)
 		{
-			PushTarget(HitResult.GetActor(), FVector::UpVector * UpperCutHoldSpeed);
+			// 根据释放技能角色的朝向，向释放技能角色的"前/上/右"等方向飞
+			FVector PushVel = GetAvatarActorFromActorInfo()->GetActorTransform().TransformVector(EffectDef->PushVel);
+			PushTarget(HitResult.GetActor(), PushVel);
 			ApplyGameplayEffectToHitResultActor(
 				HitResult, LaunchDamageEffect, GetAbilityLevel(GetCurrentAbilitySpecHandle(), GetCurrentActorInfo())
 			);
