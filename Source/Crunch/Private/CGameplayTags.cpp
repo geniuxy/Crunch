@@ -31,6 +31,10 @@ namespace CGameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(
 		Crunch_Ability_BasicAttack, "Crunch.Ability.BasicAttack"
 	);
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(
+		Crunch_Ability_BasicAttack_Event_Pressed, "Crunch.Ability.BasicAttack.Event.Pressed",
+		"可以用在其他Ability需要普攻Combo时，对技能输入的检测，比如UpperCut时需要输入普攻进行Combo"
+	);
 	UE_DEFINE_GAMEPLAY_TAG(
 		Crunch_Ability_BasicAttack_Event_Damage, "Crunch.Ability.BasicAttack.Event.Damage"
 	);

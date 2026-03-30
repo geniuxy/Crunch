@@ -38,6 +38,9 @@ protected:
 public:
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 
+	UFUNCTION(Server, Reliable, WithValidation)
+	void Server_SendGameplayEventToSelf(FGameplayTag EventTag, FGameplayEventData Payload);
+
 private:
 	void BindGASChangeDelegates();
 

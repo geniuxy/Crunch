@@ -3,10 +3,13 @@
 
 #include "Crunch/Public/Characters/CPlayerCharacter.h"
 
+#include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystemComponent.h"
+#include "CGameplayTags.h"
 #include "Camera/CameraComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "EnhancedInputComponent.h"
+#include "CTypes/CEnum.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 
@@ -114,6 +117,14 @@ void ACPlayerCharacter::HandleAbilityInput(const FInputActionValue& InputActionV
 	else
 	{
 		GetAbilitySystemComponent()->AbilityLocalInputReleased((int32)InputID);
+	}
+
+	if (InputID == ECAbilityInputID::BasicAttack)
+	{
+		// UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(
+		// 	this, CGameplayTags::Crunch_Ability_BasicAttack_Event_Pressed, FGameplayEventData()
+		// );
+		Server_SendGameplayEventToSelf(CGameplayTags::Crunch_Ability_BasicAttack_Event_Pressed, FGameplayEventData());
 	}
 }
 

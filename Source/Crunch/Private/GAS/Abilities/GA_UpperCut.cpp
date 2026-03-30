@@ -8,6 +8,11 @@
 #include "Abilities/Tasks/AbilityTask_PlayMontageAndWait.h"
 #include "Abilities/Tasks/AbilityTask_WaitGameplayEvent.h"
 
+UGA_UpperCut::UGA_UpperCut()
+{
+	BlockAbilitiesWithTag.AddTag(CGameplayTags::Crunch_Ability_BasicAttack);
+}
+
 void UGA_UpperCut::ActivateAbility(
 	const FGameplayAbilitySpecHandle Handle,
 	const FGameplayAbilityActorInfo* ActorInfo,
@@ -63,6 +68,14 @@ void UGA_UpperCut::StartLaunching(FGameplayEventData EventData)
 	);
 	WaitComboChangeEvent->EventReceived.AddDynamic(this, &ThisClass::UGA_UpperCut::HandleComboChangeEvent);
 	WaitComboChangeEvent->ReadyForActivation();
+
+	UAbilityTask_WaitGameplayEvent* WaitBasicAttackComboCommitEvent = UAbilityTask_WaitGameplayEvent::WaitGameplayEvent(
+		this, CGameplayTags::Crunch_Ability_BasicAttack_Event_Pressed
+	);
+	WaitBasicAttackComboCommitEvent->EventReceived.AddDynamic(
+		this, &ThisClass::UGA_UpperCut::HandleBasicAttackComboCommitEvent
+	);
+	WaitBasicAttackComboCommitEvent->ReadyForActivation();
 }
 
 void UGA_UpperCut::HandleComboChangeEvent(FGameplayEventData EventData)
@@ -79,4 +92,9 @@ void UGA_UpperCut::HandleComboChangeEvent(FGameplayEventData EventData)
 	UGameplayTagsManager::Get().SplitGameplayTagFName(EventTag, TagNames);
 	NextComboName = TagNames.Last();
 	Debug::Print(FString::Printf(TEXT("Next Combo Name:%s"), *NextComboName.ToString()));
+}
+
+void UGA_UpperCut::HandleBasicAttackComboCommitEvent(FGameplayEventData EventData)
+{
+	Debug::Print(FString::Printf(TEXT("Basic Attack Combo Commit")));
 }

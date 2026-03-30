@@ -3,6 +3,7 @@
 
 #include "Crunch/Public/Characters/CCharacter.h"
 
+#include "AbilitySystemBlueprintLibrary.h"
 #include "CGameplayTags.h"
 #include "CrunchDebugHelper.h"
 #include "Components/CapsuleComponent.h"
@@ -91,6 +92,16 @@ void ACCharacter::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& Ou
 UAbilitySystemComponent* ACCharacter::GetAbilitySystemComponent() const
 {
 	return AbilitySystemComponent;
+}
+
+void ACCharacter::Server_SendGameplayEventToSelf_Implementation(FGameplayTag EventTag, FGameplayEventData Payload)
+{
+	UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(this, EventTag, Payload);
+}
+
+bool ACCharacter::Server_SendGameplayEventToSelf_Validate(FGameplayTag EventTag, FGameplayEventData Payload)
+{
+	return true;
 }
 
 void ACCharacter::BindGASChangeDelegates()

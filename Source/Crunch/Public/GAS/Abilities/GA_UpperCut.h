@@ -15,6 +15,8 @@ class CRUNCH_API UGA_UpperCut : public UCGameplayAbilityBase
 	GENERATED_BODY()
 
 public:
+	UGA_UpperCut();
+	
 	virtual void ActivateAbility(
 		const FGameplayAbilitySpecHandle Handle,
 		const FGameplayAbilityActorInfo* ActorInfo,
@@ -40,6 +42,8 @@ private:
 
 	UFUNCTION()
 	void HandleComboChangeEvent(FGameplayEventData EventData);
+	UFUNCTION()
+	void HandleBasicAttackComboCommitEvent(FGameplayEventData EventData);
 
 	FName NextComboName;
 };
