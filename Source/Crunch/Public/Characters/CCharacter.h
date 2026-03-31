@@ -3,12 +3,15 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Character.h"
+#include "Abilities/GameplayAbilityTypes.h"
 #include "AbilitySystemInterface.h"
+#include "CTypes/CEnum.h"
+#include "GameFramework/Character.h"
 #include "GameplayTagContainer.h"
 #include "GenericTeamAgentInterface.h"
 #include "CCharacter.generated.h"
 
+class UGameplayAbility;
 class UCAttributeSet;
 class UCAbilitySystemComponent;
 class UWidgetComponent;
@@ -40,6 +43,8 @@ public:
 
 	UFUNCTION(Server, Reliable, WithValidation)
 	void Server_SendGameplayEventToSelf(FGameplayTag EventTag, FGameplayEventData Payload);
+
+	const TMap<ECAbilityInputID, TSubclassOf<UGameplayAbility>>& GetAbilities() const;
 
 private:
 	void BindGASChangeDelegates();

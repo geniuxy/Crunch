@@ -6,6 +6,8 @@
 #include "Blueprint/UserWidget.h"
 #include "GameplayWidget.generated.h"
 
+class UGameplayAbility;
+enum class ECAbilityInputID : uint8;
 class UAbilitySystemComponent;
 class UValueGauge;
 /**
@@ -18,6 +20,8 @@ class CRUNCH_API UGameplayWidget : public UUserWidget
 
 public:
 	virtual void NativeConstruct() override;
+
+	void ConfigureAbilities(const TMap<ECAbilityInputID, TSubclassOf<UGameplayAbility>>& Abilities);
 
 private:
 	UPROPERTY(meta=(BindWidget))

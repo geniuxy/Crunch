@@ -7,7 +7,6 @@
 #include "InputMappingContext.h"
 #include "CPlayerCharacter.generated.h"
 
-enum class ECAbilityInputID : uint8;
 struct FInputActionValue;
 class UInputAction;
 class USpringArmComponent;

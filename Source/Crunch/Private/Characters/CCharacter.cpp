@@ -104,6 +104,11 @@ bool ACCharacter::Server_SendGameplayEventToSelf_Validate(FGameplayTag EventTag,
 	return true;
 }
 
+const TMap<ECAbilityInputID, TSubclassOf<UGameplayAbility>>& ACCharacter::GetAbilities() const
+{
+	return AbilitySystemComponent->GetAbilities();
+}
+
 void ACCharacter::BindGASChangeDelegates()
 {
 	if (AbilitySystemComponent)
@@ -132,7 +137,7 @@ void ACCharacter::DeathTagUpdated(FGameplayTag Tag, int NewCount)
 void ACCharacter::StunTagUpdated(FGameplayTag Tag, int NewCount)
 {
 	if (IsDead()) return;
-	
+
 	if (NewCount != 0)
 	{
 		OnStun();
