@@ -7,6 +7,7 @@
 #include "CTypes/CEnum.h"
 #include "AbilityListView.generated.h"
 
+struct FAbilityWidgetData;
 class UGameplayAbility;
 /**
  * 
@@ -18,4 +19,12 @@ class CRUNCH_API UAbilityListView : public UListView
 
 public:
 	void ConfigureAbilities(const TMap<ECAbilityInputID, TSubclassOf<UGameplayAbility>>& Abilities);
+
+private:
+	UPROPERTY(EditAnywhere, Category="Data")
+	UDataTable* AbilityDataTable;
+
+	void AbilityGaugeGenerated(UUserWidget& Widget);
+
+	const FAbilityWidgetData* FindWidgetDataForAbility(const TSubclassOf<UGameplayAbility>& AbilityClass) const;
 };

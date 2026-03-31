@@ -7,6 +7,7 @@
 #include "Blueprint/UserWidget.h"
 #include "AbilityGauge.generated.h"
 
+struct FAbilityWidgetData;
 class UTextBlock;
 class UImage;
 /**
@@ -20,6 +21,8 @@ class CRUNCH_API UAbilityGauge : public UUserWidget, public IUserObjectListEntry
 public:
 	virtual void NativeOnListItemObjectSet(UObject* ListItemObject) override;
 
+	void ConfigureWithWidgetData(const FAbilityWidgetData* WidgetData);
+
 private:
 	UPROPERTY(meta=(BindWidget))
 	UImage* Icon;
@@ -29,7 +32,10 @@ private:
 
 	UPROPERTY(meta=(BindWidget))
 	UTextBlock* CoolDownDurationText;
-	
+
 	UPROPERTY(meta=(BindWidget))
 	UTextBlock* CostText;
+
+	UPROPERTY(EditDefaultsOnly, Category="Visual")
+	FName IconMaterialParamName = "Icon";
 };
