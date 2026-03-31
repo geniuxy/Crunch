@@ -43,7 +43,7 @@ namespace CGameplayTags
 		Crunch_Ability_UpperCut_Event_Damage, "Crunch.Ability.UpperCut.Event.Damage"
 	);
 	UE_DEFINE_GAMEPLAY_TAG(
-		Crunch_Ability_UpperCut_CoolDown, "Crunch.Ability.UpperCut.CoolDown"
+		Crunch_Ability_UpperCut_Cooldown, "Crunch.Ability.UpperCut.Cooldown"
 	);
 	UE_DEFINE_GAMEPLAY_TAG(
 		Crunch_Ability_Passive_Launched_Event_Activate, "Crunch.Ability.Passive.Launched.Event.Activate"

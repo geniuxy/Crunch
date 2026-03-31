@@ -7,6 +7,7 @@
 #include "Blueprint/UserWidget.h"
 #include "AbilityGauge.generated.h"
 
+class UGameplayAbility;
 struct FAbilityWidgetData;
 class UTextBlock;
 class UImage;
@@ -19,6 +20,7 @@ class CRUNCH_API UAbilityGauge : public UUserWidget, public IUserObjectListEntry
 	GENERATED_BODY()
 
 public:
+	virtual void NativeConstruct() override;
 	virtual void NativeOnListItemObjectSet(UObject* ListItemObject) override;
 
 	void ConfigureWithWidgetData(const FAbilityWidgetData* WidgetData);
@@ -28,13 +30,16 @@ private:
 	UImage* Icon;
 
 	UPROPERTY(meta=(BindWidget))
-	UTextBlock* CoolDownCounterText;
+	UTextBlock* CooldownCounterText; // Counter计数器，这里指冷却倒计时
 
 	UPROPERTY(meta=(BindWidget))
-	UTextBlock* CoolDownDurationText;
+	UTextBlock* CooldownDurationText;
 
 	UPROPERTY(meta=(BindWidget))
 	UTextBlock* CostText;
+
+	UPROPERTY()
+	UGameplayAbility* AbilityCDO; // AbilityGauge所指向的Ability, CDO(Class Default Object)
 
 	UPROPERTY(EditDefaultsOnly, Category="Visual")
 	FName IconMaterialParamName = "Icon";

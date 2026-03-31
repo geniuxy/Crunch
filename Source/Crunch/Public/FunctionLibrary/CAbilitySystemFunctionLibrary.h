@@ -15,4 +15,6 @@ class CRUNCH_API UCAbilitySystemFunctionLibrary : public UAbilitySystemBlueprint
 	GENERATED_BODY()
 
 public:
+	static float GetStaticCooldownDurationForAbility(const UGameplayAbility* Ability);
+	static float GetStaticCostForAbility(const UGameplayAbility* Ability);
 };
