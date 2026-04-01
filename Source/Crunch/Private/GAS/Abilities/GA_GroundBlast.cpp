@@ -3,7 +3,13 @@
 
 #include "GAS/Abilities/GA_GroundBlast.h"
 
+#include "CGameplayTags.h"
 #include "Abilities/Tasks/AbilityTask_PlayMontageAndWait.h"
+
+UGA_GroundBlast::UGA_GroundBlast()
+{
+	ActivationOwnedTags.AddTag(CGameplayTags::Crunch_Stats_Aim);
+}
 
 void UGA_GroundBlast::ActivateAbility(
 	const FGameplayAbilitySpecHandle Handle,

@@ -15,6 +15,8 @@ class CRUNCH_API UGA_GroundBlast : public UCGameplayAbilityBase
 	GENERATED_BODY()
 
 public:
+	UGA_GroundBlast();
+	
 	virtual void ActivateAbility(
 		const FGameplayAbilitySpecHandle Handle,
 		const FGameplayAbilityActorInfo* ActorInfo,

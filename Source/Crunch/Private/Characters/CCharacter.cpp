@@ -119,6 +119,9 @@ void ACCharacter::BindGASChangeDelegates()
 		AbilitySystemComponent->RegisterGameplayTagEvent(CGameplayTags::Crunch_Stats_Stun).AddUObject(
 			this, &ThisClass::StunTagUpdated
 		);
+		AbilitySystemComponent->RegisterGameplayTagEvent(CGameplayTags::Crunch_Stats_Aim).AddUObject(
+			this, &ThisClass::AimTagUpdated
+		);
 	}
 }
 
@@ -148,6 +151,17 @@ void ACCharacter::StunTagUpdated(FGameplayTag Tag, int NewCount)
 		OnRecoverFromStun();
 		StopAnimMontage(StunMontage);
 	}
+}
+
+void ACCharacter::AimTagUpdated(FGameplayTag Tag, int NewCount)
+{
+	SetIsAiming(NewCount != 0);
+}
+
+void ACCharacter::SetIsAiming(bool bIsAiming)
+{
+	bUseControllerRotationYaw = bIsAiming;
+	GetCharacterMovement()->bOrientRotationToMovement = !bIsAiming;
 }
 
 void ACCharacter::ConfigureOverHeadStatsWidget()

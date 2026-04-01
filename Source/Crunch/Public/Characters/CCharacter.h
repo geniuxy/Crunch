@@ -51,6 +51,8 @@ private:
 
 	void DeathTagUpdated(FGameplayTag Tag, int NewCount);
 	void StunTagUpdated(FGameplayTag Tag, int NewCount);
+	void AimTagUpdated(FGameplayTag Tag, int NewCount);
+	void SetIsAiming(bool bIsAiming);
 
 	UPROPERTY(VisibleDefaultsOnly, Category = "Gameplay Ability")
 	UCAbilitySystemComponent* AbilitySystemComponent;
