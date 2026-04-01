@@ -3,6 +3,9 @@
 
 #include "Animations/CAnimInstance.h"
 
+#include "AbilitySystemBlueprintLibrary.h"
+#include "AbilitySystemComponent.h"
+#include "CGameplayTags.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/KismetMathLibrary.h"
@@ -13,6 +16,14 @@ void UCAnimInstance::NativeInitializeAnimation()
 	if (OwnerCharacter)
 	{
 		OwnerMovementComp = OwnerCharacter->GetCharacterMovement();
+	}
+
+	UAbilitySystemComponent* OwnerASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(TryGetPawnOwner());
+	if (OwnerASC)
+	{
+		OwnerASC->RegisterGameplayTagEvent(CGameplayTags::Crunch_Stats_Aim).AddUObject(
+			this, &ThisClass::OwnerAimTagUpdated
+		);
 	}
 }
 
@@ -36,6 +47,9 @@ void UCAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 
 		FRotator ControlRot = OwnerCharacter->GetBaseAimRotation();
 		LookRotOffset = UKismetMathLibrary::NormalizedDeltaRotator(ControlRot, BodyRot);
+		
+		FwdSpeed = Velocity.Dot(ControlRot.Vector()); // .Vector()会将转向变成单位向量
+		RightSpeed = Velocity.Dot(ControlRot.Vector().Cross(FVector::UpVector));
 	}
 
 	if (OwnerMovementComp)
@@ -48,8 +62,12 @@ void UCAnimInstance::NativeThreadSafeUpdateAnimation(float DeltaSeconds)
 {
 }
 
-bool UCAnimInstance::ShouldDoFullBody() const
+bool UCAnimInstance::ShouldDoUpperBodyBlend() const
 {
-	// return (GetSpeed() <= 0) && !(GetIsAimming());
-	return GetSpeed() <= 0;
+	return (GetSpeed() > 0) || (GetIsAiming());
+}
+
+void UCAnimInstance::OwnerAimTagUpdated(const FGameplayTag Tag, int32 NewCount)
+{
+	bIsAiming = NewCount != 0;
 }

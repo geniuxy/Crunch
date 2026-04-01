@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameplayTagContainer.h"
 #include "Animation/AnimInstance.h"
 #include "CAnimInstance.generated.h"
 
@@ -24,6 +25,12 @@ public:
 	FORCEINLINE float GetSpeed() const { return Speed; }
 
 	UFUNCTION(BlueprintPure, meta=(BlueprintThreadSafe))
+	FORCEINLINE float GetFwdSpeed() const { return FwdSpeed; }
+
+	UFUNCTION(BlueprintPure, meta=(BlueprintThreadSafe))
+	FORCEINLINE float GetRightSpeed() const { return RightSpeed; }
+
+	UFUNCTION(BlueprintPure, meta=(BlueprintThreadSafe))
 	FORCEINLINE bool IsMoving() const { return Speed != 0.f; }
 
 	UFUNCTION(BlueprintPure, meta=(BlueprintThreadSafe))
@@ -39,13 +46,16 @@ public:
 	FORCEINLINE bool GetIsOnGround() const { return !bIsJumping; }
 
 	UFUNCTION(BlueprintPure, meta=(BlueprintThreadSafe))
+	FORCEINLINE bool GetIsAiming() const { return bIsAiming; }
+
+	UFUNCTION(BlueprintPure, meta=(BlueprintThreadSafe))
 	FORCEINLINE float GetLookYawOffset() const { return LookRotOffset.Yaw; }
 
 	UFUNCTION(BlueprintPure, meta=(BlueprintThreadSafe))
 	FORCEINLINE float GetLookPitchOffset() const { return LookRotOffset.Pitch; }
 
 	UFUNCTION(BlueprintCallable, meta=(BlueprintThreadSafe))
-	bool ShouldDoFullBody() const;
+	bool ShouldDoUpperBodyBlend() const;
 
 private:
 	UPROPERTY()
@@ -55,6 +65,8 @@ private:
 	UCharacterMovementComponent* OwnerMovementComp;
 
 	float Speed;
+	float FwdSpeed;
+	float RightSpeed;
 	/* Yaw旋转速度 */
 	FRotator BodyPrevRot;
 	float YawSpeed;
@@ -73,4 +85,10 @@ private:
 	/* Look Offset */
 	FRotator LookRotOffset;
 	/********/
+
+	/*
+	 * Aiming相关
+	 */
+	bool bIsAiming;
+	void OwnerAimTagUpdated(const FGameplayTag Tag, int32 NewCount);
 };
