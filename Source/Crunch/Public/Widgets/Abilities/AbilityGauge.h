@@ -62,4 +62,7 @@ private:
 	
 	UPROPERTY(EditDefaultsOnly, Category="Visual")
 	FName IconMaterialParamName = "Icon";
+
+	UPROPERTY(EditDefaultsOnly, Category="Visual")
+	FName CooldownPercentParamName = "Percent";
 };
