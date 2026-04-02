@@ -23,12 +23,11 @@ public:
 	virtual void PawnClientRestart() override;
 	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
 
+	/**********************************************************************/
+	/*                         Gameplay Ability                           */
+	/**********************************************************************/
 private:
-	UPROPERTY(VisibleDefaultsOnly, Category="View")
-	USpringArmComponent* CameraBoom;
-
-	UPROPERTY(VisibleDefaultsOnly, Category="View")
-	UCameraComponent* ViewCamera;
+	virtual void OnAimStateChanged(bool bIsAiming) override;
 
 	/**********************************************************************/
 	/*                              Input                                 */
@@ -67,8 +66,28 @@ protected:
 	/**********************************************************************/
 	/*                               Stun                                 */
 	/**********************************************************************/
-
 protected:
 	virtual void OnStun() override;
 	virtual void OnRecoverFromStun() override;
+	
+	/**********************************************************************/
+	/*                           Camera View                              */
+	/**********************************************************************/
+private:
+	UPROPERTY(VisibleDefaultsOnly, Category="View")
+	USpringArmComponent* CameraBoom;
+
+	UPROPERTY(VisibleDefaultsOnly, Category="View")
+	UCameraComponent* ViewCamera;
+
+	UPROPERTY(EditDefaultsOnly, Category="View")
+	FVector CameraAimLocalOffset;
+
+	UPROPERTY(EditDefaultsOnly, Category="View")
+	float CameraLerpSpeed = 20.f;
+	
+	FTimerHandle CameraLerpTimerHandle;
+
+	void LerpCameraToLocalOffsetLocation(const FVector& Goal);
+	void TickCameraLocalOffsetLerp(FVector Goal);
 };

@@ -49,7 +49,7 @@ void UCAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 		LookRotOffset = UKismetMathLibrary::NormalizedDeltaRotator(ControlRot, BodyRot);
 		
 		FwdSpeed = Velocity.Dot(ControlRot.Vector()); // .Vector()会将转向变成单位向量
-		RightSpeed = Velocity.Dot(ControlRot.Vector().Cross(FVector::UpVector));
+		RightSpeed = -Velocity.Dot(ControlRot.Vector().Cross(FVector::UpVector));
 	}
 
 	if (OwnerMovementComp)

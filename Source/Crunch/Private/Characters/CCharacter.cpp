@@ -162,6 +162,12 @@ void ACCharacter::SetIsAiming(bool bIsAiming)
 {
 	bUseControllerRotationYaw = bIsAiming;
 	GetCharacterMovement()->bOrientRotationToMovement = !bIsAiming;
+	OnAimStateChanged(bIsAiming);
+}
+
+void ACCharacter::OnAimStateChanged(bool bIsAiming)
+{
+	// 在子类中重写该方法
 }
 
 void ACCharacter::ConfigureOverHeadStatsWidget()
