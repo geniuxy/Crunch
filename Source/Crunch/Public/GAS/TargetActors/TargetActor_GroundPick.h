@@ -17,11 +17,21 @@ class CRUNCH_API ATargetActor_GroundPick : public AGameplayAbilityTargetActor
 public:
 	ATargetActor_GroundPick();
 
+	void SetTargetAreaRadius(float NewRadius);
+	virtual void ConfirmTargetingAndContinue() override;
+	void SetTargetOptions(bool bTargetFriendly, bool bTargetEnemy = true);
+
 protected:
+	bool bShouldTargetEnemy = true;
+	bool bShouldTargetFriendly = false;
+	
 	virtual void Tick(float DeltaSeconds) override;
 
 	FVector GetTargetPoint() const;
 
-	UPROPERTY(EditDefaultsOnly, Category="Targetting")
+	UPROPERTY(EditDefaultsOnly, Category="Targeting")
 	float TargetTraceRange = 2000.f;
+	
+	UPROPERTY(EditDefaultsOnly, Category="Targeting")
+	float TargetAreaRadius = 300.f;
 };
