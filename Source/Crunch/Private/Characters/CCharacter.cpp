@@ -8,6 +8,7 @@
 #include "CrunchDebugHelper.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/WidgetComponent.h"
+#include "Crunch/Crunch.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/PlayerState.h"
 #include "GAS/CAbilitySystemComponent.h"
@@ -30,8 +31,8 @@ ACCharacter::ACCharacter()
 	GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	GetMesh()->SetCollisionResponseToAllChannels(ECR_Block);
 
-	// CapsuleComponent不要挡摄像头
-	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
+	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore); // CapsuleComponent不要挡摄像头
+	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Target, ECR_Ignore); // CapsuleComponent不要挡目标跟踪通道
 
 	AbilitySystemComponent = CreateDefaultSubobject<UCAbilitySystemComponent>(TEXT("Ability System Component"));
 	AttributeSet = CreateDefaultSubobject<UCAttributeSet>(TEXT("AttributeSet"));

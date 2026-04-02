@@ -13,5 +13,15 @@ UCLASS()
 class CRUNCH_API ATargetActor_GroundPick : public AGameplayAbilityTargetActor
 {
 	GENERATED_BODY()
-	
+
+public:
+	ATargetActor_GroundPick();
+
+protected:
+	virtual void Tick(float DeltaSeconds) override;
+
+	FVector GetTargetPoint() const;
+
+	UPROPERTY(EditDefaultsOnly, Category="Targetting")
+	float TargetTraceRange = 2000.f;
 };

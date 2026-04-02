@@ -3,3 +3,48 @@
 
 #include "GAS/TargetActors/TargetActor_GroundPick.h"
 
+#include "Crunch/Crunch.h"
+
+ATargetActor_GroundPick::ATargetActor_GroundPick()
+{
+	PrimaryActorTick.bCanEverTick = true;
+}
+
+void ATargetActor_GroundPick::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+
+	if (PrimaryPC && PrimaryPC->IsLocalPlayerController())
+	{
+		SetActorLocation(GetTargetPoint());
+	}
+}
+
+FVector ATargetActor_GroundPick::GetTargetPoint() const
+{
+	if (!PrimaryPC || !PrimaryPC->IsLocalPlayerController()) return GetActorLocation();
+
+	FHitResult TraceResult;
+
+	FVector ViewLocation;
+	FRotator ViewRotator;
+	PrimaryPC->GetPlayerViewPoint(ViewLocation, ViewRotator);
+
+	FVector TraceEnd = ViewLocation + ViewRotator.Vector() * TargetTraceRange;
+
+	GetWorld()->LineTraceSingleByChannel(TraceResult, ViewLocation, TraceEnd, ECC_Target);
+
+	if (!TraceResult.bBlockingHit)
+	{
+		GetWorld()->LineTraceSingleByChannel(
+			TraceResult, TraceEnd, TraceEnd + FVector::DownVector * TNumericLimits<float>::Max(), ECC_Target
+		);
+	}
+
+	if (!TraceResult.bBlockingHit)
+	{
+		return GetActorLocation();
+	}
+
+	return TraceResult.ImpactPoint;
+}
