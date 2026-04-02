@@ -14,11 +14,6 @@ ATargetActor_GroundPick::ATargetActor_GroundPick()
 	PrimaryActorTick.bCanEverTick = true;
 }
 
-void ATargetActor_GroundPick::SetTargetAreaRadius(float NewRadius)
-{
-	TargetAreaRadius = NewRadius;
-}
-
 void ATargetActor_GroundPick::ConfirmTargetingAndContinue()
 {
 	TArray<FOverlapResult> OverlapResults;
@@ -105,6 +100,11 @@ FVector ATargetActor_GroundPick::GetTargetPoint() const
 	if (!TraceResult.bBlockingHit)
 	{
 		return GetActorLocation();
+	}
+
+	if (bShouldDrawDebug)
+	{
+		DrawDebugSphere(GetWorld(), TraceResult.ImpactPoint, TargetAreaRadius, 32, FColor::Red);
 	}
 
 	return TraceResult.ImpactPoint;

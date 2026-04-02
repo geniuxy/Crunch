@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "CGameplayAbilityBase.h"
+#include "CTypes/CStruct.h"
 #include "GA_GroundBlast.generated.h"
 
 class ATargetActor_GroundPick;
@@ -26,7 +27,16 @@ public:
 	) override;
 
 private:
-	UPROPERTY(EditDefaultsOnly, Category="Animation")
+	UPROPERTY(EditDefaultsOnly, Category="Targeting")
+	float TargetAreaRadius = 300.f;
+
+	UPROPERTY(EditDefaultsOnly, Category="Damage")
+	FGenericDamageEffectDef DamageEffectDef;
+
+	UPROPERTY(EditDefaultsOnly, Category="Targeting")
+	float TargetTraceRange = 2000.f;
+	
+	UPROPERTY(EditDefaultsOnly, Category="Targeting")
 	TSubclassOf<ATargetActor_GroundPick> TargetActorClass;
 	
 	UPROPERTY(EditDefaultsOnly, Category="Animation")
