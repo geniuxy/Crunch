@@ -13,6 +13,7 @@
 UCGameplayAbilityBase::UCGameplayAbilityBase()
 {
 	ActivationBlockedTags.AddTag(CGameplayTags::Crunch_Stats_Stun);
+	InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerActor;
 }
 
 UAnimInstance* UCGameplayAbilityBase::GetOwnerAnimInstance() const

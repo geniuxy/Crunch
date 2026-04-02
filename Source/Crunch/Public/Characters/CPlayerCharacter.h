@@ -88,6 +88,12 @@ private:
 	
 	FTimerHandle CameraLerpTimerHandle;
 
+	UPROPERTY()
+	bool bIsCameraLerping = false;
+
+	UPROPERTY()
+	FVector PendingCameraGoal;
+
 	void LerpCameraToLocalOffsetLocation(const FVector& Goal);
-	void TickCameraLocalOffsetLerp(FVector Goal);
+	void TickCameraLocalOffsetLerp();
 };

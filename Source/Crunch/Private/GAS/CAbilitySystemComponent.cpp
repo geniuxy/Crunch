@@ -48,6 +48,13 @@ void UCAbilitySystemComponent::ApplyFullStatsEffect()
 	}
 }
 
+void UCAbilitySystemComponent::DisableAim()
+{
+	if (!GetOwner() || !GetOwner()->HasAuthority()) return;
+	
+	AuthApplyGameplayEffect(DisableAimEffect);
+}
+
 void UCAbilitySystemComponent::AuthApplyGameplayEffect(TSubclassOf<UGameplayEffect> GameplayEffect, int Level)
 {
 	if (GetOwner() && GetOwner()->HasAuthority())

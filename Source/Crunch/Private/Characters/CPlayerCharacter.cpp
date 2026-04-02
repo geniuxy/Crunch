@@ -170,26 +170,38 @@ void ACPlayerCharacter::OnRecoverFromStun()
 
 void ACPlayerCharacter::LerpCameraToLocalOffsetLocation(const FVector& Goal)
 {
+	PendingCameraGoal = Goal;
+
+	// 后续可以加个Tag，在1秒时间内不让玩家连续多次瞄准(已完成)
+	// 这是为了防止连续取消，Set多个Timer导致镜头抖动
+	// 如果已在插值中，只更新目标，不重启 Timer
+	if (bIsCameraLerping)
+	{
+		return;
+	}
+
+	bIsCameraLerping = true;
 	GetWorldTimerManager().ClearTimer(CameraLerpTimerHandle);
-	GetWorldTimerManager().SetTimerForNextTick(
-		FTimerDelegate::CreateUObject(this, &ThisClass::TickCameraLocalOffsetLerp, Goal)
+	FTimerHandle TimerForNextTick = GetWorldTimerManager().SetTimerForNextTick(
+		FTimerDelegate::CreateUObject(this, &ThisClass::TickCameraLocalOffsetLerp)
 	);
 }
 
-void ACPlayerCharacter::TickCameraLocalOffsetLerp(FVector Goal)
+void ACPlayerCharacter::TickCameraLocalOffsetLerp()
 {
 	FVector CurrentLocalOffset = ViewCamera->GetRelativeLocation();
-	if (FVector::Dist(CurrentLocalOffset, Goal) < 1.f)
+	if (FVector::Dist(CurrentLocalOffset, PendingCameraGoal) < 1.f)
 	{
-		ViewCamera->SetRelativeLocation(Goal);
+		ViewCamera->SetRelativeLocation(PendingCameraGoal);
+		bIsCameraLerping = false; // 清除状态
 		return;
 	}
 
 	float LerpAlpha = FMath::Clamp(GetWorld()->GetDeltaSeconds() * CameraLerpSpeed, 0.f, 1.f);
-	FVector NewLocalOffset = FMath::Lerp(CurrentLocalOffset, Goal, LerpAlpha);
+	FVector NewLocalOffset = FMath::Lerp(CurrentLocalOffset, PendingCameraGoal, LerpAlpha);
 	ViewCamera->SetRelativeLocation(NewLocalOffset);
 
 	GetWorldTimerManager().SetTimerForNextTick(
-		FTimerDelegate::CreateUObject(this, &ThisClass::TickCameraLocalOffsetLerp, Goal)
+		FTimerDelegate::CreateUObject(this, &ThisClass::TickCameraLocalOffsetLerp)
 	);
 }

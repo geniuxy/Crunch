@@ -17,7 +17,6 @@ UGA_Combo::UGA_Combo()
 	// 设置AbilityTags
 	AbilityTags.AddTag(CGameplayTags::Crunch_Ability_BasicAttack);
 	BlockAbilitiesWithTag.AddTag(CGameplayTags::Crunch_Ability_BasicAttack);
-	InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerActor;
 }
 
 void UGA_Combo::ActivateAbility(

@@ -8,12 +8,14 @@
 #include "Abilities/Tasks/AbilityTask_WaitTargetData.h"
 #include "CGameplayTags.h"
 #include "CrunchDebugHelper.h"
+#include "GAS/CAbilitySystemComponent.h"
 #include "GAS/TargetActors/TargetActor_GroundPick.h"
 
 UGA_GroundBlast::UGA_GroundBlast()
 {
 	ActivationOwnedTags.AddTag(CGameplayTags::Crunch_Stats_Aim);
 	BlockAbilitiesWithTag.AddTag(CGameplayTags::Crunch_Ability_BasicAttack);
+	ActivationBlockedTags.AddTag(CGameplayTags::Crunch_Stats_DisableAim);
 }
 
 void UGA_GroundBlast::ActivateAbility(
@@ -60,11 +62,22 @@ void UGA_GroundBlast::TargetConfirmed(const FGameplayAbilityTargetDataHandle& Ta
 	);
 
 	Debug::Print(TEXT("Target Confirmed"));
+	UCAbilitySystemComponent* OwnerASC = Cast<UCAbilitySystemComponent>(GetAbilitySystemComponentFromActorInfo());
+	if (OwnerASC)
+	{
+		OwnerASC->DisableAim();
+	}
 	K2_EndAbility();
 }
 
 void UGA_GroundBlast::TargetCancelled(const FGameplayAbilityTargetDataHandle& TargetDataHandle)
 {
 	Debug::Print(TEXT("Target Canceled"));
+	
+	UCAbilitySystemComponent* OwnerASC = Cast<UCAbilitySystemComponent>(GetAbilitySystemComponentFromActorInfo());
+	if (OwnerASC)
+	{
+		OwnerASC->DisableAim();
+	}
 	K2_EndAbility();
 }

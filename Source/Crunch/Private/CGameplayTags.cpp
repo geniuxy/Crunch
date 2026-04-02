@@ -11,6 +11,9 @@ namespace CGameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(
 		Crunch_Stats_Aim, "Crunch.Stats.Aim"
 	);
+	UE_DEFINE_GAMEPLAY_TAG(
+		Crunch_Stats_DisableAim, "Crunch.Stats.DisableAim"
+	);
 
 	UE_DEFINE_GAMEPLAY_TAG(
 		Crunch_Ability_Combo_Event_Change, "Crunch.Ability.Combo.Event.Change"

@@ -24,9 +24,11 @@ public:
 
 	void ApplyFullStatsEffect();
 
+	void DisableAim();
+	
 private:
 	void AuthApplyGameplayEffect(TSubclassOf<UGameplayEffect> GameplayEffect, int Level = 1);
-
+	
 	void HealthUpdated(const FOnAttributeChangeData& ChangeData);
 
 	UPROPERTY(EditDefaultsOnly, Category="Gameplay Effects")
@@ -34,6 +36,9 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, Category="Gameplay Effects")
 	TSubclassOf<UGameplayEffect> DeathEffect;
+
+	UPROPERTY(EditDefaultsOnly, Category="Gameplay Effects")
+	TSubclassOf<UGameplayEffect> DisableAimEffect;
 
 	UPROPERTY(EditDefaultsOnly, Category="Gameplay Ability")
 	TArray<TSubclassOf<UGameplayEffect>> InitializeGameplayEffects;
