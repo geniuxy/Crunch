@@ -6,6 +6,7 @@
 #include "CGameplayAbilityBase.h"
 #include "GA_GroundBlast.generated.h"
 
+class ATargetActor_GroundPick;
 /**
  * 
  */
@@ -26,5 +27,14 @@ public:
 
 private:
 	UPROPERTY(EditDefaultsOnly, Category="Animation")
+	TSubclassOf<ATargetActor_GroundPick> TargetActorClass;
+	
+	UPROPERTY(EditDefaultsOnly, Category="Animation")
 	UAnimMontage* GroundBlastMontage;
+
+	UFUNCTION()
+	void TargetConfirmed(const FGameplayAbilityTargetDataHandle& TargetDataHandle);
+	
+	UFUNCTION()
+	void TargetCancelled(const FGameplayAbilityTargetDataHandle& TargetDataHandle);
 };

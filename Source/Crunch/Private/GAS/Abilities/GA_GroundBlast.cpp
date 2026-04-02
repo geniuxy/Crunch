@@ -3,12 +3,16 @@
 
 #include "GAS/Abilities/GA_GroundBlast.h"
 
-#include "CGameplayTags.h"
 #include "Abilities/Tasks/AbilityTask_PlayMontageAndWait.h"
+#include "Abilities/Tasks/AbilityTask_WaitTargetData.h"
+#include "CGameplayTags.h"
+#include "CrunchDebugHelper.h"
+#include "GAS/TargetActors/TargetActor_GroundPick.h"
 
 UGA_GroundBlast::UGA_GroundBlast()
 {
 	ActivationOwnedTags.AddTag(CGameplayTags::Crunch_Stats_Aim);
+	BlockAbilitiesWithTag.AddTag(CGameplayTags::Crunch_Ability_BasicAttack);
 }
 
 void UGA_GroundBlast::ActivateAbility(
@@ -26,4 +30,27 @@ void UGA_GroundBlast::ActivateAbility(
 	PlayGroundBlastMontageTask->OnInterrupted.AddDynamic(this, &ThisClass::K2_EndAbility);
 	PlayGroundBlastMontageTask->OnCancelled.AddDynamic(this, &ThisClass::K2_EndAbility);
 	PlayGroundBlastMontageTask->ReadyForActivation();
+
+	UAbilityTask_WaitTargetData* WaitTargetDataTask = UAbilityTask_WaitTargetData::WaitTargetData(
+		this, NAME_None, EGameplayTargetingConfirmation::UserConfirmed, TargetActorClass
+	);
+	WaitTargetDataTask->ValidData.AddDynamic(this, &ThisClass::TargetConfirmed);
+	WaitTargetDataTask->Cancelled.AddDynamic(this, &ThisClass::TargetCancelled);
+	WaitTargetDataTask->ReadyForActivation();
+
+	AGameplayAbilityTargetActor* TargetActor;
+	WaitTargetDataTask->BeginSpawningActor(this, TargetActorClass, TargetActor);
+	WaitTargetDataTask->FinishSpawningActor(this, TargetActor);
+}
+
+void UGA_GroundBlast::TargetConfirmed(const FGameplayAbilityTargetDataHandle& TargetDataHandle)
+{
+	Debug::Print(TEXT("Target Confirmed"));
+	K2_EndAbility();
+}
+
+void UGA_GroundBlast::TargetCancelled(const FGameplayAbilityTargetDataHandle& TargetDataHandle)
+{
+	Debug::Print(TEXT("Target Canceled"));
+	K2_EndAbility();
 }
