@@ -27,7 +27,7 @@ void UGA_GroundBlast::ActivateAbility(
 	if (!HasAuthorityOrPredictionKey(GetCurrentActorInfo(), &CurrentActivationInfo)) return;
 
 	UAbilityTask_PlayMontageAndWait* PlayGroundBlastMontageTask =
-		UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, NAME_None, GroundBlastMontage);
+		UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, NAME_None, TargetingMontage);
 	PlayGroundBlastMontageTask->OnCompleted.AddDynamic(this, &ThisClass::K2_EndAbility);
 	PlayGroundBlastMontageTask->OnBlendOut.AddDynamic(this, &ThisClass::K2_EndAbility);
 	PlayGroundBlastMontageTask->OnInterrupted.AddDynamic(this, &ThisClass::K2_EndAbility);
@@ -57,11 +57,20 @@ void UGA_GroundBlast::ActivateAbility(
 
 void UGA_GroundBlast::TargetConfirmed(const FGameplayAbilityTargetDataHandle& TargetDataHandle)
 {
-	BP_ApplyGameplayEffectToTarget(
-		TargetDataHandle, DamageEffectDef.DamageEffect, GetAbilityLevel(CurrentSpecHandle, CurrentActorInfo)
-	);
+	if (!K2_CommitAbility())
+	{
+		K2_EndAbility();
+		return;
+	}
+	
+	if (K2_HasAuthority())
+	{
+		BP_ApplyGameplayEffectToTarget(
+			TargetDataHandle, DamageEffectDef.DamageEffect, GetAbilityLevel(CurrentSpecHandle, CurrentActorInfo)
+		);
 
-	PushTargets(TargetDataHandle, DamageEffectDef.PushVel);
+		PushTargets(TargetDataHandle, DamageEffectDef.PushVel);
+	}
 
 	FGameplayCueParameters BlastingGameplayCueParams;
 	// index = 1, 记录的是爆炸范围中心点的信息
@@ -71,6 +80,11 @@ void UGA_GroundBlast::TargetConfirmed(const FGameplayAbilityTargetDataHandle& Ta
 
 	GetAbilitySystemComponentFromActorInfo()->ExecuteGameplayCue(BlastingGameplayCueTag, BlastingGameplayCueParams);
 	GetAbilitySystemComponentFromActorInfo()->ExecuteGameplayCue(CGameplayTags::GameplayCue_CameraShake);
+
+	if (UAnimInstance* OwnerAnimInstance = GetOwnerAnimInstance())
+	{
+		OwnerAnimInstance->Montage_Play(CastingMontage);
+	}
 
 	UCAbilitySystemComponent* OwnerASC = Cast<UCAbilitySystemComponent>(GetAbilitySystemComponentFromActorInfo());
 	if (OwnerASC)

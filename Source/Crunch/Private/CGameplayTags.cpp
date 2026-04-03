@@ -55,6 +55,10 @@ namespace CGameplayTags
 		Crunch_Ability_Passive_Launched_Event_Activate, "Crunch.Ability.Passive.Launched.Event.Activate"
 	);
 
+	UE_DEFINE_GAMEPLAY_TAG(
+		Crunch_Ability_GroundBlast_Cooldown, "Crunch.Ability.GroundBlast.Cooldown"
+	);
+
 	/*
 	 * GameplayCue Tags
 	 */
