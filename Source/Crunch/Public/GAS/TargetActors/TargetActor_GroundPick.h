@@ -19,8 +19,12 @@ public:
 
 	virtual void ConfirmTargetingAndContinue() override;
 	void SetTargetOptions(bool bTargetFriendly, bool bTargetEnemy = true);
+	void SetTargetAreaRadius(float NewRadius);
 
 protected:
+	UPROPERTY(VisibleDefaultsOnly, Category="Visual")
+	UDecalComponent* DecalComp;
+	
 	bool bShouldTargetEnemy = true;
 	bool bShouldTargetFriendly = false;
 
@@ -37,7 +41,6 @@ protected:
 	bool bShouldDrawDebug = false;
 
 public:
-	FORCEINLINE void SetTargetAreaRadius(float NewRadius) { TargetAreaRadius = NewRadius; }
 	FORCEINLINE void SetTargetTraceRange(float NewRange) { TargetTraceRange = NewRange; }
 	FORCEINLINE void SetShouldDrawDebug(bool bDrawDebug) { bShouldDrawDebug = bDrawDebug; }
 };

@@ -27,6 +27,9 @@ public:
 	) override;
 
 private:
+	UPROPERTY(EditDefaultsOnly, Category="Cue", meta=(Categories="GameplayCue"))
+	FGameplayTag BlastingGameplayCueTag;
+	
 	UPROPERTY(EditDefaultsOnly, Category="Targeting")
 	float TargetAreaRadius = 300.f;
 

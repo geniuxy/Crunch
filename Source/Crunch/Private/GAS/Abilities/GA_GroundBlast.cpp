@@ -51,7 +51,7 @@ void UGA_GroundBlast::ActivateAbility(
 		GroundPickActor->SetTargetAreaRadius(TargetAreaRadius);
 		GroundPickActor->SetTargetTraceRange(TargetTraceRange);
 	}
-	
+
 	WaitTargetDataTask->FinishSpawningActor(this, TargetActor);
 }
 
@@ -61,7 +61,17 @@ void UGA_GroundBlast::TargetConfirmed(const FGameplayAbilityTargetDataHandle& Ta
 		TargetDataHandle, DamageEffectDef.DamageEffect, GetAbilityLevel(CurrentSpecHandle, CurrentActorInfo)
 	);
 
-	Debug::Print(TEXT("Target Confirmed"));
+	PushTargets(TargetDataHandle, DamageEffectDef.PushVel);
+
+	FGameplayCueParameters BlastingGameplayCueParams;
+	// index = 1, 记录的是爆炸范围中心点的信息
+	BlastingGameplayCueParams.Location =
+		UAbilitySystemBlueprintLibrary::GetHitResultFromTargetData(TargetDataHandle, 1).ImpactPoint;
+	BlastingGameplayCueParams.RawMagnitude = TargetAreaRadius;
+
+	GetAbilitySystemComponentFromActorInfo()->ExecuteGameplayCue(BlastingGameplayCueTag, BlastingGameplayCueParams);
+	GetAbilitySystemComponentFromActorInfo()->ExecuteGameplayCue(CGameplayTags::GameplayCue_CameraShake);
+
 	UCAbilitySystemComponent* OwnerASC = Cast<UCAbilitySystemComponent>(GetAbilitySystemComponentFromActorInfo());
 	if (OwnerASC)
 	{
@@ -73,7 +83,7 @@ void UGA_GroundBlast::TargetConfirmed(const FGameplayAbilityTargetDataHandle& Ta
 void UGA_GroundBlast::TargetCancelled(const FGameplayAbilityTargetDataHandle& TargetDataHandle)
 {
 	Debug::Print(TEXT("Target Canceled"));
-	
+
 	UCAbilitySystemComponent* OwnerASC = Cast<UCAbilitySystemComponent>(GetAbilitySystemComponentFromActorInfo());
 	if (OwnerASC)
 	{

@@ -70,4 +70,7 @@ namespace CGameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(
 		GameplayCue_Hit_Reaction, "GameplayCue.Hit.Reaction"
 	);
+	UE_DEFINE_GAMEPLAY_TAG(
+		GameplayCue_Hit_Impact_GroundBlast, "GameplayCue.Hit.Impact.GroundBlast"
+	);
 }

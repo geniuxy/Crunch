@@ -4,14 +4,19 @@
 #include "GAS/TargetActors/TargetActor_GroundPick.h"
 
 #include "AbilitySystemBlueprintLibrary.h"
-#include "GenericTeamAgentInterface.h"
 #include "Abilities/GameplayAbility.h"
+#include "Components/DecalComponent.h"
 #include "Crunch/Crunch.h"
+#include "GenericTeamAgentInterface.h"
 #include "Engine/OverlapResult.h"
 
 ATargetActor_GroundPick::ATargetActor_GroundPick()
 {
 	PrimaryActorTick.bCanEverTick = true;
+
+	SetRootComponent(CreateDefaultSubobject<USceneComponent>("RootComponent"));
+	DecalComp = CreateDefaultSubobject<UDecalComponent>("DecalComponent");
+	DecalComp->SetupAttachment(GetRootComponent());
 }
 
 void ATargetActor_GroundPick::ConfirmTargetingAndContinue()
@@ -57,6 +62,12 @@ void ATargetActor_GroundPick::ConfirmTargetingAndContinue()
 	FGameplayAbilityTargetDataHandle TargetData = UAbilitySystemBlueprintLibrary::AbilityTargetDataFromActorArray(
 		TargetActors.Array(), false
 	);
+
+	// 记录爆炸范围中心点的信息 index = 1
+	FGameplayAbilityTargetData_SingleTargetHit* HitLoc = new FGameplayAbilityTargetData_SingleTargetHit;
+	HitLoc->HitResult.ImpactPoint = GetActorLocation();
+	TargetData.Add(HitLoc);
+	
 	TargetDataReadyDelegate.Broadcast(TargetData);
 }
 
@@ -64,6 +75,12 @@ void ATargetActor_GroundPick::SetTargetOptions(bool bTargetFriendly, bool bTarge
 {
 	bShouldTargetFriendly = bTargetFriendly;
 	bShouldTargetEnemy = bTargetEnemy;
+}
+
+void ATargetActor_GroundPick::SetTargetAreaRadius(float NewRadius)
+{
+	TargetAreaRadius = NewRadius;
+	DecalComp->DecalSize = FVector(NewRadius);
 }
 
 void ATargetActor_GroundPick::Tick(float DeltaSeconds)
