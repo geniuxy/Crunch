@@ -42,6 +42,12 @@ private:
 	FGameplayAttributeData Mana;
 	UPROPERTY(ReplicatedUsing = OnRep_MaxMana)
 	FGameplayAttributeData MaxMana;
+	UPROPERTY(ReplicatedUsing = OnRep_AttackDamage)
+	FGameplayAttributeData AttackDamage;
+	UPROPERTY(ReplicatedUsing = OnRep_Armor)
+	FGameplayAttributeData Armor;
+	UPROPERTY(ReplicatedUsing = OnRep_MoveSpeed)
+	FGameplayAttributeData MoveSpeed;
 
 	UFUNCTION()
 	void OnRep_Health(const FGameplayAttributeData& OldValue);
@@ -54,4 +60,13 @@ private:
 
 	UFUNCTION()
 	void OnRep_MaxMana(const FGameplayAttributeData& OldValue);
+
+	UFUNCTION()
+	void OnRep_AttackDamage(const FGameplayAttributeData& OldValue);
+
+	UFUNCTION()
+	void OnRep_Armor(const FGameplayAttributeData& OldValue);
+
+	UFUNCTION()
+	void OnRep_MoveSpeed(const FGameplayAttributeData& OldValue);
 };

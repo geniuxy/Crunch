@@ -7,6 +7,7 @@
 #include "InputMappingContext.h"
 #include "CPlayerCharacter.generated.h"
 
+class UCHeroAttributeSet;
 struct FInputActionValue;
 class UInputAction;
 class USpringArmComponent;
@@ -28,6 +29,9 @@ public:
 	/**********************************************************************/
 private:
 	virtual void OnAimStateChanged(bool bIsAiming) override;
+
+	UPROPERTY()
+	UCHeroAttributeSet* HeroAttributeSet;
 
 	/**********************************************************************/
 	/*                              Input                                 */

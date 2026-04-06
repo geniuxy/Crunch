@@ -11,6 +11,7 @@
 #include "EnhancedInputComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "GAS/CHeroAttributeSet.h"
 
 
 ACPlayerCharacter::ACPlayerCharacter()
@@ -27,6 +28,8 @@ ACPlayerCharacter::ACPlayerCharacter()
 
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 	GetCharacterMovement()->RotationRate = FRotator(0.f, 300.f, 0.f);
+
+	HeroAttributeSet = CreateDefaultSubobject<UCHeroAttributeSet>("HeroAttributeSet");
 }
 
 void ACPlayerCharacter::PawnClientRestart()
