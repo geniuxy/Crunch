@@ -29,6 +29,8 @@ public:
 	ATTRIBUTE_ACCESSORS(UCHeroAttributeSet, Level)
 	ATTRIBUTE_ACCESSORS(UCHeroAttributeSet, MaxLevel)
 	ATTRIBUTE_ACCESSORS(UCHeroAttributeSet, Gold)
+	ATTRIBUTE_ACCESSORS(UCHeroAttributeSet, IntelligenceGrowthRate)
+	ATTRIBUTE_ACCESSORS(UCHeroAttributeSet, StrengthGrowthRate)
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 private:
@@ -37,6 +39,12 @@ private:
 
 	UPROPERTY(ReplicatedUsing = OnRep_Strength)
 	FGameplayAttributeData Strength;
+
+	UPROPERTY()
+	FGameplayAttributeData IntelligenceGrowthRate;
+
+	UPROPERTY()
+	FGameplayAttributeData StrengthGrowthRate;
 
 	UPROPERTY(ReplicatedUsing = OnRep_Experience)
 	FGameplayAttributeData Experience;

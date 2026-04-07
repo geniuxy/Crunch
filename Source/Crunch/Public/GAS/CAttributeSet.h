@@ -25,6 +25,9 @@ public:
 	ATTRIBUTE_ACCESSORS(UCAttributeSet, MaxHealth)
 	ATTRIBUTE_ACCESSORS(UCAttributeSet, Mana)
 	ATTRIBUTE_ACCESSORS(UCAttributeSet, MaxMana)
+	ATTRIBUTE_ACCESSORS(UCAttributeSet, AttackDamage)
+	ATTRIBUTE_ACCESSORS(UCAttributeSet, Armor)
+	ATTRIBUTE_ACCESSORS(UCAttributeSet, MoveSpeed)
 
 	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
 

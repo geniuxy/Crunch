@@ -18,17 +18,21 @@ class CRUNCH_API UCAbilitySystemComponent : public UAbilitySystemComponent
 public:
 	UCAbilitySystemComponent();
 
-	void InitializeBaseAttributes();
-
-	void GiveInitialAbilities();
+	void ServerSideInit();
 
 	void ApplyFullStatsEffect();
 
 	void DisableAim();
-	
+
 private:
+	void InitializeBaseAttributes();
+
+	void InitializeBaseGameplayEffects();
+
+	void GiveInitialAbilities();
+
 	void AuthApplyGameplayEffect(TSubclassOf<UGameplayEffect> GameplayEffect, int Level = 1);
-	
+
 	void HealthUpdated(const FOnAttributeChangeData& ChangeData);
 
 	UPROPERTY(EditDefaultsOnly, Category="Gameplay Effects")
@@ -41,13 +45,16 @@ private:
 	TSubclassOf<UGameplayEffect> DisableAimEffect;
 
 	UPROPERTY(EditDefaultsOnly, Category="Gameplay Ability")
-	TArray<TSubclassOf<UGameplayEffect>> InitializeGameplayEffects;
+	TArray<TSubclassOf<UGameplayEffect>> InitialGameplayEffects;
 
 	UPROPERTY(EditDefaultsOnly, Category="Gameplay Ability")
 	TMap<ECAbilityInputID, TSubclassOf<UGameplayAbility>> Abilities; // 指代AvatarActor独有的Abilities
 
 	UPROPERTY(EditDefaultsOnly, Category="Gameplay Ability")
 	TMap<ECAbilityInputID, TSubclassOf<UGameplayAbility>> BasicAbilities; // 通用的Abilities
+
+	UPROPERTY(EditDefaultsOnly, Category="Base Stats")
+	UDataTable* BaseStatDataTable;
 
 public:
 	FORCEINLINE const TMap<ECAbilityInputID, TSubclassOf<UGameplayAbility>>& GetAbilities() const { return Abilities; }
