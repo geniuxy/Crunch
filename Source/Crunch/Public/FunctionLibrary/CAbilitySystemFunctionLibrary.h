@@ -17,4 +17,6 @@ class CRUNCH_API UCAbilitySystemFunctionLibrary : public UAbilitySystemBlueprint
 public:
 	static float GetStaticCooldownDurationForAbility(const UGameplayAbility* Ability);
 	static float GetStaticCostForAbility(const UGameplayAbility* Ability);
+
+	static bool IsHero(const AActor* ActorToCheck);
 };

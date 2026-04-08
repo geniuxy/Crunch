@@ -3,6 +3,9 @@
 
 #include "FunctionLibrary/CAbilitySystemFunctionLibrary.h"
 
+#include "AbilitySystemComponent.h"
+#include "AbilitySystemInterface.h"
+#include "CGameplayTags.h"
 #include "Abilities/GameplayAbility.h"
 
 float UCAbilitySystemFunctionLibrary::GetStaticCooldownDurationForAbility(const UGameplayAbility* Ability)
@@ -27,4 +30,16 @@ float UCAbilitySystemFunctionLibrary::GetStaticCostForAbility(const UGameplayAbi
 	float Cost = 0.f;
 	CostGameplayEffect->Modifiers[0].ModifierMagnitude.GetStaticMagnitudeIfPossible(1.f, Cost);
 	return FMath::Abs(Cost);
+}
+
+bool UCAbilitySystemFunctionLibrary::IsHero(const AActor* ActorToCheck)
+{
+	if (const IAbilitySystemInterface* ActorASI = Cast<IAbilitySystemInterface>(ActorToCheck))
+	{
+		if (UAbilitySystemComponent* ActorASC = ActorASI->GetAbilitySystemComponent())
+		{
+			return ActorASC->HasMatchingGameplayTag(CGameplayTags::Crunch_Role_Hero);
+		}
+	}
+	return false;
 }
