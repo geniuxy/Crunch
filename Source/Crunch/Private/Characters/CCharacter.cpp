@@ -122,6 +122,12 @@ void ACCharacter::BindGASChangeDelegates()
 		AbilitySystemComponent->RegisterGameplayTagEvent(CGameplayTags::Crunch_Stats_Aim).AddUObject(
 			this, &ThisClass::AimTagUpdated
 		);
+
+		AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(
+			UCAttributeSet::GetMoveSpeedAttribute()
+		).AddUObject(
+			this, &ThisClass::MoveSpeedUpdated
+		);
 	}
 }
 
@@ -168,6 +174,11 @@ void ACCharacter::SetIsAiming(bool bIsAiming)
 void ACCharacter::OnAimStateChanged(bool bIsAiming)
 {
 	// 在子类中重写该方法
+}
+
+void ACCharacter::MoveSpeedUpdated(const FOnAttributeChangeData& Data)
+{
+	GetCharacterMovement()->MaxWalkSpeed = Data.NewValue;
 }
 
 void ACCharacter::ConfigureOverHeadStatsWidget()

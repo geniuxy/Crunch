@@ -54,6 +54,7 @@ private:
 	void AimTagUpdated(FGameplayTag Tag, int NewCount);
 	void SetIsAiming(bool bIsAiming);
 	virtual void OnAimStateChanged(bool bIsAiming);
+	void MoveSpeedUpdated(const FOnAttributeChangeData& Data);
 
 	UPROPERTY(VisibleDefaultsOnly, Category = "Gameplay Ability")
 	UCAbilitySystemComponent* AbilitySystemComponent;
