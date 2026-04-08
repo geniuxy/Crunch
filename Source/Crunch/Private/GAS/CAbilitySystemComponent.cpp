@@ -3,7 +3,9 @@
 
 #include "GAS/CAbilitySystemComponent.h"
 
+#include "AbilitySystemBlueprintLibrary.h"
 #include "CGameplayTags.h"
+#include "GameplayEffectExtension.h"
 #include "CTypes/CStruct.h"
 #include "GAS/CAttributeSet.h"
 #include "GAS/CHeroAttributeSet.h"
@@ -96,6 +98,11 @@ void UCAbilitySystemComponent::GiveInitialAbilities()
 	{
 		GiveAbility(FGameplayAbilitySpec(AbilityPair.Value, 1, (int32)AbilityPair.Key, nullptr));
 	}
+
+	for (const TSubclassOf<UGameplayAbility>& PassiveAbility : PassiveAbilities)
+	{
+		GiveAbility(FGameplayAbilitySpec(PassiveAbility, 1, -1, nullptr));
+	}
 }
 
 void UCAbilitySystemComponent::AuthApplyGameplayEffect(TSubclassOf<UGameplayEffect> GameplayEffect, int Level)
@@ -131,11 +138,21 @@ void UCAbilitySystemComponent::HealthUpdated(const FOnAttributeChangeData& Chang
 		if (!HasMatchingGameplayTag(CGameplayTags::Crunch_Stats_Health_Empty))
 		{
 			AddLooseGameplayTag(CGameplayTags::Crunch_Stats_Health_Empty);
-			
+
 			if (DeathEffect)
 			{
 				AuthApplyGameplayEffect(DeathEffect);
 			}
+
+			FGameplayEventData DeadAbilityEventData;
+			if (ChangeData.GEModData)
+			{
+				DeadAbilityEventData.ContextHandle = ChangeData.GEModData->EffectSpec.GetContext();
+			}
+
+			UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(
+				GetOwner(), CGameplayTags::Crunch_Stats_Dead, DeadAbilityEventData
+			);
 		}
 	}
 	else
@@ -168,7 +185,7 @@ void UCAbilitySystemComponent::ManaUpdated(const FOnAttributeChangeData& ChangeD
 		if (!HasMatchingGameplayTag(CGameplayTags::Crunch_Stats_Mana_Empty))
 		{
 			AddLooseGameplayTag(CGameplayTags::Crunch_Stats_Mana_Empty);
-			
+
 			if (DeathEffect)
 			{
 				AuthApplyGameplayEffect(DeathEffect);
