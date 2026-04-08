@@ -3,6 +3,7 @@
 
 #include "GAS/CAbilitySystemComponent.h"
 
+#include "CGameplayTags.h"
 #include "CTypes/CStruct.h"
 #include "GAS/CAttributeSet.h"
 #include "GAS/CHeroAttributeSet.h"
@@ -11,6 +12,9 @@ UCAbilitySystemComponent::UCAbilitySystemComponent()
 {
 	GetGameplayAttributeValueChangeDelegate(UCAttributeSet::GetHealthAttribute()).AddUObject(
 		this, &ThisClass::HealthUpdated
+	);
+	GetGameplayAttributeValueChangeDelegate(UCAttributeSet::GetManaAttribute()).AddUObject(
+		this, &ThisClass::ManaUpdated
 	);
 
 	GenericConfirmInputID = (int32)ECAbilityInputID::Confirm;
@@ -35,7 +39,7 @@ void UCAbilitySystemComponent::ApplyFullStatsEffect()
 void UCAbilitySystemComponent::DisableAim()
 {
 	if (!GetOwner() || !GetOwner()->HasAuthority()) return;
-	
+
 	AuthApplyGameplayEffect(DisableAimEffect);
 }
 
@@ -60,11 +64,12 @@ void UCAbilitySystemComponent::InitializeBaseAttributes()
 		SetNumericAttributeBase(UCAttributeSet::GetAttackDamageAttribute(), BaseStats->BaseAttackDamage);
 		SetNumericAttributeBase(UCAttributeSet::GetArmorAttribute(), BaseStats->BaseArmor);
 		SetNumericAttributeBase(UCAttributeSet::GetMoveSpeedAttribute(), BaseStats->BaseMoveSpeed);
-		
+
 		SetNumericAttributeBase(UCHeroAttributeSet::GetStrengthAttribute(), BaseStats->Strength);
 		SetNumericAttributeBase(UCHeroAttributeSet::GetStrengthGrowthRateAttribute(), BaseStats->StrengthGrowthRate);
 		SetNumericAttributeBase(UCHeroAttributeSet::GetIntelligenceAttribute(), BaseStats->Intelligence);
-		SetNumericAttributeBase(UCHeroAttributeSet::GetIntelligenceGrowthRateAttribute(), BaseStats->IntelligenceGrowthRate);
+		SetNumericAttributeBase(UCHeroAttributeSet::GetIntelligenceGrowthRateAttribute(),
+		                        BaseStats->IntelligenceGrowthRate);
 	}
 }
 
@@ -106,8 +111,72 @@ void UCAbilitySystemComponent::HealthUpdated(const FOnAttributeChangeData& Chang
 {
 	if (!GetOwner() || !GetOwner()->HasAuthority()) return;
 
-	if (ChangeData.NewValue <= 0.f && DeathEffect)
+	bool bFound = false;
+	float MaxHealth = GetGameplayAttributeValue(UCAttributeSet::GetMaxHealthAttribute(), bFound);
+	if (bFound && ChangeData.NewValue >= MaxHealth)
 	{
-		AuthApplyGameplayEffect(DeathEffect);
+		if (!HasMatchingGameplayTag(CGameplayTags::Crunch_Stats_Health_Full))
+		{
+			// 只在本地执行Tag添加
+			AddLooseGameplayTag(CGameplayTags::Crunch_Stats_Health_Full);
+		}
+	}
+	else
+	{
+		RemoveLooseGameplayTag(CGameplayTags::Crunch_Stats_Health_Full);
+	}
+
+	if (ChangeData.NewValue <= 0.f)
+	{
+		if (!HasMatchingGameplayTag(CGameplayTags::Crunch_Stats_Health_Empty))
+		{
+			AddLooseGameplayTag(CGameplayTags::Crunch_Stats_Health_Empty);
+			
+			if (DeathEffect)
+			{
+				AuthApplyGameplayEffect(DeathEffect);
+			}
+		}
+	}
+	else
+	{
+		RemoveLooseGameplayTag(CGameplayTags::Crunch_Stats_Health_Empty);
+	}
+}
+
+void UCAbilitySystemComponent::ManaUpdated(const FOnAttributeChangeData& ChangeData)
+{
+	if (!GetOwner() || !GetOwner()->HasAuthority()) return;
+
+	bool bFound = false;
+	float MaxMana = GetGameplayAttributeValue(UCAttributeSet::GetMaxManaAttribute(), bFound);
+	if (bFound && ChangeData.NewValue >= MaxMana)
+	{
+		if (!HasMatchingGameplayTag(CGameplayTags::Crunch_Stats_Mana_Full))
+		{
+			// 只在本地执行Tag添加
+			AddLooseGameplayTag(CGameplayTags::Crunch_Stats_Mana_Full);
+		}
+	}
+	else
+	{
+		RemoveLooseGameplayTag(CGameplayTags::Crunch_Stats_Mana_Full);
+	}
+
+	if (ChangeData.NewValue <= 0.f)
+	{
+		if (!HasMatchingGameplayTag(CGameplayTags::Crunch_Stats_Mana_Empty))
+		{
+			AddLooseGameplayTag(CGameplayTags::Crunch_Stats_Mana_Empty);
+			
+			if (DeathEffect)
+			{
+				AuthApplyGameplayEffect(DeathEffect);
+			}
+		}
+	}
+	else
+	{
+		RemoveLooseGameplayTag(CGameplayTags::Crunch_Stats_Mana_Empty);
 	}
 }
