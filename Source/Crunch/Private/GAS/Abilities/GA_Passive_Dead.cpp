@@ -3,10 +3,12 @@
 
 #include "GAS/Abilities/GA_Passive_Dead.h"
 
+#include "AbilitySystemComponent.h"
 #include "CGameplayTags.h"
 #include "CrunchDebugHelper.h"
 #include "Engine/OverlapResult.h"
 #include "FunctionLibrary/CAbilitySystemFunctionLibrary.h"
+#include "GAS/CHeroAttributeSet.h"
 
 UGA_Passive_Dead::UGA_Passive_Dead()
 {
@@ -30,16 +32,30 @@ void UGA_Passive_Dead::ActivateAbility(
 	if (K2_HasAuthority())
 	{
 		AActor* Killer = TriggerEventData->ContextHandle.GetEffectCauser();
-		if (Killer)
+		if (!Killer || !UCAbilitySystemFunctionLibrary::IsHero(Killer))
 		{
-			Debug::Print(FString::Printf(TEXT("我[%s]被[%s]击杀"), *GetAvatarActorFromActorInfo()->GetName(), *Killer->GetName()));
+			Killer = nullptr;
 		}
 
 		TArray<AActor*> RewardTargets = GetRewardTargets();
-		for (const AActor* RewardTarget : RewardTargets)
+		if (RewardTargets.Num() == 0 && !Killer)
 		{
-			Debug::Print(FString::Printf(TEXT("英雄[%s]可获得经验"), *RewardTarget->GetName()));
+			K2_EndAbility();
+			return;
 		}
+
+		if (Killer && !RewardTargets.Contains(Killer))
+		{
+			RewardTargets.Add(Killer);
+		}
+
+		bool bFound = false;
+		float SelfExperience = GetAbilitySystemComponentFromActorInfo_Ensured()->GetGameplayAttributeValue(
+			UCHeroAttributeSet::GetExperienceAttribute(), bFound
+		);
+
+		float TotalExperienceReward = BaseExperienceReward + ExperienceRewardPerExperience * SelfExperience;
+		float TotalGoldReward = BaseGoldReward + GoldRewardPerExperience * SelfExperience;
 	}
 }
 
