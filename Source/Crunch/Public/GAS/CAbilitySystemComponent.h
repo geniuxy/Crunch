@@ -7,6 +7,7 @@
 #include "Characters/CPlayerCharacter.h"
 #include "CAbilitySystemComponent.generated.h"
 
+class UPA_AbilitySystemGenerics;
 /**
  * 
  */
@@ -36,18 +37,6 @@ private:
 	void HealthUpdated(const FOnAttributeChangeData& ChangeData);
 	void ManaUpdated(const FOnAttributeChangeData& ChangeData);
 
-	UPROPERTY(EditDefaultsOnly, Category="Gameplay Effects")
-	TSubclassOf<UGameplayEffect> FullStatsEffect;
-
-	UPROPERTY(EditDefaultsOnly, Category="Gameplay Effects")
-	TSubclassOf<UGameplayEffect> DeathEffect;
-
-	UPROPERTY(EditDefaultsOnly, Category="Gameplay Effects")
-	TSubclassOf<UGameplayEffect> DisableAimEffect;
-
-	UPROPERTY(EditDefaultsOnly, Category="Gameplay Ability")
-	TArray<TSubclassOf<UGameplayEffect>> InitialGameplayEffects;
-
 	UPROPERTY(EditDefaultsOnly, Category="Gameplay Ability")
 	TMap<ECAbilityInputID, TSubclassOf<UGameplayAbility>> Abilities; // 指代AvatarActor独有的Abilities
 
@@ -55,10 +44,7 @@ private:
 	TMap<ECAbilityInputID, TSubclassOf<UGameplayAbility>> BasicAbilities; // 通用的Abilities
 
 	UPROPERTY(EditDefaultsOnly, Category="Gameplay Ability")
-	TArray<TSubclassOf<UGameplayAbility>> PassiveAbilities; // 被动的Abilities
-
-	UPROPERTY(EditDefaultsOnly, Category="Base Stats")
-	UDataTable* BaseStatDataTable;
+	UPA_AbilitySystemGenerics* AbilitySystemGenerics;
 
 public:
 	FORCEINLINE const TMap<ECAbilityInputID, TSubclassOf<UGameplayAbility>>& GetAbilities() const { return Abilities; }

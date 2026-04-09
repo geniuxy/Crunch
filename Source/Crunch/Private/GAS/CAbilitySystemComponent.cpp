@@ -9,6 +9,7 @@
 #include "CTypes/CStruct.h"
 #include "GAS/CAttributeSet.h"
 #include "GAS/CHeroAttributeSet.h"
+#include "GAS/Data/PA_AbilitySystemGenerics.h"
 
 UCAbilitySystemComponent::UCAbilitySystemComponent()
 {
@@ -32,9 +33,9 @@ void UCAbilitySystemComponent::ServerSideInit()
 
 void UCAbilitySystemComponent::ApplyFullStatsEffect()
 {
-	if (FullStatsEffect)
+	if (AbilitySystemGenerics && AbilitySystemGenerics->GetFullStatsEffect())
 	{
-		AuthApplyGameplayEffect(FullStatsEffect);
+		AuthApplyGameplayEffect(AbilitySystemGenerics->GetFullStatsEffect());
 	}
 }
 
@@ -42,13 +43,21 @@ void UCAbilitySystemComponent::DisableAim()
 {
 	if (!GetOwner() || !GetOwner()->HasAuthority()) return;
 
-	AuthApplyGameplayEffect(DisableAimEffect);
+	if (AbilitySystemGenerics && AbilitySystemGenerics->GetDisableAimEffect())
+	{
+		AuthApplyGameplayEffect(AbilitySystemGenerics->GetDisableAimEffect());
+	}
 }
 
 void UCAbilitySystemComponent::InitializeBaseAttributes()
 {
-	if (!BaseStatDataTable || !GetOwner() || !GetOwner()->HasAuthority()) return;
+	if (!AbilitySystemGenerics || !AbilitySystemGenerics->GetBaseStatDataTable() ||
+		!GetOwner() || !GetOwner()->HasAuthority())
+	{
+		return;
+	}
 
+	UDataTable* BaseStatDataTable = AbilitySystemGenerics->GetBaseStatDataTable();
 	const FHeroBaseStats* BaseStats = nullptr;
 	for (const TPair<FName, uint8*>& DataPair : BaseStatDataTable->GetRowMap())
 	{
@@ -77,9 +86,9 @@ void UCAbilitySystemComponent::InitializeBaseAttributes()
 
 void UCAbilitySystemComponent::InitializeBaseGameplayEffects()
 {
-	if (!GetOwner() || !GetOwner()->HasAuthority()) return;
+	if (!AbilitySystemGenerics || !GetOwner() || !GetOwner()->HasAuthority()) return;
 
-	for (const TSubclassOf<UGameplayEffect>& EffectClass : InitialGameplayEffects)
+	for (const TSubclassOf<UGameplayEffect>& EffectClass : AbilitySystemGenerics->GetInitialGameplayEffects())
 	{
 		AuthApplyGameplayEffect(EffectClass);
 	}
@@ -87,7 +96,7 @@ void UCAbilitySystemComponent::InitializeBaseGameplayEffects()
 
 void UCAbilitySystemComponent::GiveInitialAbilities()
 {
-	if (!GetOwner() || !GetOwner()->HasAuthority()) return;
+	if (!AbilitySystemGenerics || !GetOwner() || !GetOwner()->HasAuthority()) return;
 
 	for (const TPair<ECAbilityInputID, TSubclassOf<UGameplayAbility>>& AbilityPair : Abilities)
 	{
@@ -99,7 +108,7 @@ void UCAbilitySystemComponent::GiveInitialAbilities()
 		GiveAbility(FGameplayAbilitySpec(AbilityPair.Value, 1, (int32)AbilityPair.Key, nullptr));
 	}
 
-	for (const TSubclassOf<UGameplayAbility>& PassiveAbility : PassiveAbilities)
+	for (const TSubclassOf<UGameplayAbility>& PassiveAbility : AbilitySystemGenerics->GetPassiveAbilities())
 	{
 		GiveAbility(FGameplayAbilitySpec(PassiveAbility, 1, -1, nullptr));
 	}
@@ -116,7 +125,7 @@ void UCAbilitySystemComponent::AuthApplyGameplayEffect(TSubclassOf<UGameplayEffe
 
 void UCAbilitySystemComponent::HealthUpdated(const FOnAttributeChangeData& ChangeData)
 {
-	if (!GetOwner() || !GetOwner()->HasAuthority()) return;
+	if (!AbilitySystemGenerics || !GetOwner() || !GetOwner()->HasAuthority()) return;
 
 	bool bFound = false;
 	float MaxHealth = GetGameplayAttributeValue(UCAttributeSet::GetMaxHealthAttribute(), bFound);
@@ -139,9 +148,9 @@ void UCAbilitySystemComponent::HealthUpdated(const FOnAttributeChangeData& Chang
 		{
 			AddLooseGameplayTag(CGameplayTags::Crunch_Stats_Health_Empty);
 
-			if (DeathEffect)
+			if (AbilitySystemGenerics->GetDeathEffect())
 			{
-				AuthApplyGameplayEffect(DeathEffect);
+				AuthApplyGameplayEffect(AbilitySystemGenerics->GetDeathEffect());
 			}
 
 			FGameplayEventData DeadAbilityEventData;
@@ -163,7 +172,7 @@ void UCAbilitySystemComponent::HealthUpdated(const FOnAttributeChangeData& Chang
 
 void UCAbilitySystemComponent::ManaUpdated(const FOnAttributeChangeData& ChangeData)
 {
-	if (!GetOwner() || !GetOwner()->HasAuthority()) return;
+	if (!AbilitySystemGenerics || !GetOwner() || !GetOwner()->HasAuthority()) return;
 
 	bool bFound = false;
 	float MaxMana = GetGameplayAttributeValue(UCAttributeSet::GetMaxManaAttribute(), bFound);
@@ -186,9 +195,9 @@ void UCAbilitySystemComponent::ManaUpdated(const FOnAttributeChangeData& ChangeD
 		{
 			AddLooseGameplayTag(CGameplayTags::Crunch_Stats_Mana_Empty);
 
-			if (DeathEffect)
+			if (AbilitySystemGenerics->GetDeathEffect())
 			{
-				AuthApplyGameplayEffect(DeathEffect);
+				AuthApplyGameplayEffect(AbilitySystemGenerics->GetDeathEffect());
 			}
 		}
 	}
