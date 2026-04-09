@@ -25,6 +25,8 @@ public:
 
 	void DisableAim();
 
+	bool IsAtMaxLevel() const;
+
 private:
 	void InitializeBaseAttributes();
 
@@ -36,6 +38,7 @@ private:
 
 	void HealthUpdated(const FOnAttributeChangeData& ChangeData);
 	void ManaUpdated(const FOnAttributeChangeData& ChangeData);
+	void ExperienceUpdated(const FOnAttributeChangeData& ChangeData);
 
 	UPROPERTY(EditDefaultsOnly, Category="Gameplay Ability")
 	TMap<ECAbilityInputID, TSubclassOf<UGameplayAbility>> Abilities; // 指代AvatarActor独有的Abilities
