@@ -5,6 +5,7 @@
 
 #include "AbilitySystemBlueprintLibrary.h"
 #include "CGameplayTags.h"
+#include "CrunchDebugHelper.h"
 #include "GameplayEffectExtension.h"
 #include "CTypes/CStruct.h"
 #include "GAS/CAttributeSet.h"
@@ -79,8 +80,21 @@ void UCAbilitySystemComponent::InitializeBaseAttributes()
 		SetNumericAttributeBase(UCHeroAttributeSet::GetStrengthAttribute(), BaseStats->Strength);
 		SetNumericAttributeBase(UCHeroAttributeSet::GetStrengthGrowthRateAttribute(), BaseStats->StrengthGrowthRate);
 		SetNumericAttributeBase(UCHeroAttributeSet::GetIntelligenceAttribute(), BaseStats->Intelligence);
-		SetNumericAttributeBase(UCHeroAttributeSet::GetIntelligenceGrowthRateAttribute(),
-		                        BaseStats->IntelligenceGrowthRate);
+		SetNumericAttributeBase(
+			UCHeroAttributeSet::GetIntelligenceGrowthRateAttribute(), BaseStats->IntelligenceGrowthRate
+		);
+	}
+
+	const FRealCurve* ExperienceCurve = AbilitySystemGenerics->GetExperienceCurve();
+	if (ExperienceCurve)
+	{
+		int32 MaxLevel = ExperienceCurve->GetNumKeys();
+		SetNumericAttributeBase(UCHeroAttributeSet::GetMaxLevelAttribute(), MaxLevel);
+
+		float MaxLevelExp = ExperienceCurve->GetKeyValue(ExperienceCurve->GetLastKeyHandle());
+		SetNumericAttributeBase(UCHeroAttributeSet::GetMaxLevelExperienceAttribute(), MaxLevelExp);
+
+		Debug::Print(FString::Printf(TEXT("Max Level is: %d, max experience is: %f"), MaxLevel, MaxLevelExp));
 	}
 }
 

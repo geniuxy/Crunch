@@ -16,6 +16,9 @@ class CRUNCH_API UPA_AbilitySystemGenerics : public UPrimaryDataAsset
 {
 	GENERATED_BODY()
 
+public:
+	const FRealCurve* GetExperienceCurve() const;
+
 private:
 	UPROPERTY(EditDefaultsOnly, Category="Gameplay Effects")
 	TSubclassOf<UGameplayEffect> FullStatsEffect;
@@ -34,6 +37,12 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, Category="Base Stats")
 	UDataTable* BaseStatDataTable;
+
+	UPROPERTY(EditDefaultsOnly, Category="Level")
+	FName ExperienceRowName = "ExperienceNeededToReachLevel";
+
+	UPROPERTY(EditDefaultsOnly, Category="Level")
+	UCurveTable* ExperienceCurveTable;
 
 public:
 	FORCEINLINE TSubclassOf<UGameplayEffect> GetFullStatsEffect() const { return FullStatsEffect; }
