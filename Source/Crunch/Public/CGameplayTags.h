@@ -35,6 +35,9 @@ namespace CGameplayTags
 	CRUNCH_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Crunch_Ability_Passive_Launched_Event_Activate);
 
 	CRUNCH_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Crunch_Ability_GroundBlast_Cooldown);
+	
+	CRUNCH_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Crunch_SetByCaller_Experience);
+	CRUNCH_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Crunch_SetByCaller_Gold);
 
 	/*
 	 * GameplayCue Tags

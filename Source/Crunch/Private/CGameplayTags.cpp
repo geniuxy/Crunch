@@ -74,6 +74,13 @@ namespace CGameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(
 		Crunch_Ability_GroundBlast_Cooldown, "Crunch.Ability.GroundBlast.Cooldown"
 	);
+	
+	UE_DEFINE_GAMEPLAY_TAG(
+		Crunch_SetByCaller_Experience, "Crunch.SetByCaller.Experience"
+	);
+	UE_DEFINE_GAMEPLAY_TAG(
+		Crunch_SetByCaller_Gold, "Crunch.SetByCaller.Gold"
+	);
 
 	/*
 	 * GameplayCue Tags

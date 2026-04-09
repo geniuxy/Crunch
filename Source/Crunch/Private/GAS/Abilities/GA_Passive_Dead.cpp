@@ -56,6 +56,43 @@ void UGA_Passive_Dead::ActivateAbility(
 
 		float TotalExperienceReward = BaseExperienceReward + ExperienceRewardPerExperience * SelfExperience;
 		float TotalGoldReward = BaseGoldReward + GoldRewardPerExperience * SelfExperience;
+
+		if (Killer)
+		{
+			float KillerExperienceReward = TotalExperienceReward * KillerRewardPortion;
+			float KillerGoldReward = TotalGoldReward * KillerRewardPortion;
+
+			FGameplayEffectSpecHandle EffectSpec = MakeOutgoingGameplayEffectSpec(RewardEffect);
+			EffectSpec.Data->SetSetByCallerMagnitude(
+				CGameplayTags::Crunch_SetByCaller_Experience, KillerExperienceReward
+			);
+			EffectSpec.Data->SetSetByCallerMagnitude(
+				CGameplayTags::Crunch_SetByCaller_Gold, KillerGoldReward
+			);
+
+			K2_ApplyGameplayEffectSpecToTarget(
+				EffectSpec, UAbilitySystemBlueprintLibrary::AbilityTargetDataFromActor(Killer)
+			);
+
+			TotalExperienceReward -= KillerExperienceReward;
+			TotalGoldReward -= KillerGoldReward;
+		}
+
+		float ExperiencePerTarget = TotalExperienceReward / RewardTargets.Num();
+		float GoldPerTarget = TotalGoldReward / RewardTargets.Num();
+
+		FGameplayEffectSpecHandle EffectSpec = MakeOutgoingGameplayEffectSpec(RewardEffect);
+		EffectSpec.Data->SetSetByCallerMagnitude(
+			CGameplayTags::Crunch_SetByCaller_Experience, ExperiencePerTarget
+		);
+		EffectSpec.Data->SetSetByCallerMagnitude(
+			CGameplayTags::Crunch_SetByCaller_Gold, GoldPerTarget
+		);
+
+		K2_ApplyGameplayEffectSpecToTarget(
+			EffectSpec, UAbilitySystemBlueprintLibrary::AbilityTargetDataFromActorArray(RewardTargets, true)
+		);
+		K2_EndAbility();
 	}
 }
 
