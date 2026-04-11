@@ -23,8 +23,10 @@ class CRUNCH_API UCAttributeSet : public UAttributeSet
 public:
 	ATTRIBUTE_ACCESSORS(UCAttributeSet, Health)
 	ATTRIBUTE_ACCESSORS(UCAttributeSet, MaxHealth)
+	ATTRIBUTE_ACCESSORS(UCAttributeSet, CachedHealthPercent)
 	ATTRIBUTE_ACCESSORS(UCAttributeSet, Mana)
 	ATTRIBUTE_ACCESSORS(UCAttributeSet, MaxMana)
+	ATTRIBUTE_ACCESSORS(UCAttributeSet, CachedManaPercent)
 	ATTRIBUTE_ACCESSORS(UCAttributeSet, AttackDamage)
 	ATTRIBUTE_ACCESSORS(UCAttributeSet, Armor)
 	ATTRIBUTE_ACCESSORS(UCAttributeSet, MoveSpeed)
@@ -35,6 +37,9 @@ public:
 	virtual void PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue) override;
 	// 用于GameplayEffect的Executions相关计算Clamp
 	virtual void PostGameplayEffectExecute(const FGameplayEffectModCallbackData& Data) override;
+
+	void RescaleHealth();
+	void RescaleMana();
 
 private:
 	UPROPERTY(ReplicatedUsing = OnRep_Health)
@@ -51,6 +56,10 @@ private:
 	FGameplayAttributeData Armor;
 	UPROPERTY(ReplicatedUsing = OnRep_MoveSpeed)
 	FGameplayAttributeData MoveSpeed;
+	UPROPERTY()
+	FGameplayAttributeData CachedHealthPercent;
+	UPROPERTY()
+	FGameplayAttributeData CachedManaPercent;
 
 	UFUNCTION()
 	void OnRep_Health(const FGameplayAttributeData& OldValue);

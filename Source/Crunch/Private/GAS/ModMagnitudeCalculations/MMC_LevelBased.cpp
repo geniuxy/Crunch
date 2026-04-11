@@ -4,10 +4,11 @@
 #include "GAS/ModMagnitudeCalculations/MMC_LevelBased.h"
 
 #include "AbilitySystemComponent.h"
+#include "GAS/CHeroAttributeSet.h"
 
 UMMC_LevelBased::UMMC_LevelBased()
 {
-	LevelCaptureDef.AttributeToCapture = RateAttribute;
+	LevelCaptureDef.AttributeToCapture = UCHeroAttributeSet::GetLevelAttribute();
 	LevelCaptureDef.AttributeSource = EGameplayEffectAttributeCaptureSource::Target;
 
 	RelevantAttributesToCapture.Add(LevelCaptureDef);
@@ -22,6 +23,7 @@ float UMMC_LevelBased::CalculateBaseMagnitude_Implementation(const FGameplayEffe
 	FAggregatorEvaluateParameters EvalParams;
 	EvalParams.SourceTags = Spec.CapturedSourceTags.GetAggregatedTags();
 	EvalParams.TargetTags = Spec.CapturedTargetTags.GetAggregatedTags();
+	GetCapturedAttributeMagnitude(LevelCaptureDef, Spec, EvalParams, Level);
 
 	bool bFound;
 	float RateAttributeVal = ASC->GetGameplayAttributeValue(RateAttribute, bFound);
