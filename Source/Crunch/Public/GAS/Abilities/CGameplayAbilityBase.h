@@ -18,6 +18,14 @@ class CRUNCH_API UCGameplayAbilityBase : public UGameplayAbility
 public:
 	UCGameplayAbilityBase();
 
+	virtual bool CanActivateAbility(
+		const FGameplayAbilitySpecHandle Handle,
+		const FGameplayAbilityActorInfo* ActorInfo,
+		const FGameplayTagContainer* SourceTags = nullptr,
+		const FGameplayTagContainer* TargetTags = nullptr,
+		FGameplayTagContainer* OptionalRelevantTags = nullptr
+	) const override;
+
 protected:
 	UAnimInstance* GetOwnerAnimInstance() const;
 

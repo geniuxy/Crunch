@@ -43,3 +43,8 @@ bool UCAbilitySystemFunctionLibrary::IsHero(const AActor* ActorToCheck)
 	}
 	return false;
 }
+
+bool UCAbilitySystemFunctionLibrary::IsAbilityAtMaxLevel(const FGameplayAbilitySpec& AbilitySpec)
+{
+	return AbilitySpec.Level >= 4;
+}

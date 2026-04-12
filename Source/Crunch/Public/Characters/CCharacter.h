@@ -46,6 +46,9 @@ public:
 
 	const TMap<ECAbilityInputID, TSubclassOf<UGameplayAbility>>& GetAbilities() const;
 
+protected:
+	void UpgradeAbilityWithInputID(ECAbilityInputID InputID);
+
 private:
 	void BindGASChangeDelegates();
 

@@ -4,6 +4,7 @@
 #include "GAS/Abilities/CGameplayAbilityBase.h"
 
 #include "AbilitySystemBlueprintLibrary.h"
+#include "AbilitySystemComponent.h"
 #include "CGameplayTags.h"
 #include "CrunchDebugHelper.h"
 #include "GameFramework/Character.h"
@@ -14,6 +15,22 @@ UCGameplayAbilityBase::UCGameplayAbilityBase()
 {
 	ActivationBlockedTags.AddTag(CGameplayTags::Crunch_Stats_Stun);
 	InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerActor;
+}
+
+bool UCGameplayAbilityBase::CanActivateAbility(
+	const FGameplayAbilitySpecHandle Handle,
+	const FGameplayAbilityActorInfo* ActorInfo,
+	const FGameplayTagContainer* SourceTags,
+	const FGameplayTagContainer* TargetTags,
+	FGameplayTagContainer* OptionalRelevantTags) const
+{
+	FGameplayAbilitySpec* AbilitySpec = ActorInfo->AbilitySystemComponent->FindAbilitySpecFromHandle(Handle);
+	if (AbilitySpec && AbilitySpec->Level <= 0)
+	{
+		return false;
+	}
+	
+	return Super::CanActivateAbility(Handle, ActorInfo, SourceTags, TargetTags, OptionalRelevantTags);
 }
 
 UAnimInstance* UCGameplayAbilityBase::GetOwnerAnimInstance() const

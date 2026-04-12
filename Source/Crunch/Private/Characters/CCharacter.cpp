@@ -109,6 +109,14 @@ const TMap<ECAbilityInputID, TSubclassOf<UGameplayAbility>>& ACCharacter::GetAbi
 	return AbilitySystemComponent->GetAbilities();
 }
 
+void ACCharacter::UpgradeAbilityWithInputID(ECAbilityInputID InputID)
+{
+	if (AbilitySystemComponent)
+	{
+		AbilitySystemComponent->Server_UpgradeAbilityWithID(InputID);
+	}
+}
+
 void ACCharacter::BindGASChangeDelegates()
 {
 	if (AbilitySystemComponent)

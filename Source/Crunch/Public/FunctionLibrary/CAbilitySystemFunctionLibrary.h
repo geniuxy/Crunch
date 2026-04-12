@@ -19,4 +19,5 @@ public:
 	static float GetStaticCostForAbility(const UGameplayAbility* Ability);
 
 	static bool IsHero(const AActor* ActorToCheck);
+	static bool IsAbilityAtMaxLevel(const FGameplayAbilitySpec& AbilitySpec);
 };

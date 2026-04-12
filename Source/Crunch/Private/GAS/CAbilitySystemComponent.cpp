@@ -8,6 +8,7 @@
 #include "CrunchDebugHelper.h"
 #include "GameplayEffectExtension.h"
 #include "CTypes/CStruct.h"
+#include "FunctionLibrary/CAbilitySystemFunctionLibrary.h"
 #include "GAS/CAttributeSet.h"
 #include "GAS/CHeroAttributeSet.h"
 #include "GAS/Data/PA_AbilitySystemGenerics.h"
@@ -59,6 +60,35 @@ bool UCAbilitySystemComponent::IsAtMaxLevel() const
 	float CurrentLevel = GetGameplayAttributeValue(UCHeroAttributeSet::GetLevelAttribute(), bFound);
 	float MaxLevel = GetGameplayAttributeValue(UCHeroAttributeSet::GetMaxLevelAttribute(), bFound);
 	return CurrentLevel >= MaxLevel;
+}
+
+void UCAbilitySystemComponent::Server_UpgradeAbilityWithID_Implementation(ECAbilityInputID InputID)
+{
+	bool bFound;
+	float UpgradePoint = GetGameplayAttributeValue(UCHeroAttributeSet::GetUpgradePointAttribute(), bFound);
+	if (!bFound || UpgradePoint <= 0.f) return;
+
+	FGameplayAbilitySpec* AbilitySpec = FindAbilitySpecFromInputID((int32)InputID);
+	if (!AbilitySpec || UCAbilitySystemFunctionLibrary::IsAbilityAtMaxLevel(*AbilitySpec)) return;
+
+	SetNumericAttributeBase(UCHeroAttributeSet::GetUpgradePointAttribute(), UpgradePoint - 1);
+	AbilitySpec->Level += 1;
+	MarkAbilitySpecDirty(*AbilitySpec);
+}
+
+bool UCAbilitySystemComponent::Server_UpgradeAbilityWithID_Validate(ECAbilityInputID InputID)
+{
+	return true;
+}
+
+void UCAbilitySystemComponent::Client_AbilitySpecLevelUpdated_Implementation(
+	FGameplayAbilitySpecHandle Handle, int NewLevel)
+{
+	if (FGameplayAbilitySpec* AbilitySpec = FindAbilitySpecFromHandle(Handle))
+	{
+		AbilitySpec->Level = NewLevel;
+		AbilitySpecDirtiedCallbacks.Broadcast(*AbilitySpec);
+	}
 }
 
 void UCAbilitySystemComponent::InitializeBaseAttributes()
