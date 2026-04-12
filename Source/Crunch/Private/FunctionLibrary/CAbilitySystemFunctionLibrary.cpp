@@ -48,3 +48,77 @@ bool UCAbilitySystemFunctionLibrary::IsAbilityAtMaxLevel(const FGameplayAbilityS
 {
 	return AbilitySpec.Level >= 4;
 }
+
+bool UCAbilitySystemFunctionLibrary::CheckAbilityCost(
+	const FGameplayAbilitySpec& AbilitySpec, const UAbilitySystemComponent& ASC)
+{
+	if (const UGameplayAbility* AbilityCDO = AbilitySpec.Ability)
+	{
+		return AbilityCDO->CheckCost(AbilitySpec.Handle, ASC.AbilityActorInfo.Get());
+	}
+
+	return false;
+}
+
+float UCAbilitySystemFunctionLibrary::GetManaCostFor(
+	const UGameplayAbility* AbilityCDO, const UAbilitySystemComponent& ASC, int AbilityLevel)
+{
+	float ManaCost = 0.f;
+	if (AbilityCDO)
+	{
+		if (UGameplayEffect* CostGameplayEffect = AbilityCDO->GetCostGameplayEffect())
+		{
+			FGameplayEffectSpecHandle EffectSpecHandle =
+				ASC.MakeOutgoingSpec(CostGameplayEffect->GetClass(), AbilityLevel, ASC.MakeEffectContext());
+			CostGameplayEffect->Modifiers[0].ModifierMagnitude.AttemptCalculateMagnitude(
+				*EffectSpecHandle.Data.Get(), ManaCost
+			);
+		}
+	}
+
+	return FMath::Abs(ManaCost);
+}
+
+float UCAbilitySystemFunctionLibrary::GetCooldownDurationFor(
+	const UGameplayAbility* AbilityCDO, const UAbilitySystemComponent& ASC, int AbilityLevel)
+{
+	float CooldownDuration = 0.f;
+	if (AbilityCDO)
+	{
+		if (UGameplayEffect* CooldownGameplayEffect = AbilityCDO->GetCooldownGameplayEffect())
+		{
+			FGameplayEffectSpecHandle EffectSpecHandle =
+				ASC.MakeOutgoingSpec(CooldownGameplayEffect->GetClass(), AbilityLevel, ASC.MakeEffectContext());
+			CooldownGameplayEffect->DurationMagnitude.AttemptCalculateMagnitude(
+				*EffectSpecHandle.Data.Get(), CooldownDuration
+			);
+		}
+	}
+
+	return FMath::Abs(CooldownDuration);
+}
+
+float UCAbilitySystemFunctionLibrary::GetCooldownRemainingFor(
+	const UGameplayAbility* AbilityCDO, const UAbilitySystemComponent& ASC)
+{
+	if (!AbilityCDO) return 0.f;
+
+	UGameplayEffect* CooldownEffect = AbilityCDO->GetCooldownGameplayEffect();
+	if (!CooldownEffect) return 0.f;
+
+	FGameplayEffectQuery CooldownEffectQuery;
+	CooldownEffectQuery.EffectDefinition = CooldownEffect->GetClass();
+
+	float CooldownRemaining = 0.f;
+	FJsonSerializableArrayFloat CooldownTimeRemainings = ASC.GetActiveEffectsTimeRemaining(CooldownEffectQuery);
+
+	for (const float Remaining : CooldownTimeRemainings)
+	{
+		if (Remaining > CooldownRemaining)
+		{
+			CooldownRemaining = Remaining;
+		}
+	}
+
+	return CooldownRemaining;
+}

@@ -64,12 +64,17 @@ bool UCAbilitySystemComponent::IsAtMaxLevel() const
 
 void UCAbilitySystemComponent::Server_UpgradeAbilityWithID_Implementation(ECAbilityInputID InputID)
 {
+	if (InputID < ECAbilityInputID::AbilityOne || InputID > ECAbilityInputID::AbilitySix) return;
+	
 	bool bFound;
 	float UpgradePoint = GetGameplayAttributeValue(UCHeroAttributeSet::GetUpgradePointAttribute(), bFound);
 	if (!bFound || UpgradePoint <= 0.f) return;
 
 	FGameplayAbilitySpec* AbilitySpec = FindAbilitySpecFromInputID((int32)InputID);
 	if (!AbilitySpec || UCAbilitySystemFunctionLibrary::IsAbilityAtMaxLevel(*AbilitySpec)) return;
+
+	float OwnerLevel = GetGameplayAttributeValue(UCHeroAttributeSet::GetLevelAttribute(), bFound);
+	if (!bFound || OwnerLevel < 2 * AbilitySpec->Level + 1) return;
 
 	SetNumericAttributeBase(UCHeroAttributeSet::GetUpgradePointAttribute(), UpgradePoint - 1);
 	AbilitySpec->Level += 1;

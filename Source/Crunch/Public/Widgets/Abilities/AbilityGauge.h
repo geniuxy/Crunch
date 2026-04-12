@@ -75,6 +75,7 @@ private:
 	void AbilitySpecUpdated(const FGameplayAbilitySpec& AbilitySpec);
 	void UpdateCanCast();
 	void UpgradePointUpdated(const FOnAttributeChangeData& Data);
+	void ManaUpdated(const FOnAttributeChangeData& Data);
 	
 	UPROPERTY(EditDefaultsOnly, Category="Cooldown")
 	float CooldownUpdateInterval = 0.1f;
