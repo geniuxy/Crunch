@@ -9,6 +9,7 @@
 #include "Components/TextBlock.h"
 #include "CTypes/CStruct.h"
 #include "FunctionLibrary/CAbilitySystemFunctionLibrary.h"
+#include "GAS/CHeroAttributeSet.h"
 
 void UAbilityGauge::NativeConstruct()
 {
@@ -16,11 +17,14 @@ void UAbilityGauge::NativeConstruct()
 
 	CooldownCounterText->SetVisibility(ESlateVisibility::Hidden);
 
-	UAbilitySystemComponent* OwnerASC =
-		UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(GetOwningPlayerPawn());
-	if (OwnerASC)
+	OwnerAbilitySystemComponent = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(GetOwningPlayerPawn());
+	if (OwnerAbilitySystemComponent)
 	{
-		OwnerASC->AbilityCommittedCallbacks.AddUObject(this, &ThisClass::AbilityCommit);
+		OwnerAbilitySystemComponent->AbilityCommittedCallbacks.AddUObject(this, &ThisClass::AbilityCommit);
+		OwnerAbilitySystemComponent->AbilitySpecDirtiedCallbacks.AddUObject(this, &ThisClass::AbilitySpecUpdated);
+		OwnerAbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(
+			UCHeroAttributeSet::GetUpgradePointAttribute()).AddUObject(this, &ThisClass::UpgradePointUpdated
+		);
 	}
 
 	WholeNumberFormattingOptions.MaximumFractionalDigits = 0;
@@ -37,6 +41,21 @@ void UAbilityGauge::NativeOnListItemObjectSet(UObject* ListItemObject)
 
 	CooldownDurationText->SetText(FText::AsNumber(CooldownDuration));
 	CostText->SetText(FText::AsNumber(Cost));
+	AbilityLevelGauge->GetDynamicMaterial()->SetScalarParameterValue(AbilityLevelParamName, 0);
+
+	bool bFound = false;
+	if (OwnerAbilitySystemComponent)
+	{
+		float UpgradePoint = OwnerAbilitySystemComponent->GetGameplayAttributeValue(
+			UCHeroAttributeSet::GetUpgradePointAttribute(), bFound
+		);
+		if (bFound)
+		{
+			FOnAttributeChangeData Data;
+			Data.NewValue = UpgradePoint;
+			UpgradePointUpdated(Data);
+		}
+	}
 }
 
 void UAbilityGauge::ConfigureWithWidgetData(const FAbilityWidgetData* WidgetData)
@@ -98,5 +117,56 @@ void UAbilityGauge::UpdateCooldown()
 	CooldownCounterText->SetText(FText::AsNumber(CachedCooldownTimeRemaining, FormattingOptions));
 	Icon->GetDynamicMaterial()->SetScalarParameterValue(
 		CooldownPercentParamName, 1.f - CachedCooldownTimeRemaining / CachedCooldownDuration
+	);
+}
+
+const FGameplayAbilitySpec* UAbilityGauge::GetAbilitySpec()
+{
+	if (!CachedAbilitySpec)
+	{
+		if (AbilityCDO && OwnerAbilitySystemComponent)
+		{
+			CachedAbilitySpec = OwnerAbilitySystemComponent->FindAbilitySpecFromClass(AbilityCDO->GetClass());
+		}
+	}
+
+	return CachedAbilitySpec;
+}
+
+void UAbilityGauge::AbilitySpecUpdated(const FGameplayAbilitySpec& AbilitySpec)
+{
+	if (AbilitySpec.Ability != AbilityCDO) return;
+
+	bIsAbilityLearned = AbilitySpec.Level > 0;
+	AbilityLevelGauge->GetDynamicMaterial()->SetScalarParameterValue(AbilityLevelParamName, AbilitySpec.Level);
+	UpdateCanCast();
+}
+
+void UAbilityGauge::UpdateCanCast()
+{
+	Icon->GetDynamicMaterial()->SetScalarParameterValue(CanCastAbilityParamName, bIsAbilityLearned);
+}
+
+void UAbilityGauge::UpgradePointUpdated(const FOnAttributeChangeData& Data)
+{
+	bool bHasUpgradePoint = Data.NewValue > 0;
+	bool bCanUpgrade = false;
+	bool bAbilityAtMaxLevel = false;
+	if (const FGameplayAbilitySpec* AbilitySpec = GetAbilitySpec())
+	{
+		if (UCAbilitySystemFunctionLibrary::IsAbilityAtMaxLevel(*AbilitySpec))
+		{
+			bAbilityAtMaxLevel = true;
+		}
+
+		bool bFound;
+		float OwnerLevel = OwnerAbilitySystemComponent->GetGameplayAttributeValue(
+			UCHeroAttributeSet::GetLevelAttribute(), bFound
+		);
+		bCanUpgrade = OwnerLevel >= 2 * AbilitySpec->Level + 1;
+	}
+
+	Icon->GetDynamicMaterial()->SetScalarParameterValue(
+		UpgradePointAvaliableParamName, bHasUpgradePoint && bCanUpgrade && !bAbilityAtMaxLevel
 	);
 }

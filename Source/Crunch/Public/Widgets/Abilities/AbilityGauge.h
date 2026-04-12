@@ -3,10 +3,13 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameplayAbilitySpec.h"
 #include "Blueprint/IUserObjectListEntry.h"
 #include "Blueprint/UserWidget.h"
 #include "AbilityGauge.generated.h"
 
+struct FGameplayAbilitySpec;
+class UAbilitySystemComponent;
 class UGameplayAbility;
 struct FAbilityWidgetData;
 class UTextBlock;
@@ -38,6 +41,9 @@ private:
 	UPROPERTY(meta=(BindWidget))
 	UTextBlock* CostText;
 
+	UPROPERTY(meta=(BindWidget))
+	UImage* AbilityLevelGauge;
+
 	UPROPERTY()
 	UGameplayAbility* AbilityCDO; // AbilityGauge所指向的Ability, CDO(Class Default Object)
 
@@ -56,6 +62,19 @@ private:
 
 	FNumberFormattingOptions WholeNumberFormattingOptions;
 	FNumberFormattingOptions OneDigitNumberFormattingOptions;
+
+	UPROPERTY()
+	UAbilitySystemComponent* OwnerAbilitySystemComponent;
+
+	const FGameplayAbilitySpec* CachedAbilitySpec;
+
+	const FGameplayAbilitySpec* GetAbilitySpec();
+
+	bool bIsAbilityLearned = false;
+
+	void AbilitySpecUpdated(const FGameplayAbilitySpec& AbilitySpec);
+	void UpdateCanCast();
+	void UpgradePointUpdated(const FOnAttributeChangeData& Data);
 	
 	UPROPERTY(EditDefaultsOnly, Category="Cooldown")
 	float CooldownUpdateInterval = 0.1f;
@@ -65,4 +84,13 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, Category="Visual")
 	FName CooldownPercentParamName = "Percent";
+
+	UPROPERTY(EditDefaultsOnly, Category="Visual")
+	FName AbilityLevelParamName = "Level";
+
+	UPROPERTY(EditDefaultsOnly, Category="Visual")
+	FName CanCastAbilityParamName = "CanCast";
+
+	UPROPERTY(EditDefaultsOnly, Category="Visual")
+	FName UpgradePointAvaliableParamName = "UpgradeAvaliable";
 };
