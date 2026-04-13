@@ -8,6 +8,20 @@
 #include "GameplayCueManager.h"
 #include "Kismet/KismetSystemLibrary.h"
 
+/*
+ * Server (ROLE_Authority)、Local Client (ROLE_AutonomousProxy)、Other Clients (ROLE_SimulatedProxy)
+ * 三种角色都会分别执行各自的 AnimNotify
+ * 可作区分处理：
+ * 1. 视觉效果：所有端都做（Server 可选跳过）
+ * 2. 游戏逻辑：只有 Server 执行权威判定
+ * 3. 本地预测反馈（Local Client 专属）
+ *
+ * MontageTickType 设置为 BranchingPoint，更适用于即时性要求高的，如（攻击判定、精确状态切换）
+ * MontageTickType 设置为 Queued，更适用于 （音效、粒子等非关键反馈）
+ * 
+ * Queued 模式：由于检测窗口宽松，可能因为动画帧率波动或网络回滚，导致 同一 Notify 在同一端被多次检测到（比如 Server 一帧内触发两次）
+ * BranchingPoint 模式：精确到动画评估的单一时间点，避免这种单端重复触发
+ */
 void UAN_SendTargetGroup::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation,
                                  const FAnimNotifyEventReference& EventReference)
 {
