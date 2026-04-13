@@ -9,7 +9,6 @@ struct FGenericDamageEffectDef
 {
 	GENERATED_BODY()
 
-public:
 	FGenericDamageEffectDef(): DamageEffect(nullptr), PushVel(0.f)
 	{
 	}
