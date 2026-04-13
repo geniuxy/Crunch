@@ -96,8 +96,6 @@ void UGA_GroundBlast::TargetConfirmed(const FGameplayAbilityTargetDataHandle& Ta
 
 void UGA_GroundBlast::TargetCancelled(const FGameplayAbilityTargetDataHandle& TargetDataHandle)
 {
-	Debug::Print(TEXT("Target Canceled"));
-
 	UCAbilitySystemComponent* OwnerASC = Cast<UCAbilitySystemComponent>(GetAbilitySystemComponentFromActorInfo());
 	if (OwnerASC)
 	{
