@@ -38,9 +38,6 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category="Launch")
 	float UpperCutHoldSpeed = 100.f;
 	
-	UPROPERTY(EditDefaultsOnly, Category="Targeting")
-	float TargetSweepSphereRadius = 120.f;
-	
 	UPROPERTY(EditDefaultsOnly, Category="Animation")
 	UAnimMontage* UpperCutMontage;
 

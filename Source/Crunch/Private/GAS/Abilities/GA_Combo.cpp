@@ -44,6 +44,8 @@ void UGA_Combo::ActivateAbility(
 		PlayComboMontageTask->OnInterrupted.AddDynamic(this, &ThisClass::K2_EndAbility);
 		PlayComboMontageTask->ReadyForActivation();
 
+		// MontageTickType 设置为 BranchingPoint（立即执行Notify）很重要
+		// 经测试，如果MontageTickType设为Queued，Server端会收两次Event
 		UAbilityTask_WaitGameplayEvent* WaitGameplayEventTask = UAbilityTask_WaitGameplayEvent::WaitGameplayEvent(
 			this, CGameplayTags::Crunch_Ability_Combo_Event_Change, nullptr, false, false
 		);
@@ -53,7 +55,6 @@ void UGA_Combo::ActivateAbility(
 
 	if (K2_HasAuthority())
 	{
-		// MontageTickType 设置为 BranchingPoint（立即执行Notify） 很重要，不然会造成两次伤害
 		UAbilityTask_WaitGameplayEvent* WaitTargetingEventTask = UAbilityTask_WaitGameplayEvent::WaitGameplayEvent(
 			this, CGameplayTags::Crunch_Ability_BasicAttack_Event_Damage
 		);
@@ -117,10 +118,10 @@ void UGA_Combo::ComboChangedEventReceived(FGameplayEventData Data)
 
 void UGA_Combo::DoDamage(FGameplayEventData Data)
 {
-	TArray<FHitResult> HitResults = GetHitResultFromSweepLocationTargetData(Data.TargetData, TargetSweepSphereRadius);
-
-	for (FHitResult HitResult : HitResults)
+	int HitResultCount = UAbilitySystemBlueprintLibrary::GetDataCountFromTargetData(Data.TargetData);
+	for (int i = 0; i < HitResultCount; ++i)
 	{
+		FHitResult HitResult = UAbilitySystemBlueprintLibrary::GetHitResultFromTargetData(Data.TargetData, i);
 		TSubclassOf<UGameplayEffect> EffectForCurrentCombo = GetCurrentEffectForCurrentCombo();
 		ApplyGameplayEffectToHitResultActor(
 			HitResult, EffectForCurrentCombo, GetAbilityLevel(GetCurrentAbilitySpecHandle(), GetCurrentActorInfo())

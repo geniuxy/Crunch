@@ -3,6 +3,7 @@
 
 #include "GAS/Abilities/GA_UpperCut.h"
 
+#include "AbilitySystemBlueprintLibrary.h"
 #include "CGameplayTags.h"
 #include "Abilities/Tasks/AbilityTask_PlayMontageAndWait.h"
 #include "Abilities/Tasks/AbilityTask_WaitGameplayEvent.h"
@@ -61,13 +62,11 @@ void UGA_UpperCut::StartLaunching(FGameplayEventData EventData)
 {
 	if (K2_HasAuthority())
 	{
-		TArray<FHitResult> HitResults = GetHitResultFromSweepLocationTargetData(
-			EventData.TargetData, TargetSweepSphereRadius, ETeamAttitude::Hostile, ShouldDrawDebug()
-		);
-
 		PushTarget(GetAvatarActorFromActorInfo(), FVector::UpVector * UpperCutLaunchSpeed);
-		for (FHitResult HitResult : HitResults)
+		int HitResultCount = UAbilitySystemBlueprintLibrary::GetDataCountFromTargetData(EventData.TargetData);
+		for (int i = 0; i < HitResultCount; ++i)
 		{
+			FHitResult HitResult = UAbilitySystemBlueprintLibrary::GetHitResultFromTargetData(EventData.TargetData, i);
 			PushTarget(HitResult.GetActor(), FVector::UpVector * UpperCutLaunchSpeed);
 			ApplyGameplayEffectToHitResultActor(
 				HitResult, LaunchDamageEffect, GetAbilityLevel(GetCurrentAbilitySpecHandle(), GetCurrentActorInfo())
@@ -140,16 +139,14 @@ void UGA_UpperCut::HandleBasicAttackComboDamageEvent(FGameplayEventData EventDat
 {
 	if (K2_HasAuthority())
 	{
-		TArray<FHitResult> HitResults = GetHitResultFromSweepLocationTargetData(
-			EventData.TargetData, TargetSweepSphereRadius, ETeamAttitude::Hostile, ShouldDrawDebug()
-		);
-
 		PushTarget(GetAvatarActorFromActorInfo(), FVector::UpVector * UpperCutHoldSpeed);
 		const FGenericDamageEffectDef* EffectDef = GetDamageEffectDefForCurrentCombo();
 		if (!EffectDef) return;
 		
-		for (FHitResult HitResult : HitResults)
+		int HitResultCount = UAbilitySystemBlueprintLibrary::GetDataCountFromTargetData(EventData.TargetData);
+		for (int i = 0; i < HitResultCount; ++i)
 		{
+			FHitResult HitResult = UAbilitySystemBlueprintLibrary::GetHitResultFromTargetData(EventData.TargetData, i);
 			// 根据释放技能角色的朝向，向释放技能角色的"前/上/右"等方向飞
 			FVector PushVel = GetAvatarActorFromActorInfo()->GetActorTransform().TransformVector(EffectDef->PushVel);
 			PushTarget(HitResult.GetActor(), PushVel);
