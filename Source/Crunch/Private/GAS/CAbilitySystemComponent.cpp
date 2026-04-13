@@ -140,8 +140,6 @@ void UCAbilitySystemComponent::InitializeBaseAttributes()
 
 		float MaxLevelExp = ExperienceCurve->GetKeyValue(ExperienceCurve->GetLastKeyHandle());
 		SetNumericAttributeBase(UCHeroAttributeSet::GetMaxLevelExperienceAttribute(), MaxLevelExp);
-
-		Debug::Print(FString::Printf(TEXT("Max Level is: %d, max experience is: %f"), MaxLevel, MaxLevelExp));
 	}
 
 	ExperienceUpdated(FOnAttributeChangeData()); // 经验值为0
