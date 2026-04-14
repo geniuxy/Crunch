@@ -2,7 +2,10 @@
 
 #include "CoreMinimal.h"
 #include "GameplayEffect.h"
+#include "Inventory/Data/PA_ShopItem.h"
 #include "CStruct.generated.h"
+
+class UPA_ShopItem;
 
 USTRUCT(BlueprintType)
 struct FGenericDamageEffectDef
@@ -72,4 +75,40 @@ struct FHeroBaseStats : public FTableRowBase
 
 	UPROPERTY(EditAnywhere)
 	float BaseMoveSpeed = 0.f;
+};
+
+USTRUCT(BlueprintType)
+struct FItemCollection
+{
+	GENERATED_BODY()
+
+public:
+	FItemCollection()
+	{
+	}
+
+	FItemCollection(const TArray<const UPA_ShopItem*>& InItems): Items(InItems)
+	{
+	}
+
+	void AddItem(const UPA_ShopItem* NewItem, bool bAddUnique = false)
+	{
+		if (bAddUnique && Contains(NewItem)) return;
+
+		Items.Add(NewItem);
+	}
+
+	bool Contains(const UPA_ShopItem* Item) const
+	{
+		return Items.Contains(Item);
+	}
+
+	const TArray<const UPA_ShopItem*>& GetItems() const
+	{
+		return Items;
+	}
+
+private:
+	UPROPERTY()
+	TArray<const UPA_ShopItem*> Items;
 };
