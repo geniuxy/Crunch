@@ -21,7 +21,7 @@ public:
 	static UCAssetManager& Get();
 
 	void LoadShopItems(const FStreamableDelegate& LoadFinishedCallback); // 异步加载ShopItems
-	bool GetLoadedShopItems(TArray<const UPA_ShopItem*>& OutItems) const; // 获取ShopItem的合集
+	bool GetLoadedShopItems(TArray<UPA_ShopItem*>& OutItems) const; // 获取ShopItem的合集
 
 private:
 	void ShopItemLoadFinished(FStreamableDelegate Callback);

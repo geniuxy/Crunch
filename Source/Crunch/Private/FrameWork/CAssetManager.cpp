@@ -27,7 +27,7 @@ void UCAssetManager::LoadShopItems(const FStreamableDelegate& LoadFinishedCallba
 	);
 }
 
-bool UCAssetManager::GetLoadedShopItems(TArray<const UPA_ShopItem*>& OutItems) const
+bool UCAssetManager::GetLoadedShopItems(TArray<UPA_ShopItem*>& OutItems) const
 {
 	TArray<UObject*> LoadedObjects;
 	bool bLoaded = GetPrimaryAssetObjectList(UPA_ShopItem::GetShopItemAssetType(), LoadedObjects);
@@ -49,7 +49,7 @@ void UCAssetManager::ShopItemLoadFinished(FStreamableDelegate Callback)
 
 void UCAssetManager::BuildItemMaps()
 {
-	TArray<const UPA_ShopItem*> LoadedItems;
+	TArray<UPA_ShopItem*> LoadedItems;
 	if (GetLoadedShopItems(LoadedItems))
 	{
 		for (const UPA_ShopItem* Item : LoadedItems)
