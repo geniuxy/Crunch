@@ -7,6 +7,8 @@
 #include "GameFramework/PlayerController.h"
 #include "CPlayerController.generated.h"
 
+class UInputAction;
+class UInputMappingContext;
 class UGameplayWidget;
 class ACPlayerCharacter;
 /**
@@ -30,6 +32,8 @@ public:
 	virtual FGenericTeamId GetGenericTeamId() const override;
 	//~ End IGenericTeamAgentInterface Interface
 
+	virtual void SetupInputComponent() override;
+
 protected:
 	void SpawnGameplayWidget();
 
@@ -44,4 +48,13 @@ protected:
 
 	UPROPERTY(Replicated)
 	FGenericTeamId TeamID;
+
+	UPROPERTY(EditDefaultsOnly, Category="Input")
+	UInputMappingContext* UIInputMapping;
+	
+	UPROPERTY(EditDefaultsOnly, Category="Input")
+	UInputAction* ShopToggleInputAction;
+
+	UFUNCTION()
+	void ToggleShop();
 };

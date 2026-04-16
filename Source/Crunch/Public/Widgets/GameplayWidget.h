@@ -25,6 +25,8 @@ public:
 
 	void ConfigureAbilities(const TMap<ECAbilityInputID, TSubclassOf<UGameplayAbility>>& Abilities);
 
+	void ToggleShop();
+
 private:
 	UPROPERTY(meta=(BindWidget))
 	UValueGauge* HealthBar;
@@ -49,6 +51,14 @@ private:
 
 	UPROPERTY(meta=(BindWidget))
 	UStatsGauge* MoveSpeedGauge;
+	
+	UPROPERTY(meta=(BindWidget))
+	UUserWidget* ShopWidget;
+
+	UPROPERTY(Transient, meta=(BindWidgetAnim))
+	UWidgetAnimation* ShopPopUpAnimation;
+	
+	void PlayShopPopUpAnimation(bool bPlayForward);
 	
 	UPROPERTY()
 	TObjectPtr<UAbilitySystemComponent> OwnerAbilitySystemComponent;

@@ -33,3 +33,29 @@ void UGameplayWidget::ConfigureAbilities(const TMap<ECAbilityInputID, TSubclassO
 {
 	AbilityListView->ConfigureAbilities(Abilities);
 }
+
+void UGameplayWidget::ToggleShop()
+{
+	if (ShopWidget->GetVisibility() == ESlateVisibility::HitTestInvisible)
+	{
+		ShopWidget->SetVisibility(ESlateVisibility::Visible);
+		PlayShopPopUpAnimation(true);
+	}
+	else
+	{
+		ShopWidget->SetVisibility(ESlateVisibility::HitTestInvisible);
+		PlayShopPopUpAnimation(false);
+	}
+}
+
+void UGameplayWidget::PlayShopPopUpAnimation(bool bPlayForward)
+{
+	if (bPlayForward)
+	{
+		PlayAnimationForward(ShopPopUpAnimation);
+	}
+	else
+	{
+		PlayAnimationReverse(ShopPopUpAnimation);
+	}
+}

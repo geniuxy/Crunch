@@ -3,6 +3,8 @@
 
 #include "Crunch/Public/Player/CPlayerController.h"
 
+#include "EnhancedInputComponent.h"
+#include "EnhancedInputSubsystems.h"
 #include "Blueprint/UserWidget.h"
 #include "Characters/CPlayerCharacter.h"
 #include "Net/UnrealNetwork.h"
@@ -49,6 +51,24 @@ FGenericTeamId ACPlayerController::GetGenericTeamId() const
 	return TeamID;
 }
 
+void ACPlayerController::SetupInputComponent()
+{
+	Super::SetupInputComponent();
+
+	UEnhancedInputLocalPlayerSubsystem* InputSubsystem = GetLocalPlayer()->GetSubsystem<UEnhancedInputLocalPlayerSubsystem>();
+	if (InputSubsystem)
+	{
+		InputSubsystem->RemoveMappingContext(UIInputMapping);
+		InputSubsystem->AddMappingContext(UIInputMapping, 1);
+	}
+
+	UEnhancedInputComponent* EnhancedInputComp = Cast<UEnhancedInputComponent>(InputComponent);
+	if (EnhancedInputComp)
+	{
+		EnhancedInputComp->BindAction(ShopToggleInputAction, ETriggerEvent::Triggered, this, &ACPlayerController::ToggleShop);
+	}
+}
+
 void ACPlayerController::SpawnGameplayWidget()
 {
 	if (!IsLocalPlayerController()) // 排除在Client端，Server的副本角色的情况
@@ -61,5 +81,13 @@ void ACPlayerController::SpawnGameplayWidget()
 	{
 		GameplayWidget->AddToViewport();
 		GameplayWidget->ConfigureAbilities(OwningPlayerCharacter->GetAbilities());
+	}
+}
+
+void ACPlayerController::ToggleShop()
+{
+	if (GameplayWidget)
+	{
+		GameplayWidget->ToggleShop();
 	}
 }
