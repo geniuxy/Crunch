@@ -59,6 +59,10 @@ private:
 	UWidgetAnimation* ShopPopUpAnimation;
 	
 	void PlayShopPopUpAnimation(bool bPlayForward);
+	void SetOwningPawnInputEnabled(bool bPawnInputEnabled);
+	void SetShowMouseCursor(bool bShowMouseCursor);
+	void SetFocusToGameAndUI();
+	void SetFocusToGameOnly();
 	
 	UPROPERTY()
 	TObjectPtr<UAbilitySystemComponent> OwnerAbilitySystemComponent;
