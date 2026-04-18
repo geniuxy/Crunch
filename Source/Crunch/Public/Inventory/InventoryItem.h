@@ -6,6 +6,40 @@
 #include "UObject/Object.h"
 #include "InventoryItem.generated.h"
 
+USTRUCT()
+struct FInventoryItemHandle
+{
+	GENERATED_BODY()
+
+public:
+	FInventoryItemHandle() : HandleID(GetInvalidID())
+	{
+	}
+
+	static FInventoryItemHandle InvalidHandle();
+	static FInventoryItemHandle CreateHandle();
+
+	bool IsValid() const;
+	uint32 GetHandleID() const { return HandleID; }
+
+private:
+	// explicit 表示 类型不能隐式转换 uint32不能自动转为FInventoryItemHandle
+	// 这个 Handle 的设计意图很明确：
+	// 不允许外部直接用原始 ID 构造，必须通过 CreateHandle() 或 InvalidHandle() 工厂方法。
+	explicit FInventoryItemHandle(uint32 ID) : HandleID(ID)
+	{
+	}
+
+	UPROPERTY()
+	uint32 HandleID;
+
+	static uint32 GenerateNextID();
+	static uint32 GetInvalidID();
+};
+
+bool operator==(const FInventoryItemHandle& Lhs, const FInventoryItemHandle& Rhs);
+uint32 GetTypeHash(const FInventoryItemHandle& Key);
+
 /**
  * 
  */
