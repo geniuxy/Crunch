@@ -3,34 +3,55 @@
 
 #include "Inventory/InventoryComponent.h"
 
+#include "AbilitySystemBlueprintLibrary.h"
+#include "AbilitySystemComponent.h"
+#include "CrunchDebugHelper.h"
+#include "GAS/CHeroAttributeSet.h"
 
-// Sets default values for this component's properties
+
 UInventoryComponent::UInventoryComponent()
 {
-	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
-	// off to improve performance if you don't need them.
-	PrimaryComponentTick.bCanEverTick = true;
-
-	// ...
+	PrimaryComponentTick.bCanEverTick = false;
 }
 
+void UInventoryComponent::TryPurchase(const UPA_ShopItem* ItemToPurchase)
+{
+	if (!OwnerAbilitySystemComponent) return;
 
-// Called when the game starts
+	Server_Purchase(ItemToPurchase);
+}
+
+float UInventoryComponent::GetGold() const
+{
+	if (!OwnerAbilitySystemComponent) return 0.f;
+
+	bool bFound = false;
+	float Gold = OwnerAbilitySystemComponent->GetGameplayAttributeValue(
+		UCHeroAttributeSet::GetGoldAttribute(), bFound
+	);
+
+	return bFound ? Gold : 0.f;
+}
+
 void UInventoryComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// ...
-	
+	OwnerAbilitySystemComponent = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(GetOwner());
 }
 
-
-// Called every frame
-void UInventoryComponent::TickComponent(float DeltaTime, ELevelTick TickType,
-                                        FActorComponentTickFunction* ThisTickFunction)
+void UInventoryComponent::Server_Purchase_Implementation(const UPA_ShopItem* ItemToPurchase)
 {
-	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+	if (!ItemToPurchase) return;
+	if (GetGold() < ItemToPurchase->GetPrice()) return;
 
-	// ...
+	OwnerAbilitySystemComponent->ApplyModToAttribute(
+		UCHeroAttributeSet::GetGoldAttribute(), EGameplayModOp::Additive, -ItemToPurchase->GetPrice()
+	);
+	Debug::Print(FString::Printf(TEXT("购买了物品：%s"), *ItemToPurchase->GetItemName().ToString()));
 }
 
+bool UInventoryComponent::Server_Purchase_Validate(const UPA_ShopItem* ItemToPurchase)
+{
+	return true;
+}

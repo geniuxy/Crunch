@@ -5,6 +5,7 @@
 
 #include "Components/TileView.h"
 #include "FrameWork/CAssetManager.h"
+#include "Inventory/InventoryComponent.h"
 #include "Widgets/Item/Shop/ShopItemWidget.h"
 
 void UShopWidget::NativeConstruct()
@@ -13,6 +14,10 @@ void UShopWidget::NativeConstruct()
 	SetIsFocusable(true);
 	LoadShopItems();
 	ShopItemList->OnEntryWidgetGenerated().AddUObject(this, &ThisClass::ShopItemWidgetGenerated);
+	if (APawn* OwnerPawn = GetOwningPlayerPawn())
+	{
+		OwnerInventoryComponent = OwnerPawn->GetComponentByClass<UInventoryComponent>();
+	}
 }
 
 void UShopWidget::LoadShopItems()
@@ -35,6 +40,10 @@ void UShopWidget::ShopItemWidgetGenerated(UUserWidget& NewWidget)
 	UShopItemWidget* ItemWidget = Cast<UShopItemWidget>(&NewWidget);
 	if (ItemWidget)
 	{
+		if (OwnerInventoryComponent)
+		{
+			ItemWidget->OnShopItemPurchaseIssued.AddUObject(OwnerInventoryComponent, &UInventoryComponent::TryPurchase);
+		}
 		ItemsMap.Add(ItemWidget->GetShopItem(), ItemWidget);
 	}
 }

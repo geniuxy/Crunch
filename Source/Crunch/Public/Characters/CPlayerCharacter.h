@@ -7,6 +7,7 @@
 #include "InputMappingContext.h"
 #include "CPlayerCharacter.generated.h"
 
+class UInventoryComponent;
 class UCHeroAttributeSet;
 struct FInputActionValue;
 class UInputAction;
@@ -45,13 +46,13 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, Category="Input")
 	UInputAction* MoveInputAction;
-	
+
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	UInputAction* LearnAbilityLeaderAction;
 
 	UPROPERTY(EditDefaultsOnly, Category="Input")
 	TMap<ECAbilityInputID, UInputAction*> GameplayAbilityInputActions;
-	
+
 	UPROPERTY(EditDefaultsOnly, Category="Input")
 	UInputMappingContext* GameplayInputMappingContext;
 
@@ -65,7 +66,7 @@ private:
 	void HandleAbilityInput(const FInputActionValue& InputActionValue, ECAbilityInputID InputID);
 
 	void SetInputEnabledFromPlayerController(bool bEnabled);
-	
+
 	/**********************************************************************/
 	/*                         Death And Respawn                          */
 	/**********************************************************************/
@@ -80,7 +81,7 @@ protected:
 protected:
 	virtual void OnStun() override;
 	virtual void OnRecoverFromStun() override;
-	
+
 	/**********************************************************************/
 	/*                           Camera View                              */
 	/**********************************************************************/
@@ -96,7 +97,7 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, Category="View")
 	float CameraLerpSpeed = 20.f;
-	
+
 	FTimerHandle CameraLerpTimerHandle;
 
 	UPROPERTY()
@@ -107,4 +108,11 @@ private:
 
 	void LerpCameraToLocalOffsetLocation(const FVector& Goal);
 	void TickCameraLocalOffsetLerp();
+	
+	/**********************************************************************/
+	/*                           Camera View                              */
+	/**********************************************************************/
+private:
+	UPROPERTY()
+	UInventoryComponent* InventoryComponent;
 };
