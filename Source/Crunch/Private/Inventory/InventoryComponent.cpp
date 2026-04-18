@@ -7,6 +7,7 @@
 #include "AbilitySystemComponent.h"
 #include "CrunchDebugHelper.h"
 #include "GAS/CHeroAttributeSet.h"
+#include "Inventory/InventoryItem.h"
 
 
 UInventoryComponent::UInventoryComponent()
@@ -40,6 +41,38 @@ void UInventoryComponent::BeginPlay()
 	OwnerAbilitySystemComponent = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(GetOwner());
 }
 
+void UInventoryComponent::GrantItem(const UPA_ShopItem* NewItem)
+{
+	if (!GetOwner()->HasAuthority()) return;
+
+	UInventoryItem* InventoryItem = NewObject<UInventoryItem>();
+	FInventoryItemHandle NewHandle = FInventoryItemHandle::CreateHandle();
+	InventoryItem->InitItem(NewHandle, NewItem);
+	InventoryMap.Add(NewHandle, InventoryItem);
+	OnItemAdded.Broadcast(InventoryItem);
+	Debug::Print(FString::Printf(
+			TEXT("Server添加物品：%s, ID为：%d"),
+			*InventoryItem->GetShopItem()->GetItemName().ToString(),
+			NewHandle.GetHandleID())
+	);
+	Client_ItemAdded(NewHandle, NewItem);
+}
+
+void UInventoryComponent::Client_ItemAdded_Implementation(FInventoryItemHandle AssignedHandle, const UPA_ShopItem* Item)
+{
+	if (GetOwner()->HasAuthority()) return;
+
+	UInventoryItem* InventoryItem = NewObject<UInventoryItem>();
+	InventoryItem->InitItem(AssignedHandle, Item);
+	InventoryMap.Add(AssignedHandle, InventoryItem);
+	OnItemAdded.Broadcast(InventoryItem);
+	Debug::Print(FString::Printf(
+			TEXT("Client添加物品：%s, ID为：%d"),
+			*InventoryItem->GetShopItem()->GetItemName().ToString(),
+			AssignedHandle.GetHandleID())
+	);
+}
+
 void UInventoryComponent::Server_Purchase_Implementation(const UPA_ShopItem* ItemToPurchase)
 {
 	if (!ItemToPurchase) return;
@@ -48,7 +81,7 @@ void UInventoryComponent::Server_Purchase_Implementation(const UPA_ShopItem* Ite
 	OwnerAbilitySystemComponent->ApplyModToAttribute(
 		UCHeroAttributeSet::GetGoldAttribute(), EGameplayModOp::Additive, -ItemToPurchase->GetPrice()
 	);
-	Debug::Print(FString::Printf(TEXT("购买了物品：%s"), *ItemToPurchase->GetItemName().ToString()));
+	GrantItem(ItemToPurchase);
 }
 
 bool UInventoryComponent::Server_Purchase_Validate(const UPA_ShopItem* ItemToPurchase)

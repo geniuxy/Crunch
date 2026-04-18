@@ -6,6 +6,8 @@
 #include "UObject/Object.h"
 #include "InventoryItem.generated.h"
 
+class UPA_ShopItem;
+
 USTRUCT()
 struct FInventoryItemHandle
 {
@@ -47,4 +49,17 @@ UCLASS()
 class CRUNCH_API UInventoryItem : public UObject
 {
 	GENERATED_BODY()
+
+public:
+	void InitItem(const FInventoryItemHandle& NewHandle, const UPA_ShopItem* NewShopItem);
+
+private:
+	UPROPERTY()
+	const UPA_ShopItem* ShopItem;
+
+	FInventoryItemHandle Handle;
+
+public:
+	FORCEINLINE const UPA_ShopItem* GetShopItem() const { return ShopItem; }
+	FORCEINLINE FInventoryItemHandle GetHandle() const { return Handle; }
 };
