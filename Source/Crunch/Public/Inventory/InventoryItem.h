@@ -3,9 +3,13 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "ActiveGameplayEffectHandle.h"
+#include "GameplayAbilitySpecHandle.h"
 #include "UObject/Object.h"
 #include "InventoryItem.generated.h"
 
+struct FGameplayAbilitySpecHandle;
+class UAbilitySystemComponent;
 class UPA_ShopItem;
 
 USTRUCT()
@@ -53,12 +57,17 @@ class CRUNCH_API UInventoryItem : public UObject
 public:
 	void InitItem(const FInventoryItemHandle& NewHandle, const UPA_ShopItem* NewShopItem);
 
+	void ApplyGASModifications(UAbilitySystemComponent* AbilitySystemComponent);
+
 private:
 	UPROPERTY()
 	const UPA_ShopItem* ShopItem;
 
 	FInventoryItemHandle Handle;
 
+	FActiveGameplayEffectHandle AppliedEquippedEffectHandle;
+	FGameplayAbilitySpecHandle GrantedAbilitySpecHandle;
+	
 public:
 	FORCEINLINE const UPA_ShopItem* GetShopItem() const { return ShopItem; }
 	FORCEINLINE FInventoryItemHandle GetHandle() const { return Handle; }

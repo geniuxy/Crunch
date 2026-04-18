@@ -3,6 +3,9 @@
 
 #include "Inventory/InventoryItem.h"
 
+#include "AbilitySystemComponent.h"
+#include "Inventory/Data/PA_ShopItem.h"
+
 FInventoryItemHandle FInventoryItemHandle::InvalidHandle()
 {
 	// 返回静态单例引用
@@ -46,4 +49,30 @@ void UInventoryItem::InitItem(const FInventoryItemHandle& NewHandle, const UPA_S
 {
 	Handle = NewHandle;
 	ShopItem = NewShopItem;
+}
+
+void UInventoryItem::ApplyGASModifications(UAbilitySystemComponent* AbilitySystemComponent)
+{
+	if (!GetShopItem() || !AbilitySystemComponent) return;
+	if (!AbilitySystemComponent->GetOwner() || !AbilitySystemComponent->GetOwner()->HasAuthority()) return;
+
+	if (TSubclassOf<UGameplayEffect> EquippedEffect = GetShopItem()->GetEquippedEffect())
+	{
+		AppliedEquippedEffectHandle = AbilitySystemComponent->BP_ApplyGameplayEffectToSelf(
+			EquippedEffect, 1, AbilitySystemComponent->MakeEffectContext()
+		);
+	}
+
+	if (TSubclassOf<UGameplayAbility> GrantedAbility = GetShopItem()->GetGrantedAbility())
+	{
+		FGameplayAbilitySpec* FoundSpec = AbilitySystemComponent->FindAbilitySpecFromClass(GrantedAbility);
+		if (FoundSpec)
+		{
+			GrantedAbilitySpecHandle = FoundSpec->Handle;
+		}
+		else
+		{
+			GrantedAbilitySpecHandle = AbilitySystemComponent->GiveAbility(FGameplayAbilitySpec(GrantedAbility));
+		}
+	}
 }
