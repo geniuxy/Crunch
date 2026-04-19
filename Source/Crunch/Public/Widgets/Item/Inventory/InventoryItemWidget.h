@@ -3,7 +3,6 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Inventory/Data/PA_ShopItem.h"
 #include "Widgets/Item/ItemWidget.h"
 #include "InventoryItemWidget.generated.h"
 
@@ -24,6 +23,8 @@ public:
 	void EmptySlot();
 	void UpdateStackCount();
 
+	UTexture2D* GetIconTexture() const;
+	
 private:
 	UPROPERTY(EditDefaultsOnly, Category="Visual")
 	UTexture2D* EmptyTexture;

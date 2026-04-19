@@ -7,6 +7,7 @@
 #include "GAS/CAttributeSet.h"
 #include "Widgets/ValueGauge.h"
 #include "Widgets/Abilities/AbilityListView.h"
+#include "Widgets/Item/Shop/ShopWidget.h"
 
 void UGameplayWidget::NativeConstruct()
 {

@@ -6,6 +6,8 @@
 #include "Blueprint/UserWidget.h"
 #include "GameplayWidget.generated.h"
 
+class UInventoryWidget;
+class UShopWidget;
 class UStatsGauge;
 class UAbilityListView;
 class UGameplayAbility;
@@ -53,10 +55,10 @@ private:
 	UStatsGauge* MoveSpeedGauge;
 	
 	UPROPERTY(meta=(BindWidget))
-	UUserWidget* ShopWidget;
+	UShopWidget* ShopWidget;
 
 	UPROPERTY(meta=(BindWidget))
-	UUserWidget* InventoryWidget;
+	UInventoryWidget* InventoryWidget;
 
 	UPROPERTY(Transient, meta=(BindWidgetAnim))
 	UWidgetAnimation* ShopPopUpAnimation;
