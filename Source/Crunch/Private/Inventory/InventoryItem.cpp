@@ -76,3 +76,8 @@ void UInventoryItem::ApplyGASModifications(UAbilitySystemComponent* AbilitySyste
 		}
 	}
 }
+
+bool UInventoryItem::IsValid() const
+{
+	return ShopItem != nullptr;
+}

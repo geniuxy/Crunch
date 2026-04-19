@@ -59,16 +59,23 @@ public:
 
 	void ApplyGASModifications(UAbilitySystemComponent* AbilitySystemComponent);
 
+	bool IsValid() const;
+
 private:
 	UPROPERTY()
 	const UPA_ShopItem* ShopItem;
 
 	FInventoryItemHandle Handle;
 
+	int StackCount = 1;
+	int Slot;
+
 	FActiveGameplayEffectHandle AppliedEquippedEffectHandle;
 	FGameplayAbilitySpecHandle GrantedAbilitySpecHandle;
-	
+
 public:
 	FORCEINLINE const UPA_ShopItem* GetShopItem() const { return ShopItem; }
 	FORCEINLINE FInventoryItemHandle GetHandle() const { return Handle; }
+	FORCEINLINE int GetStackCount() const { return StackCount; }
+	void SetSlot(int NewSlot) { Slot = NewSlot;}
 };

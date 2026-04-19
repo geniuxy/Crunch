@@ -59,6 +59,7 @@ private:
 public:
 	// 内联作用： 建议编译器将函数调用替换为函数体代码，避免函数调用的开销。
 	FORCEINLINE float GetPrice() const { return Price; }
+	FORCEINLINE float GetSellPrice() const { return Price / 2.f; }
 	FORCEINLINE FText GetItemName() const { return ItemName; }
 	FORCEINLINE FText GetItemDescription() const { return ItemDescription; }
 	FORCEINLINE bool GetIsConsumable() const { return bIsConsumable; }
