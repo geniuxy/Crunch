@@ -12,7 +12,7 @@ class UInventoryItem;
 class UPA_ShopItem;
 class UAbilitySystemComponent;
 
-DECLARE_MULTICAST_DELEGATE_OneParam(FOnItemAddedDelegate, UInventoryItem* /* NewItem */)
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnItemAddedDelegate, const UInventoryItem* /* NewItem */)
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class CRUNCH_API UInventoryComponent : public UActorComponent
@@ -27,6 +27,9 @@ public:
 	void TryPurchase(const UPA_ShopItem* ItemToPurchase);
 	float GetGold() const;
 
+	void ItemSlotChanged(const FInventoryItemHandle& Handle, int NewSlotNumber);
+	UInventoryItem* GetInventoryItemByHandle(const FInventoryItemHandle& Handle) const;
+
 protected:
 	virtual void BeginPlay() override;
 
@@ -36,6 +39,12 @@ private:
 
 	UPROPERTY()
 	TMap<FInventoryItemHandle, UInventoryItem*> InventoryMap;
+
+	UPROPERTY(EditDefaultsOnly, Category="Inventory")
+	int Capacity = 6;
+
+public:
+	FORCEINLINE int GetCapacity() const { return Capacity; }
 
 	/**********************************************************************/
 	/*                              Server                                */

@@ -48,4 +48,5 @@ private:
 
 public:
 	FORCEINLINE int GetSlotNumber() const { return SlotNumber; }
+	void SetSlotNumber(int NewSlotNumber) { SlotNumber = NewSlotNumber; }
 };
