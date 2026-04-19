@@ -22,10 +22,9 @@ public:
 	bool IsEmpty() const;
 	void UpdateInventoryItem(const UInventoryItem* Item);
 	void EmptySlot();
-
-private:
 	void UpdateStackCount();
 
+private:
 	UPROPERTY(EditDefaultsOnly, Category="Visual")
 	UTexture2D* EmptyTexture;
 

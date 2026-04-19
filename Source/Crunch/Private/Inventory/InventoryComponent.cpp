@@ -90,22 +90,48 @@ void UInventoryComponent::BeginPlay()
 	OwnerAbilitySystemComponent = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(GetOwner());
 }
 
+void UInventoryComponent::Server_Purchase_Implementation(const UPA_ShopItem* ItemToPurchase)
+{
+	if (!ItemToPurchase) return;
+	if (GetGold() < ItemToPurchase->GetPrice()) return;
+	if (IsFullFor(ItemToPurchase)) return;
+
+	OwnerAbilitySystemComponent->ApplyModToAttribute(
+		UCHeroAttributeSet::GetGoldAttribute(), EGameplayModOp::Additive, -ItemToPurchase->GetPrice()
+	);
+	GrantItem(ItemToPurchase);
+}
+
+bool UInventoryComponent::Server_Purchase_Validate(const UPA_ShopItem* ItemToPurchase)
+{
+	return true;
+}
+
 void UInventoryComponent::GrantItem(const UPA_ShopItem* NewItem)
 {
 	if (!GetOwner()->HasAuthority()) return;
 
-	UInventoryItem* InventoryItem = NewObject<UInventoryItem>();
-	FInventoryItemHandle NewHandle = FInventoryItemHandle::CreateHandle();
-	InventoryItem->InitItem(NewHandle, NewItem);
-	InventoryMap.Add(NewHandle, InventoryItem);
-	OnItemAdded.Broadcast(InventoryItem);
-	Debug::Print(FString::Printf(
-			TEXT("Server添加物品：%s, ID为：%d"),
-			*InventoryItem->GetShopItem()->GetItemName().ToString(),
-			NewHandle.GetHandleID())
-	);
-	Client_ItemAdded(NewHandle, NewItem);
-	InventoryItem->ApplyGASModifications(OwnerAbilitySystemComponent);
+	if (UInventoryItem* StackItem = GetAvaliableStackForItem(NewItem))
+	{
+		StackItem->AddStackCount();
+		OnItemStackCountChanged.Broadcast(StackItem->GetHandle(), StackItem->GetStackCount());
+		Client_ItemStackCountChanged(StackItem->GetHandle(), StackItem->GetStackCount());
+	}
+	else
+	{
+		UInventoryItem* InventoryItem = NewObject<UInventoryItem>();
+		FInventoryItemHandle NewHandle = FInventoryItemHandle::CreateHandle();
+		InventoryItem->InitItem(NewHandle, NewItem);
+		InventoryMap.Add(NewHandle, InventoryItem);
+		OnItemAdded.Broadcast(InventoryItem);
+		Debug::Print(FString::Printf(
+				TEXT("Server添加物品：%s, ID为：%d"),
+				*InventoryItem->GetShopItem()->GetItemName().ToString(),
+				NewHandle.GetHandleID())
+		);
+		Client_ItemAdded(NewHandle, NewItem);
+		InventoryItem->ApplyGASModifications(OwnerAbilitySystemComponent);
+	}
 }
 
 void UInventoryComponent::Client_ItemAdded_Implementation(FInventoryItemHandle AssignedHandle, const UPA_ShopItem* Item)
@@ -123,19 +149,14 @@ void UInventoryComponent::Client_ItemAdded_Implementation(FInventoryItemHandle A
 	);
 }
 
-void UInventoryComponent::Server_Purchase_Implementation(const UPA_ShopItem* ItemToPurchase)
+void UInventoryComponent::Client_ItemStackCountChanged_Implementation(FInventoryItemHandle Handle, int NewCount)
 {
-	if (!ItemToPurchase) return;
-	if (GetGold() < ItemToPurchase->GetPrice()) return;
-	if (InventoryMap.Num() >= GetCapacity()) return;
+	if (GetOwner()->HasAuthority()) return;
 
-	OwnerAbilitySystemComponent->ApplyModToAttribute(
-		UCHeroAttributeSet::GetGoldAttribute(), EGameplayModOp::Additive, -ItemToPurchase->GetPrice()
-	);
-	GrantItem(ItemToPurchase);
-}
-
-bool UInventoryComponent::Server_Purchase_Validate(const UPA_ShopItem* ItemToPurchase)
-{
-	return true;
+	UInventoryItem* FoundItem = GetInventoryItemByHandle(Handle);
+	if (FoundItem)
+	{
+		FoundItem->SetStackCount(NewCount);
+		OnItemStackCountChanged.Broadcast(Handle, NewCount);
+	}
 }
