@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "ActiveGameplayEffectHandle.h"
 #include "GameplayAbilitySpecHandle.h"
+#include "Data/PA_ShopItem.h"
 #include "UObject/Object.h"
 #include "InventoryItem.generated.h"
 
@@ -60,6 +61,12 @@ public:
 	void ApplyGASModifications(UAbilitySystemComponent* AbilitySystemComponent);
 
 	bool IsValid() const;
+
+	bool AddStackCount(); // 如果可以添加的话，返回true
+	bool ReduceStackCount(); // 如果减少1个之后不是空的话，返回true
+	bool SetStackCount(int NewStackCount); // 如果可以设置的话，返回true
+	bool IsStackFull() const;
+	bool IsForItem(const UPA_ShopItem* Item) const;
 
 private:
 	UPROPERTY()
