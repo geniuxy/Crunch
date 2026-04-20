@@ -14,6 +14,7 @@ class UInventoryItemWidget;
 DECLARE_MULTICAST_DELEGATE_TwoParams(
 	FOnInventoryItemDropped, UInventoryItemWidget* /* DestinationWidget*/, UInventoryItemWidget* /*SourceWidget*/
 );
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnButtonClicked, FInventoryItemHandle /* ClickedItemHandle */);
 /**
  * 
  */
@@ -24,6 +25,8 @@ class CRUNCH_API UInventoryItemWidget : public UItemWidget
 
 public:
 	FOnInventoryItemDropped OnInventoryItemDropped;
+	FOnButtonClicked OnRightMouseClicked;
+	FOnButtonClicked OnLeftMouseClicked;
 	
 	virtual void NativeConstruct() override;
 	bool IsEmpty() const;
@@ -55,6 +58,9 @@ private:
 	const UInventoryItem* InventoryItem;
 
 	int SlotNumber;
+
+	virtual void RightButtonClicked() override;
+	virtual void LeftButtonClicked() override;
 
 public:
 	FORCEINLINE int GetSlotNumber() const { return SlotNumber; }

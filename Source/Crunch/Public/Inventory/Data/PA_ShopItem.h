@@ -64,7 +64,7 @@ public:
 	FORCEINLINE FText GetItemDescription() const { return ItemDescription; }
 	FORCEINLINE bool GetIsConsumable() const { return bIsConsumable; }
 	FORCEINLINE TSubclassOf<UGameplayEffect> GetEquippedEffect() const { return EquippedEffect; }
-	FORCEINLINE TSubclassOf<UGameplayEffect> GetConsumableEffect() const { return ConsumeEffect; }
+	FORCEINLINE TSubclassOf<UGameplayEffect> GetConsumeEffect() const { return ConsumeEffect; }
 	FORCEINLINE TSubclassOf<UGameplayAbility> GetGrantedAbility() const { return GrantedAbility; }
 	FORCEINLINE bool GetIsStackable() const { return bIsStackable; }
 	FORCEINLINE int GetMaxStackCount() const { return MaxStackCount; }

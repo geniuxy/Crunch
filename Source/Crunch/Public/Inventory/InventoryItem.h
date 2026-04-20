@@ -58,7 +58,10 @@ class CRUNCH_API UInventoryItem : public UObject
 public:
 	void InitItem(const FInventoryItemHandle& NewHandle, const UPA_ShopItem* NewShopItem);
 
+	bool TryActivateGrantedAbility(UAbilitySystemComponent* AbilitySystemComponent);
+	void ApplyConsumeEffect(UAbilitySystemComponent* AbilitySystemComponent);
 	void ApplyGASModifications(UAbilitySystemComponent* AbilitySystemComponent);
+	void RemoveGASModifications(UAbilitySystemComponent* AbilitySystemComponent);
 
 	bool IsValid() const;
 
