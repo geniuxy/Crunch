@@ -17,6 +17,7 @@ void UInventoryWidget::NativeConstruct()
 		if (InventoryComponent)
 		{
 			InventoryComponent->OnItemAdded.AddUObject(this, &ThisClass::ItemAdded);
+			InventoryComponent->OnItemRemoved.AddUObject(this, &ThisClass::ItemRemoved);
 			InventoryComponent->OnItemStackCountChanged.AddUObject(this, &ThisClass::ItemStackCountChanged);
 			int Capacity = InventoryComponent->GetCapacity();
 
@@ -34,6 +35,7 @@ void UInventoryWidget::NativeConstruct()
 					InventoryItemWidgets.Add(NewEmptyWidget);
 
 					NewEmptyWidget->OnInventoryItemDropped.AddUObject(this, &ThisClass::HandleItemDragDrop);
+					NewEmptyWidget->OnLeftMouseClicked.AddUObject(InventoryComponent, &UInventoryComponent::TryActivateItem);
 				}
 			}
 		}
@@ -98,5 +100,15 @@ void UInventoryWidget::HandleItemDragDrop(UInventoryItemWidget* DestinationWidge
 		{
 			InventoryComponent->ItemSlotChanged(SourceWidget->GetItemHandle(), SourceWidget->GetSlotNumber());
 		}
+	}
+}
+
+void UInventoryWidget::ItemRemoved(const FInventoryItemHandle& ItemHandle)
+{
+	UInventoryItemWidget** FoundWidget = PopulatedInventoryItemWidgetsMap.Find(ItemHandle);
+	if (FoundWidget && *FoundWidget)
+	{
+		(*FoundWidget)->EmptySlot();
+		PopulatedInventoryItemWidgetsMap.Remove(ItemHandle);
 	}
 }

@@ -14,7 +14,7 @@ class UInventoryItemWidget;
 DECLARE_MULTICAST_DELEGATE_TwoParams(
 	FOnInventoryItemDropped, UInventoryItemWidget* /* DestinationWidget*/, UInventoryItemWidget* /*SourceWidget*/
 );
-DECLARE_MULTICAST_DELEGATE_OneParam(FOnButtonClicked, FInventoryItemHandle /* ClickedItemHandle */);
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnButtonClicked, const FInventoryItemHandle& /* ClickedItemHandle */);
 /**
  * 
  */

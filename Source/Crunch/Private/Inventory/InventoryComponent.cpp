@@ -15,6 +15,14 @@ UInventoryComponent::UInventoryComponent()
 	PrimaryComponentTick.bCanEverTick = false;
 }
 
+void UInventoryComponent::TryActivateItem(const FInventoryItemHandle& ItemHandle)
+{
+	UInventoryItem* InventoryItem = GetInventoryItemByHandle(ItemHandle);
+	if (!InventoryItem) return;
+
+	Server_ActivateItem(ItemHandle);
+}
+
 void UInventoryComponent::TryPurchase(const UPA_ShopItem* ItemToPurchase)
 {
 	if (!OwnerAbilitySystemComponent) return;
@@ -107,6 +115,24 @@ bool UInventoryComponent::Server_Purchase_Validate(const UPA_ShopItem* ItemToPur
 	return true;
 }
 
+void UInventoryComponent::Server_ActivateItem_Implementation(FInventoryItemHandle ItemHandle)
+{
+	UInventoryItem* InventoryItem = GetInventoryItemByHandle(ItemHandle);
+	if (!InventoryItem) return;
+
+	InventoryItem->TryActivateGrantedAbility(OwnerAbilitySystemComponent);
+	const UPA_ShopItem* Item = InventoryItem->GetShopItem();
+	if (Item->GetIsConsumable())
+	{
+		ConsumeItem(InventoryItem);
+	}
+}
+
+bool UInventoryComponent::Server_ActivateItem_Validate(FInventoryItemHandle ItemHandle)
+{
+	return true;
+}
+
 void UInventoryComponent::GrantItem(const UPA_ShopItem* NewItem)
 {
 	if (!GetOwner()->HasAuthority()) return;
@@ -134,6 +160,33 @@ void UInventoryComponent::GrantItem(const UPA_ShopItem* NewItem)
 	}
 }
 
+void UInventoryComponent::ConsumeItem(UInventoryItem* Item)
+{
+	if (!GetOwner()->HasAuthority()) return;
+	if (!Item) return;
+
+	Item->ApplyConsumeEffect(OwnerAbilitySystemComponent);
+	if (!Item->ReduceStackCount())
+	{
+		RemoveItem(Item);
+	}
+	else
+	{
+		OnItemStackCountChanged.Broadcast(Item->GetHandle(), Item->GetStackCount());
+		Client_ItemStackCountChanged(Item->GetHandle(), Item->GetStackCount());
+	}
+}
+
+void UInventoryComponent::RemoveItem(UInventoryItem* Item)
+{
+	if (!GetOwner()->HasAuthority()) return;
+
+	Item->RemoveGASModifications(OwnerAbilitySystemComponent);
+	OnItemRemoved.Broadcast(Item->GetHandle());
+	InventoryMap.Remove(Item->GetHandle());
+	Client_ItemRemoved(Item->GetHandle());
+}
+
 void UInventoryComponent::Client_ItemAdded_Implementation(FInventoryItemHandle AssignedHandle, const UPA_ShopItem* Item)
 {
 	if (GetOwner()->HasAuthority()) return;
@@ -147,6 +200,17 @@ void UInventoryComponent::Client_ItemAdded_Implementation(FInventoryItemHandle A
 			*InventoryItem->GetShopItem()->GetItemName().ToString(),
 			AssignedHandle.GetHandleID())
 	);
+}
+
+void UInventoryComponent::Client_ItemRemoved_Implementation(FInventoryItemHandle ItemHandle)
+{
+	if (GetOwner()->HasAuthority()) return;
+
+	UInventoryItem* InventoryItem = GetInventoryItemByHandle(ItemHandle);
+	if (!InventoryItem) return;
+	
+	OnItemRemoved.Broadcast(ItemHandle);
+	InventoryMap.Remove(ItemHandle);
 }
 
 void UInventoryComponent::Client_ItemStackCountChanged_Implementation(FInventoryItemHandle Handle, int NewCount)

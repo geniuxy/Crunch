@@ -40,4 +40,6 @@ private:
 	UInventoryItemWidget* GetNextAvaliableSlot() const;
 
 	void HandleItemDragDrop(UInventoryItemWidget* DestinationWidget, UInventoryItemWidget* SourceWidget);
+
+	void ItemRemoved(const FInventoryItemHandle& ItemHandle);
 };
