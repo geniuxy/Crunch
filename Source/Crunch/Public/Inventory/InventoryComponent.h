@@ -30,6 +30,7 @@ public:
 
 	void TryActivateItem(const FInventoryItemHandle& ItemHandle);
 	void TryPurchase(const UPA_ShopItem* ItemToPurchase);
+	void SellItem(const FInventoryItemHandle& ItemToPurchase);
 	float GetGold() const;
 
 	void ItemSlotChanged(const FInventoryItemHandle& Handle, int NewSlotNumber);
@@ -64,6 +65,9 @@ private:
 
 	UFUNCTION(Server, Reliable, WithValidation)
 	void Server_ActivateItem(FInventoryItemHandle ItemHandle);
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void Server_SellItem(FInventoryItemHandle ItemHandle);
 
 	void GrantItem(const UPA_ShopItem* NewItem);
 

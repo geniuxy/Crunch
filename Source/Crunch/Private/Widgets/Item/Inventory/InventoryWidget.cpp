@@ -142,6 +142,8 @@ void UInventoryWidget::SpawnContextMenu()
 	{
 		ContextMenuWidget->GetSellButtonClickedEvent().AddDynamic(this, &ThisClass::SellFocusedItem);
 		ContextMenuWidget->GetUseButtonClickedEvent().AddDynamic(this, &ThisClass::UseFocusedItem);
+		// 同一个 AddToViewport 体系，ZOrder 1 vs ZOrder 0: 1 覆盖 0
+		// 同一个 ZOrder，后添加 vs 先添加: 后添加的覆盖先添加的
 		ContextMenuWidget->AddToViewport(1);
 		SetContextMenuVisible(false);
 	}
@@ -149,12 +151,14 @@ void UInventoryWidget::SpawnContextMenu()
 
 void UInventoryWidget::SellFocusedItem()
 {
-	Debug::Print(TEXT("卖当前的Item"));
+	InventoryComponent->SellItem(CurrentFocusedItemHandle);
+	ClearContextMenu();
 }
 
 void UInventoryWidget::UseFocusedItem()
 {
-	Debug::Print(TEXT("使用当前的Item"));
+	InventoryComponent->TryActivateItem(CurrentFocusedItemHandle);
+	SetContextMenuVisible(false);
 }
 
 void UInventoryWidget::SetContextMenuVisible(bool bContextMenuVisible)

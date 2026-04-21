@@ -30,6 +30,11 @@ void UInventoryComponent::TryPurchase(const UPA_ShopItem* ItemToPurchase)
 	Server_Purchase(ItemToPurchase);
 }
 
+void UInventoryComponent::SellItem(const FInventoryItemHandle& ItemToPurchase)
+{
+	Server_SellItem(ItemToPurchase);
+}
+
 float UInventoryComponent::GetGold() const
 {
 	if (!OwnerAbilitySystemComponent) return 0.f;
@@ -133,6 +138,23 @@ bool UInventoryComponent::Server_ActivateItem_Validate(FInventoryItemHandle Item
 	return true;
 }
 
+void UInventoryComponent::Server_SellItem_Implementation(FInventoryItemHandle ItemHandle)
+{
+	UInventoryItem* InventoryItem = GetInventoryItemByHandle(ItemHandle);
+	if (!InventoryItem || !InventoryItem->IsValid()) return;
+
+	float SellPrice = InventoryItem->GetShopItem()->GetSellPrice();
+	OwnerAbilitySystemComponent->ApplyModToAttribute(
+		UCHeroAttributeSet::GetGoldAttribute(), EGameplayModOp::Additive, SellPrice * InventoryItem->GetStackCount()
+	);
+	RemoveItem(InventoryItem);
+}
+
+bool UInventoryComponent::Server_SellItem_Validate(FInventoryItemHandle ItemHandle)
+{
+	return true;
+}
+
 void UInventoryComponent::GrantItem(const UPA_ShopItem* NewItem)
 {
 	if (!GetOwner()->HasAuthority()) return;
@@ -208,7 +230,7 @@ void UInventoryComponent::Client_ItemRemoved_Implementation(FInventoryItemHandle
 
 	UInventoryItem* InventoryItem = GetInventoryItemByHandle(ItemHandle);
 	if (!InventoryItem) return;
-	
+
 	OnItemRemoved.Broadcast(ItemHandle);
 	InventoryMap.Remove(ItemHandle);
 }
