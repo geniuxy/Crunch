@@ -7,6 +7,7 @@
 #include "Inventory/InventoryItem.h"
 #include "InventoryWidget.generated.h"
 
+class UInventoryContextMenuWidget;
 class UInventoryComponent;
 class UInventoryItemWidget;
 class UWrapBox;
@@ -42,4 +43,25 @@ private:
 	void HandleItemDragDrop(UInventoryItemWidget* DestinationWidget, UInventoryItemWidget* SourceWidget);
 
 	void ItemRemoved(const FInventoryItemHandle& ItemHandle);
+
+	/**********************************************************************/
+	/*                           Context Menu                             */
+	/**********************************************************************/
+private:
+	UPROPERTY(EditDefaultsOnly, Category="Inventory")
+	TSubclassOf<UInventoryContextMenuWidget> ContextMenuWidgetClass;
+
+	UPROPERTY()
+	UInventoryContextMenuWidget* ContextMenuWidget;
+
+	void SpawnContextMenu();
+
+	UFUNCTION()
+	void SellFocusedItem();
+	
+	UFUNCTION()
+	void UseFocusedItem();
+
+	void SetContextMenuVisible(bool bContextMenuVisible);
+	void ToggleContextMenu(const FInventoryItemHandle& ItemHandle);
 };
