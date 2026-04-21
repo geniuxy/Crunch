@@ -4,6 +4,8 @@
 #include "Widgets/Item/Inventory/InventoryWidget.h"
 
 #include "CrunchDebugHelper.h"
+#include "Blueprint/SlateBlueprintLibrary.h"
+#include "Blueprint/WidgetLayoutLibrary.h"
 #include "Components/Button.h"
 #include "Components/WrapBox.h"
 #include "Components/WrapBoxSlot.h"
@@ -38,13 +40,25 @@ void UInventoryWidget::NativeConstruct()
 					InventoryItemWidgets.Add(NewEmptyWidget);
 
 					NewEmptyWidget->OnInventoryItemDropped.AddUObject(this, &ThisClass::HandleItemDragDrop);
-					NewEmptyWidget->OnLeftMouseClicked.AddUObject(InventoryComponent, &UInventoryComponent::TryActivateItem);
+					NewEmptyWidget->OnLeftMouseClicked.AddUObject(InventoryComponent,
+					                                              &UInventoryComponent::TryActivateItem);
 					NewEmptyWidget->OnRightMouseClicked.AddUObject(this, &ThisClass::ToggleContextMenu);
 				}
 			}
 
 			SpawnContextMenu();
 		}
+	}
+}
+
+void UInventoryWidget::NativeOnFocusChanging(
+	const FWeakWidgetPath& PreviousFocusPath, const FWidgetPath& NewWidgetPath, const FFocusEvent& InFocusEvent)
+{
+	Super::NativeOnFocusChanging(PreviousFocusPath, NewWidgetPath, InFocusEvent);
+
+	if (!NewWidgetPath.ContainsWidget(ContextMenuWidget->GetCachedWidget().Get()))
+	{
+		ClearContextMenu();
 	}
 }
 
@@ -153,5 +167,45 @@ void UInventoryWidget::SetContextMenuVisible(bool bContextMenuVisible)
 
 void UInventoryWidget::ToggleContextMenu(const FInventoryItemHandle& ItemHandle)
 {
-	Debug::Print(TEXT("打开物品内容菜单"));
+	if (CurrentFocusedItemHandle == ItemHandle)
+	{
+		ClearContextMenu();
+		return;
+	}
+
+	CurrentFocusedItemHandle = ItemHandle;
+	UInventoryItemWidget** ItemWidgetPtrPtr = PopulatedInventoryItemWidgetsMap.Find(ItemHandle);
+	if (!ItemWidgetPtrPtr) return;
+	UInventoryItemWidget* ItemWidget = *ItemWidgetPtrPtr;
+	if (!ItemWidget) return;
+
+	SetContextMenuVisible(true);
+	FVector2D ItemAbsPos = ItemWidget->GetCachedGeometry().GetAbsolutePositionAtCoordinates(FVector2D(1.f, 0.5f));
+
+	// ItemWidgetPixelPos:视口像素坐标, 以游戏视口左上角为 (0,0)，单位是实际像素
+	// ItemWidgetViewportPos:归一化视口坐标, 范围 0.0 ~ 1.0，表示在视口内的相对比例位置
+	FVector2D ItemWidgetPixelPos, ItemWidgetViewportPos;
+	USlateBlueprintLibrary::AbsoluteToViewport(this, ItemAbsPos, ItemWidgetPixelPos, ItemWidgetViewportPos);
+
+	APlayerController* OwnerPlayerController = GetOwningPlayer();
+	if (OwnerPlayerController)
+	{
+		int ViewportSizeX, ViewportSizeY;
+		OwnerPlayerController->GetViewportSize(ViewportSizeX, ViewportSizeY);
+		float Scale = UWidgetLayoutLibrary::GetViewportScale(this);
+
+		int Overshoot = ItemWidgetPixelPos.Y + ContextMenuWidget->GetDesiredSize().Y * Scale - ViewportSizeY;
+		if (Overshoot > 0)
+		{
+			ItemWidgetPixelPos.Y -= Overshoot;
+		}
+	}
+
+	ContextMenuWidget->SetPositionInViewport(ItemWidgetPixelPos);
+}
+
+void UInventoryWidget::ClearContextMenu()
+{
+	ContextMenuWidget->SetVisibility(ESlateVisibility::Hidden);
+	CurrentFocusedItemHandle = FInventoryItemHandle::InvalidHandle();
 }
