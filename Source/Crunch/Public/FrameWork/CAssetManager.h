@@ -23,6 +23,9 @@ public:
 	void LoadShopItems(const FStreamableDelegate& LoadFinishedCallback); // 异步加载ShopItems
 	bool GetLoadedShopItems(TArray<UPA_ShopItem*>& OutItems) const; // 获取ShopItem的合集
 
+	const FItemCollection* GetCombinationForItem(const UPA_ShopItem* Item) const;
+	const FItemCollection* GetIngredientForItem(const UPA_ShopItem* Item) const;
+
 private:
 	void ShopItemLoadFinished(FStreamableDelegate Callback);
 	void BuildItemMaps();
