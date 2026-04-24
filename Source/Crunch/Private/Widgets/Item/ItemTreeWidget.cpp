@@ -56,6 +56,7 @@ void UItemTreeWidget::DrawStream(
 		bUpperStream ? StartingNodeInterface->GetInputs() : StartingNodeInterface->GetOutputs();
 	float StartingNodeYPos = (NodeSize.Y + NodeGap.Y) * StartingNodeDepth * (bUpperStream ? -1 : 1);
 
+	// if (NextTreeNodeInterfaces.Num() == 0 || StartingNodeDepth >= 1) // 只显示一层可合成物品(与Dota2相同)
 	if (NextTreeNodeInterfaces.Num() == 0)
 	{
 		StartingNodeSlot->SetPosition(FVector2D(NextLeafXPosition, StartingNodeYPos));

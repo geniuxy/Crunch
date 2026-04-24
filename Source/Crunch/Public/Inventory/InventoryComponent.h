@@ -14,7 +14,8 @@ class UAbilitySystemComponent;
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnItemAddedDelegate, const UInventoryItem* /* NewItem */)
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnItemRemovedDelegate, const FInventoryItemHandle& /* ItemHandle */)
-DECLARE_MULTICAST_DELEGATE_TwoParams(FOnItemStackCountChangedDelegate, const FInventoryItemHandle& /* ItemHandle */, int /* NewCount */)
+DECLARE_MULTICAST_DELEGATE_TwoParams(FOnItemStackCountChangedDelegate, const FInventoryItemHandle& /* ItemHandle */,
+                                     int /* NewCount */)
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class CRUNCH_API UInventoryComponent : public UActorComponent
@@ -40,7 +41,11 @@ public:
 	bool IsAllSlotOccupied() const;
 	UInventoryItem* GetAvaliableStackForItem(const UPA_ShopItem* Item) const;
 
-	bool FoundIngredientForItem(const UPA_ShopItem* Item, TArray<UInventoryItem*>& OutIngredients);
+	bool FindIngredientForItem(
+		const UPA_ShopItem* Item,
+		TArray<UInventoryItem*>& OutIngredients,
+		const TArray<const UPA_ShopItem*>& IngredientToIgnore = TArray<const UPA_ShopItem*>()
+	);
 	UInventoryItem* TryGetItemForShopItem(const UPA_ShopItem* Item) const;
 
 protected:
@@ -78,7 +83,7 @@ private:
 
 	void RemoveItem(UInventoryItem* Item);
 
-	void CheckItemCombination(const UInventoryItem* NewItem);
+	bool TryItemCombination(const UPA_ShopItem* NewItem);
 
 	/**********************************************************************/
 	/*                              Server                                */
@@ -89,7 +94,7 @@ private:
 
 	UFUNCTION(Client, Reliable)
 	void Client_ItemRemoved(FInventoryItemHandle ItemHandle);
-	
+
 	UFUNCTION(Client, Reliable)
 	void Client_ItemStackCountChanged(FInventoryItemHandle Handle, int NewCount);
 };

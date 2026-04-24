@@ -98,7 +98,10 @@ UInventoryItem* UInventoryComponent::GetAvaliableStackForItem(const UPA_ShopItem
 	return nullptr;
 }
 
-bool UInventoryComponent::FoundIngredientForItem(const UPA_ShopItem* Item, TArray<UInventoryItem*>& OutIngredients)
+bool UInventoryComponent::FindIngredientForItem(
+	const UPA_ShopItem* Item,
+	TArray<UInventoryItem*>& OutIngredients,
+	const TArray<const UPA_ShopItem*>& IngredientToIgnore)
 {
 	const FItemCollection* Ingredients = UCAssetManager::Get().GetIngredientForItem(Item);
 	if (!Ingredients) return false;
@@ -106,6 +109,8 @@ bool UInventoryComponent::FoundIngredientForItem(const UPA_ShopItem* Item, TArra
 	bool bAllFound = true;
 	for (const UPA_ShopItem* Ingredient : Ingredients->GetItems())
 	{
+		if (IngredientToIgnore.Contains(Ingredient)) continue;
+
 		UInventoryItem* FoundItem = TryGetItemForShopItem(Ingredient);
 		if (!FoundItem)
 		{
@@ -145,12 +150,19 @@ void UInventoryComponent::Server_Purchase_Implementation(const UPA_ShopItem* Ite
 {
 	if (!ItemToPurchase) return;
 	if (GetGold() < ItemToPurchase->GetPrice()) return;
-	if (IsFullFor(ItemToPurchase)) return;
-
-	OwnerAbilitySystemComponent->ApplyModToAttribute(
-		UCHeroAttributeSet::GetGoldAttribute(), EGameplayModOp::Additive, -ItemToPurchase->GetPrice()
-	);
-	GrantItem(ItemToPurchase);
+	if (!IsFullFor(ItemToPurchase))
+	{
+		OwnerAbilitySystemComponent->ApplyModToAttribute(
+			UCHeroAttributeSet::GetGoldAttribute(), EGameplayModOp::Additive, -ItemToPurchase->GetPrice()
+		);
+		GrantItem(ItemToPurchase);
+	}
+	else if (TryItemCombination(ItemToPurchase))
+	{
+		OwnerAbilitySystemComponent->ApplyModToAttribute(
+			UCHeroAttributeSet::GetGoldAttribute(), EGameplayModOp::Additive, -ItemToPurchase->GetPrice()
+		);
+	}
 }
 
 bool UInventoryComponent::Server_Purchase_Validate(const UPA_ShopItem* ItemToPurchase)
@@ -205,6 +217,11 @@ void UInventoryComponent::GrantItem(const UPA_ShopItem* NewItem)
 	}
 	else
 	{
+		if (TryItemCombination(NewItem))
+		{
+			return;
+		}
+
 		UInventoryItem* InventoryItem = NewObject<UInventoryItem>();
 		FInventoryItemHandle NewHandle = FInventoryItemHandle::CreateHandle();
 		InventoryItem->InitItem(NewHandle, NewItem);
@@ -217,7 +234,6 @@ void UInventoryComponent::GrantItem(const UPA_ShopItem* NewItem)
 		);
 		Client_ItemAdded(NewHandle, NewItem);
 		InventoryItem->ApplyGASModifications(OwnerAbilitySystemComponent);
-		CheckItemCombination(InventoryItem);
 	}
 }
 
@@ -248,29 +264,40 @@ void UInventoryComponent::RemoveItem(UInventoryItem* Item)
 	Client_ItemRemoved(Item->GetHandle());
 }
 
-void UInventoryComponent::CheckItemCombination(const UInventoryItem* NewItem)
+bool UInventoryComponent::TryItemCombination(const UPA_ShopItem* NewItem)
 {
-	if (!GetOwner()->HasAuthority()) return;
+	if (!GetOwner()->HasAuthority()) return false;
 
-	const FItemCollection* CombinationItems = UCAssetManager::Get().GetCombinationForItem(NewItem->GetShopItem());
-	if (!CombinationItems) return;
+	const FItemCollection* CombinationItems = UCAssetManager::Get().GetCombinationForItem(NewItem);
+	if (!CombinationItems) return false;
 
 	for (const UPA_ShopItem* CombinationItem : CombinationItems->GetItems())
 	{
 		TArray<UInventoryItem*> Ingredients;
-		if (!FoundIngredientForItem(CombinationItem, Ingredients))
+		if (!FindIngredientForItem(CombinationItem, Ingredients, TArray<const UPA_ShopItem*>{NewItem}))
 		{
 			continue;
 		}
 
 		for (UInventoryItem* Ingredient : Ingredients)
 		{
-			RemoveItem(Ingredient);
+			// 如果是不可堆叠的或者只有一个，则Remove
+			if (!Ingredient->ReduceStackCount())
+			{
+				RemoveItem(Ingredient);
+			}
+			// 否则，减少StackCount并更新
+			else
+			{
+				OnItemStackCountChanged.Broadcast(Ingredient->GetHandle(), Ingredient->GetStackCount());
+				Client_ItemStackCountChanged(Ingredient->GetHandle(), Ingredient->GetStackCount());
+			}
 		}
 
 		GrantItem(CombinationItem);
-		return;
+		return true;
 	}
+	return false;
 }
 
 void UInventoryComponent::Client_ItemAdded_Implementation(FInventoryItemHandle AssignedHandle, const UPA_ShopItem* Item)
