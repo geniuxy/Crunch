@@ -8,6 +8,41 @@
 #include "Widgets/Tree/SplineWidget.h"
 #include "Widgets/Tree/TreeNodeInterface.h"
 
+void UItemTreeWidget::DrawFromNode(const ITreeNodeInterface* NodeInterface)
+{
+	if (!NodeInterface) return;
+	if (CurrentCenterItem == NodeInterface->GetItemObject()) return;
+
+	ClearTree();
+	CurrentCenterItem = NodeInterface->GetItemObject();
+
+	float NextLeafXPos = 0.f;
+	UCanvasPanelSlot* CenterWidgetPanelSlot = nullptr;
+	UUserWidget* CenterWidget = CreateWidgetForNode(NodeInterface, CenterWidgetPanelSlot);
+	TArray<UCanvasPanelSlot*> LowerStreamSlots, UpperStreamSlots;
+
+	// 绘下层制合成物的Widget和Spline，只需要移动Widgets，Spline会自动跟着移动
+	DrawStream(false, NodeInterface, CenterWidget, CenterWidgetPanelSlot, 0, NextLeafXPos, LowerStreamSlots);
+	float LowerStreamXMax = NextLeafXPos - NodeSize.X - NodeGap.X;
+	float LowerMoveAmt = 0.f - LowerStreamXMax / 2.f;
+	for (UCanvasPanelSlot* StreamSlot : LowerStreamSlots)
+	{
+		StreamSlot->SetPosition(StreamSlot->GetPosition() + FVector2D(LowerMoveAmt, 0.f));
+	}
+
+	// 绘制上层被合成物的Widget和Spline，只需要移动Widgets，Spline会自动跟着移动
+	NextLeafXPos = 0.f;
+	DrawStream(true, NodeInterface, CenterWidget, CenterWidgetPanelSlot, 0, NextLeafXPos, UpperStreamSlots);
+	float UpperStreamXMax = NextLeafXPos - NodeSize.X - NodeGap.X;
+	float UpperMoveAmt = 0.f - UpperStreamXMax / 2.f;
+	for (UCanvasPanelSlot* StreamSlot : UpperStreamSlots)
+	{
+		StreamSlot->SetPosition(StreamSlot->GetPosition() + FVector2D(UpperMoveAmt, 0.f));
+	}
+
+	CenterWidgetPanelSlot->SetPosition(FVector2D::Zero());
+}
+
 void UItemTreeWidget::DrawStream(
 	bool bUpperStream,
 	const ITreeNodeInterface* StartingNodeInterface,
@@ -57,7 +92,7 @@ void UItemTreeWidget::ClearTree()
 	RootPanel->ClearChildren();
 }
 
-UUserWidget* UItemTreeWidget::CreateWidgetForNode(const ITreeNodeInterface* Node, UCanvasPanelSlot* OutCanvasSlot)
+UUserWidget* UItemTreeWidget::CreateWidgetForNode(const ITreeNodeInterface* Node, UCanvasPanelSlot*& OutCanvasSlot)
 {
 	if (!Node) return nullptr;
 
@@ -82,8 +117,9 @@ void UItemTreeWidget::CreateConnection(const UUserWidget* From, const UUserWidge
 	UCanvasPanelSlot* ConnectionPanelSlot = RootPanel->AddChildToCanvas(Connection);
 	if (ConnectionPanelSlot)
 	{
-		ConnectionPanelSlot->SetAnchors(FAnchors(0.5f));
-		ConnectionPanelSlot->SetAlignment(FVector2D(0.5f));
+		// 这里Spline的Anchors和Alignment都在左上角，这样子绘制出来的位置才是对的
+		ConnectionPanelSlot->SetAnchors(FAnchors(0.f));
+		ConnectionPanelSlot->SetAlignment(FVector2D(0.f));
 		ConnectionPanelSlot->SetPosition(FVector2D::Zero());
 		ConnectionPanelSlot->SetZOrder(0);
 	}
