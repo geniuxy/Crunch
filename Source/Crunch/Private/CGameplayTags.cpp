@@ -83,6 +83,14 @@ namespace CGameplayTags
 	);
 
 	/*
+	 * Items
+	 */
+
+	UE_DEFINE_GAMEPLAY_TAG(
+		Crunch_Ability_Items_Shoes_Cooldown, "Crunch.Ability.Items.Shoes.Cooldown"
+	);
+
+	/*
 	 * GameplayCue Tags
 	 */
 	UE_DEFINE_GAMEPLAY_TAG(

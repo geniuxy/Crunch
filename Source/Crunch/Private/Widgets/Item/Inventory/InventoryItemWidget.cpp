@@ -5,6 +5,7 @@
 
 #include "CrunchDebugHelper.h"
 #include "Blueprint/DragDropOperation.h"
+#include "Components/Image.h"
 #include "Components/TextBlock.h"
 #include "Inventory/InventoryItem.h"
 #include "Widgets/Item/ItemToolTip.h"
@@ -120,7 +121,7 @@ void UInventoryItemWidget::NativeOnDragDetected(const FGeometry& InGeometry, con
 }
 
 bool UInventoryItemWidget::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent,
-	UDragDropOperation* InOperation)
+                                        UDragDropOperation* InOperation)
 {
 	if (UInventoryItemWidget* OtherWidget = Cast<UInventoryItemWidget>(InOperation->Payload))
 	{
@@ -130,11 +131,59 @@ bool UInventoryItemWidget::NativeOnDrop(const FGeometry& InGeometry, const FDrag
 			return true;
 		}
 	}
-	
+
 	return Super::NativeOnDrop(InGeometry, InDragDropEvent, InOperation);
 }
 
 void UInventoryItemWidget::StartCooldown(float CooldownDuration, float TimeRemaining)
 {
-	Debug::Print(TEXT("开始物品冷却倒计时"));
+	CooldownTimerRemaining = TimeRemaining;
+	CooldownTimerDuration = CooldownDuration;
+	GetWorld()->GetTimerManager().SetTimer(
+		CooldownDurationHandle, this, &ThisClass::CooldownFinished, CooldownTimerRemaining
+	);
+	GetWorld()->GetTimerManager().SetTimer(
+		CooldownUpdateTimerHandle, this, &ThisClass::UpdateCooldown, CooldownUpdateInterval, true
+	);
+
+	CooldownCountText->SetVisibility(ESlateVisibility::Visible);
+}
+
+void UInventoryItemWidget::CooldownFinished()
+{
+	GetWorld()->GetTimerManager().ClearTimer(CooldownDurationHandle);
+	CooldownCountText->SetVisibility(ESlateVisibility::Hidden);
+	if (ItemIcon)
+	{
+		ItemIcon->GetDynamicMaterial()->SetScalarParameterValue(CooldownAmtDynamicMaterialParamName, 1.f);
+	}
+}
+
+void UInventoryItemWidget::UpdateCooldown()
+{
+	CooldownTimerRemaining -= CooldownUpdateInterval;
+	float CooldownAmt = 1.f - CooldownTimerRemaining / CooldownTimerDuration;
+	FNumberFormattingOptions CooldownDisplayFormattingOptions;
+	CooldownDisplayFormattingOptions.MaximumFractionalDigits = CooldownTimerRemaining > 1.f ? 0 : 1;
+	CooldownCountText->SetText(FText::AsNumber(CooldownTimerRemaining, &CooldownDisplayFormattingOptions));
+	if (ItemIcon)
+	{
+		ItemIcon->GetDynamicMaterial()->SetScalarParameterValue(CooldownAmtDynamicMaterialParamName, CooldownAmt);
+	}
+}
+
+void UInventoryItemWidget::ClearCooldown()
+{
+	CooldownFinished();
+}
+
+void UInventoryItemWidget::SetIcon(UTexture2D* IconTexture)
+{
+	if (ItemIcon && ItemIcon->GetDynamicMaterial())
+	{
+		ItemIcon->GetDynamicMaterial()->SetTextureParameterValue(IconTextureDynamicMaterialParamName, IconTexture);
+		return;
+	}
+
+	Super::SetIcon(IconTexture);
 }
