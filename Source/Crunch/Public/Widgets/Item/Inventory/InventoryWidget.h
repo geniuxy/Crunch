@@ -70,6 +70,8 @@ private:
 	UFUNCTION()
 	void UseFocusedItem();
 
+	void OnActivateItem(const FInventoryItemHandle& ItemHandle);
+	
 	void SetContextMenuVisible(bool bContextMenuVisible);
 	void ToggleContextMenu(const FInventoryItemHandle& ItemHandle);
 

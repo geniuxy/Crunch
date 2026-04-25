@@ -44,6 +44,7 @@ void UInventoryWidget::NativeConstruct()
 					NewEmptyWidget->OnLeftMouseClicked.AddUObject(
 						InventoryComponent, &UInventoryComponent::TryActivateItem
 					);
+					NewEmptyWidget->OnLeftMouseClicked.AddUObject(this, &ThisClass::OnActivateItem);
 					NewEmptyWidget->OnRightMouseClicked.AddUObject(this, &ThisClass::ToggleContextMenu);
 				}
 			}
@@ -171,6 +172,14 @@ void UInventoryWidget::UseFocusedItem()
 {
 	InventoryComponent->TryActivateItem(CurrentFocusedItemHandle);
 	SetContextMenuVisible(false);
+}
+
+void UInventoryWidget::OnActivateItem(const FInventoryItemHandle& ItemHandle)
+{
+	if (CurrentFocusedItemHandle == ItemHandle)
+	{
+		ClearContextMenu();
+	}
 }
 
 void UInventoryWidget::SetContextMenuVisible(bool bContextMenuVisible)
