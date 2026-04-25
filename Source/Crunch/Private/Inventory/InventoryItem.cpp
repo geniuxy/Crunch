@@ -184,6 +184,21 @@ float UInventoryItem::GetAbilityManaCost() const
 	);
 }
 
+bool UInventoryItem::CanCastAbility() const
+{
+	if (!IsGrantingAnyAbility() || !OwnerAbilitySystemComponent) return false;
+
+	FGameplayAbilitySpec* Spec = OwnerAbilitySystemComponent->FindAbilitySpecFromHandle(GrantedAbilitySpecHandle);
+	if (Spec)
+	{
+		return UCAbilitySystemFunctionLibrary::CheckAbilityCost(*Spec, *OwnerAbilitySystemComponent);
+	}
+
+	return UCAbilitySystemFunctionLibrary::CheckAbilityCostStatic(
+		GetShopItem()->GetGrantedAbilityCDO(), *OwnerAbilitySystemComponent
+	);
+}
+
 void UInventoryItem::ApplyGASModifications()
 {
 	if (!GetShopItem() || !OwnerAbilitySystemComponent) return;

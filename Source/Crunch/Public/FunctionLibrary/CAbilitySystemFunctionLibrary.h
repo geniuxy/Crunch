@@ -22,6 +22,7 @@ public:
 	static bool IsAbilityAtMaxLevel(const FGameplayAbilitySpec& AbilitySpec);
 
 	static bool CheckAbilityCost(const FGameplayAbilitySpec& AbilitySpec, const UAbilitySystemComponent& ASC);
+	static bool CheckAbilityCostStatic(const UGameplayAbility* AbilityCDO, const UAbilitySystemComponent& ASC);
 	static float GetManaCostFor(
 		const UGameplayAbility* AbilityCDO, const UAbilitySystemComponent& ASC, int AbilityLevel
 	);

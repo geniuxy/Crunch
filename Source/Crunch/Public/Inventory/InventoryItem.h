@@ -80,6 +80,7 @@ public:
 	float GetAbilityCooldownTimerRemaining() const;
 	float GetAbilityCooldownDuration() const;
 	float GetAbilityManaCost() const;
+	bool CanCastAbility() const;
 
 private:
 	UPROPERTY()

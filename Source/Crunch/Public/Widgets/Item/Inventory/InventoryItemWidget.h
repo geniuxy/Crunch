@@ -62,6 +62,8 @@ private:
 	virtual void RightButtonClicked() override;
 	virtual void LeftButtonClicked() override;
 
+	void UpdateCanCastDisplay(bool bCanCast);
+
 public:
 	FORCEINLINE int GetSlotNumber() const { return SlotNumber; }
 	void SetSlotNumber(int NewSlotNumber) { SlotNumber = NewSlotNumber; }

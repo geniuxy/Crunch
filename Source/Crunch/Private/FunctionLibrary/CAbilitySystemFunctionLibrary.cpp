@@ -60,6 +60,17 @@ bool UCAbilitySystemFunctionLibrary::CheckAbilityCost(
 	return false;
 }
 
+bool UCAbilitySystemFunctionLibrary::CheckAbilityCostStatic(
+	const UGameplayAbility* AbilityCDO, const UAbilitySystemComponent& ASC)
+{
+	if (AbilityCDO)
+	{
+		return AbilityCDO->CheckCost(FGameplayAbilitySpecHandle(), ASC.AbilityActorInfo.Get());
+	}
+
+	return false;
+}
+
 float UCAbilitySystemFunctionLibrary::GetManaCostFor(
 	const UGameplayAbility* AbilityCDO, const UAbilitySystemComponent& ASC, int AbilityLevel)
 {

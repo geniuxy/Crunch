@@ -47,10 +47,40 @@ void UInventoryItemWidget::UpdateInventoryItem(const UInventoryItem* Item)
 	{
 		StackCountText->SetVisibility(ESlateVisibility::Hidden);
 	}
+
+	ClearCooldown();
+
+	if (InventoryItem->IsGrantingAnyAbility())
+	{
+		UpdateCanCastDisplay(InventoryItem->CanCastAbility());
+		float AbilityCooldownRemaining = InventoryItem->GetAbilityCooldownTimerRemaining();
+		float AbilityCooldownDuration = InventoryItem->GetAbilityCooldownDuration();
+		if (AbilityCooldownRemaining > 0.f)
+		{
+			StartCooldown(AbilityCooldownDuration, AbilityCooldownRemaining);
+		}
+
+		float AbilityCost = InventoryItem->GetAbilityManaCost();
+		ManaCostText->SetVisibility(AbilityCost == 0.f ? ESlateVisibility::Hidden : ESlateVisibility::Visible);
+		ManaCostText->SetText(FText::AsNumber(AbilityCost));
+
+		CooldownDurationText->SetVisibility(
+			AbilityCooldownDuration == 0.f ? ESlateVisibility::Hidden : ESlateVisibility::Visible
+		);
+		CooldownDurationText->SetText(FText::AsNumber(AbilityCooldownDuration));
+	}
+	else
+	{
+		UpdateCanCastDisplay(true);
+		ManaCostText->SetVisibility(ESlateVisibility::Hidden);
+		CooldownDurationText->SetVisibility(ESlateVisibility::Hidden);
+		CooldownCountText->SetVisibility(ESlateVisibility::Hidden);
+	}
 }
 
 void UInventoryItemWidget::EmptySlot()
 {
+	ClearCooldown();
 	InventoryItem = nullptr;
 	SetIcon(EmptyTexture);
 	SetToolTip(nullptr);
@@ -102,6 +132,11 @@ void UInventoryItemWidget::LeftButtonClicked()
 	{
 		OnLeftMouseClicked.Broadcast(GetItemHandle());
 	}
+}
+
+void UInventoryItemWidget::UpdateCanCastDisplay(bool bCanCast)
+{
+	ItemIcon->GetDynamicMaterial()->SetScalarParameterValue(CanCastDynamicMaterialParamName, bCanCast ? 1.f : 0.f);
 }
 
 void UInventoryItemWidget::NativeOnDragDetected(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent,
