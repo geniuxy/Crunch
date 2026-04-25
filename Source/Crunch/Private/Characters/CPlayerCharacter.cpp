@@ -82,6 +82,10 @@ void ACPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 				&ACPlayerCharacter::HandleAbilityInput, InputActionPair.Key
 			);
 		}
+
+		EnhancedInputComponent->BindAction(
+			UseInventoryItemAction, ETriggerEvent::Triggered, this, &ACPlayerCharacter::HandleUseInventoryItem
+		);
 	}
 }
 
@@ -163,6 +167,12 @@ void ACPlayerCharacter::HandleAbilityInput(const FInputActionValue& InputActionV
 		);
 		Server_SendGameplayEventToSelf(CGameplayTags::Crunch_Ability_BasicAttack_Event_Pressed, FGameplayEventData());
 	}
+}
+
+void ACPlayerCharacter::HandleUseInventoryItem(const FInputActionValue& InputActionValue)
+{
+	int Value = FMath::RoundToInt(InputActionValue.Get<float>());
+	InventoryComponent->TryActivateItemInSlot(Value - 1);
 }
 
 void ACPlayerCharacter::SetInputEnabledFromPlayerController(bool bEnabled)

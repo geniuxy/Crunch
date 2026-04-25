@@ -110,6 +110,7 @@ public:
 	FORCEINLINE const UPA_ShopItem* GetShopItem() const { return ShopItem; }
 	FORCEINLINE FInventoryItemHandle GetHandle() const { return Handle; }
 	FORCEINLINE int GetStackCount() const { return StackCount; }
+	FORCEINLINE int GetSlot() const { return Slot; }
 	void SetSlot(int NewSlot) { Slot = NewSlot; }
 	FORCEINLINE FGameplayAbilitySpecHandle GetGrantedAbilitySpecHandle() const { return GrantedAbilitySpecHandle; }
 	void SetGameplayAbilitySpecHandle(FGameplayAbilitySpecHandle SpecHandle) { GrantedAbilitySpecHandle = SpecHandle; }

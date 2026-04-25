@@ -53,6 +53,8 @@ public:
 	);
 	UInventoryItem* TryGetItemForShopItem(const UPA_ShopItem* Item) const;
 
+	void TryActivateItemInSlot(int SlotNumber);
+
 protected:
 	virtual void BeginPlay() override;
 

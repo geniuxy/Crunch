@@ -50,6 +50,9 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	UInputAction* LearnAbilityLeaderAction;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	UInputAction* UseInventoryItemAction;
+
 	UPROPERTY(EditDefaultsOnly, Category="Input")
 	TMap<ECAbilityInputID, UInputAction*> GameplayAbilityInputActions;
 
@@ -64,6 +67,8 @@ private:
 	bool bIsLearnAbilityLeaderPressedDown = false;
 
 	void HandleAbilityInput(const FInputActionValue& InputActionValue, ECAbilityInputID InputID);
+	
+	void HandleUseInventoryItem(const FInputActionValue& InputActionValue);
 
 	void SetInputEnabledFromPlayerController(bool bEnabled);
 
