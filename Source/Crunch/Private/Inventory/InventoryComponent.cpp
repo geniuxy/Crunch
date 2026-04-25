@@ -261,7 +261,8 @@ void UInventoryComponent::GrantItem(const UPA_ShopItem* NewItem)
 				*InventoryItem->GetShopItem()->GetItemName().ToString(),
 				NewHandle.GetHandleID())
 		);
-		Client_ItemAdded(NewHandle, NewItem);
+		FGameplayAbilitySpecHandle GrantedAbilitySpecHandle = InventoryItem->GetGrantedAbilitySpecHandle();
+		Client_ItemAdded(NewHandle, NewItem, GrantedAbilitySpecHandle);
 	}
 }
 
@@ -328,12 +329,14 @@ bool UInventoryComponent::TryItemCombination(const UPA_ShopItem* NewItem)
 	return false;
 }
 
-void UInventoryComponent::Client_ItemAdded_Implementation(FInventoryItemHandle AssignedHandle, const UPA_ShopItem* Item)
+void UInventoryComponent::Client_ItemAdded_Implementation(
+	FInventoryItemHandle AssignedHandle, const UPA_ShopItem* Item, FGameplayAbilitySpecHandle GrantedAbilitySpecHandle)
 {
 	if (GetOwner()->HasAuthority()) return;
 
 	UInventoryItem* InventoryItem = NewObject<UInventoryItem>();
 	InventoryItem->InitItem(AssignedHandle, Item, OwnerAbilitySystemComponent);
+	InventoryItem->SetGameplayAbilitySpecHandle(GrantedAbilitySpecHandle);
 	InventoryMap.Add(AssignedHandle, InventoryItem);
 	OnItemAdded.Broadcast(InventoryItem);
 	Debug::Print(FString::Printf(
@@ -349,6 +352,7 @@ void UInventoryComponent::Client_ItemRemoved_Implementation(FInventoryItemHandle
 
 	UInventoryItem* InventoryItem = GetInventoryItemByHandle(ItemHandle);
 	if (!InventoryItem) return;
+	InventoryItem->RemoveGASModifications();
 
 	OnItemRemoved.Broadcast(ItemHandle);
 	InventoryMap.Remove(ItemHandle);

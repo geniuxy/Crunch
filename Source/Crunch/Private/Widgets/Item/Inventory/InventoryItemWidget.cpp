@@ -24,6 +24,8 @@ bool UInventoryItemWidget::IsEmpty() const
 
 void UInventoryItemWidget::UpdateInventoryItem(const UInventoryItem* Item)
 {
+	UnbindCanCastAbilityDelegate();
+	
 	InventoryItem = Item;
 	if (!InventoryItem || !InventoryItem->IsValid() || InventoryItem->GetStackCount() <= 0)
 	{
@@ -68,6 +70,7 @@ void UInventoryItemWidget::UpdateInventoryItem(const UInventoryItem* Item)
 			AbilityCooldownDuration == 0.f ? ESlateVisibility::Hidden : ESlateVisibility::Visible
 		);
 		CooldownDurationText->SetText(FText::AsNumber(AbilityCooldownDuration));
+		BindCanCastAbilityDelegate();
 	}
 	else
 	{
@@ -81,6 +84,7 @@ void UInventoryItemWidget::UpdateInventoryItem(const UInventoryItem* Item)
 void UInventoryItemWidget::EmptySlot()
 {
 	ClearCooldown();
+	UnbindCanCastAbilityDelegate();
 	InventoryItem = nullptr;
 	SetIcon(EmptyTexture);
 	SetToolTip(nullptr);
@@ -185,6 +189,22 @@ void UInventoryItemWidget::StartCooldown(float CooldownDuration, float TimeRemai
 	CooldownDisplayFormattingOptions.MaximumFractionalDigits = CooldownTimerRemaining > 1.f ? 0 : 1;
 	CooldownCountText->SetText(FText::AsNumber(CooldownTimerRemaining, &CooldownDisplayFormattingOptions));
 	CooldownCountText->SetVisibility(ESlateVisibility::Visible);
+}
+
+void UInventoryItemWidget::BindCanCastAbilityDelegate()
+{
+	if (InventoryItem)
+	{
+		const_cast<UInventoryItem*>(InventoryItem)->OnAbilityCanCastUpdateDalegate.AddUObject(this, &ThisClass::UpdateCanCastDisplay);
+	}
+}
+
+void UInventoryItemWidget::UnbindCanCastAbilityDelegate()
+{
+	if (InventoryItem)
+	{
+		const_cast<UInventoryItem*>(InventoryItem)->OnAbilityCanCastUpdateDalegate.RemoveAll(this);
+	}
 }
 
 void UInventoryItemWidget::CooldownFinished()

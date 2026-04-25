@@ -5,6 +5,7 @@
 
 #include "AbilitySystemComponent.h"
 #include "FunctionLibrary/CAbilitySystemFunctionLibrary.h"
+#include "GAS/CAttributeSet.h"
 #include "Inventory/Data/PA_ShopItem.h"
 
 FInventoryItemHandle FInventoryItemHandle::InvalidHandle()
@@ -55,6 +56,12 @@ void UInventoryItem::InitItem(
 	ShopItem = NewShopItem;
 
 	OwnerAbilitySystemComponent = AbilitySystemComponent;
+	if (OwnerAbilitySystemComponent)
+	{
+		OwnerAbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(
+			UCAttributeSet::GetManaAttribute()
+		).AddUObject(this, &ThisClass::ManaUpdated);
+	}
 	ApplyGASModifications();
 }
 
@@ -86,14 +93,21 @@ void UInventoryItem::RemoveGASModifications()
 {
 	if (!OwnerAbilitySystemComponent) return;
 
-	if (AppliedEquippedEffectHandle.IsValid())
-	{
-		OwnerAbilitySystemComponent->RemoveActiveGameplayEffect(AppliedEquippedEffectHandle);
-	}
+	OwnerAbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(
+		UCAttributeSet::GetManaAttribute()
+	).RemoveAll(this);
 
-	if (GrantedAbilitySpecHandle.IsValid())
+	if (OwnerAbilitySystemComponent->GetOwner()->HasAuthority())
 	{
-		OwnerAbilitySystemComponent->SetRemoveAbilityOnEnd(GrantedAbilitySpecHandle);
+		if (AppliedEquippedEffectHandle.IsValid())
+		{
+			OwnerAbilitySystemComponent->RemoveActiveGameplayEffect(AppliedEquippedEffectHandle);
+		}
+
+		if (GrantedAbilitySpecHandle.IsValid())
+		{
+			OwnerAbilitySystemComponent->SetRemoveAbilityOnEnd(GrantedAbilitySpecHandle);
+		}
 	}
 }
 
@@ -215,4 +229,9 @@ void UInventoryItem::ApplyGASModifications()
 	{
 		GrantedAbilitySpecHandle = OwnerAbilitySystemComponent->GiveAbility(FGameplayAbilitySpec(GrantedAbility));
 	}
+}
+
+void UInventoryItem::ManaUpdated(const FOnAttributeChangeData& ChangeData)
+{
+	OnAbilityCanCastUpdateDalegate.Broadcast(CanCastAbility());
 }

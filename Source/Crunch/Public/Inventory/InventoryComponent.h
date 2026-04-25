@@ -97,7 +97,11 @@ private:
 	/**********************************************************************/
 private:
 	UFUNCTION(Client, Reliable) // Client: 仅在拥有该 Actor 的本地客户端执行
-	void Client_ItemAdded(FInventoryItemHandle AssignedHandle, const UPA_ShopItem* Item);
+	void Client_ItemAdded(
+		FInventoryItemHandle AssignedHandle,
+		const UPA_ShopItem* Item,
+		FGameplayAbilitySpecHandle GrantedAbilitySpecHandle
+	);
 
 	UFUNCTION(Client, Reliable)
 	void Client_ItemRemoved(FInventoryItemHandle ItemHandle);

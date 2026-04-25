@@ -9,9 +9,12 @@
 #include "UObject/Object.h"
 #include "InventoryItem.generated.h"
 
+struct FOnAttributeChangeData;
 struct FGameplayAbilitySpecHandle;
 class UAbilitySystemComponent;
 class UPA_ShopItem;
+
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnAbilityCanCastUpdateDalegate, bool /* bCanCast */)
 
 USTRUCT()
 struct FInventoryItemHandle
@@ -81,11 +84,13 @@ public:
 	float GetAbilityCooldownDuration() const;
 	float GetAbilityManaCost() const;
 	bool CanCastAbility() const;
+	
+	FOnAbilityCanCastUpdateDalegate OnAbilityCanCastUpdateDalegate;
 
 private:
 	UPROPERTY()
 	UAbilitySystemComponent* OwnerAbilitySystemComponent;
-	
+
 	UPROPERTY()
 	const UPA_ShopItem* ShopItem;
 
@@ -96,12 +101,16 @@ private:
 
 	FActiveGameplayEffectHandle AppliedEquippedEffectHandle;
 	FGameplayAbilitySpecHandle GrantedAbilitySpecHandle;
-	
+
 	void ApplyGASModifications();
+
+	void ManaUpdated(const FOnAttributeChangeData& ChangeData);
 
 public:
 	FORCEINLINE const UPA_ShopItem* GetShopItem() const { return ShopItem; }
 	FORCEINLINE FInventoryItemHandle GetHandle() const { return Handle; }
 	FORCEINLINE int GetStackCount() const { return StackCount; }
 	void SetSlot(int NewSlot) { Slot = NewSlot; }
+	FORCEINLINE FGameplayAbilitySpecHandle GetGrantedAbilitySpecHandle() const { return GrantedAbilitySpecHandle; }
+	void SetGameplayAbilitySpecHandle(FGameplayAbilitySpecHandle SpecHandle) { GrantedAbilitySpecHandle = SpecHandle; }
 };
