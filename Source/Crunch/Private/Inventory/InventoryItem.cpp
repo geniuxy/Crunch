@@ -158,3 +158,18 @@ bool UInventoryItem::IsForItem(const UPA_ShopItem* Item) const
 
 	return GetShopItem() == Item;
 }
+
+bool UInventoryItem::IsGrantingAbility(TSubclassOf<UGameplayAbility> AbilityClass) const
+{
+	if (!ShopItem) return false;
+
+	TSubclassOf<UGameplayAbility> GrantedAbility = ShopItem->GetGrantedAbility();
+	return GrantedAbility == AbilityClass;
+}
+
+bool UInventoryItem::IsGrantingAnyAbility()
+{
+	if (!ShopItem) return false;
+	
+	return ShopItem->GetGrantedAbility() != nullptr;
+}

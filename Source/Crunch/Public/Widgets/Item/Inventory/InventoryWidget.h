@@ -48,6 +48,10 @@ private:
 
 	void ItemRemoved(const FInventoryItemHandle& ItemHandle);
 
+	void ItemAbilityCommitted(
+		const FInventoryItemHandle& ItemHandle, float CooldownDuration, float CooldownTimeRemaining
+	);
+
 	/**********************************************************************/
 	/*                           Context Menu                             */
 	/**********************************************************************/

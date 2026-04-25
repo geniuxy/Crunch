@@ -71,6 +71,9 @@ public:
 	bool IsStackFull() const;
 	bool IsForItem(const UPA_ShopItem* Item) const;
 
+	bool IsGrantingAbility(TSubclassOf<UGameplayAbility> AbilityClass) const;
+	bool IsGrantingAnyAbility();
+
 private:
 	UPROPERTY()
 	const UPA_ShopItem* ShopItem;

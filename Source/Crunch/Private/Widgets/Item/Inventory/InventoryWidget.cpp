@@ -24,6 +24,7 @@ void UInventoryWidget::NativeConstruct()
 			InventoryComponent->OnItemAdded.AddUObject(this, &ThisClass::ItemAdded);
 			InventoryComponent->OnItemRemoved.AddUObject(this, &ThisClass::ItemRemoved);
 			InventoryComponent->OnItemStackCountChanged.AddUObject(this, &ThisClass::ItemStackCountChanged);
+			InventoryComponent->OnItemAbilityCommitted.AddUObject(this, &ThisClass::ItemAbilityCommitted);
 			int Capacity = InventoryComponent->GetCapacity();
 
 			InventoryItemList->ClearChildren();
@@ -40,8 +41,9 @@ void UInventoryWidget::NativeConstruct()
 					InventoryItemWidgets.Add(NewEmptyWidget);
 
 					NewEmptyWidget->OnInventoryItemDropped.AddUObject(this, &ThisClass::HandleItemDragDrop);
-					NewEmptyWidget->OnLeftMouseClicked.AddUObject(InventoryComponent,
-					                                              &UInventoryComponent::TryActivateItem);
+					NewEmptyWidget->OnLeftMouseClicked.AddUObject(
+						InventoryComponent, &UInventoryComponent::TryActivateItem
+					);
 					NewEmptyWidget->OnRightMouseClicked.AddUObject(this, &ThisClass::ToggleContextMenu);
 				}
 			}
@@ -130,6 +132,16 @@ void UInventoryWidget::ItemRemoved(const FInventoryItemHandle& ItemHandle)
 	{
 		(*FoundWidget)->EmptySlot();
 		PopulatedInventoryItemWidgetsMap.Remove(ItemHandle);
+	}
+}
+
+void UInventoryWidget::ItemAbilityCommitted(
+	const FInventoryItemHandle& ItemHandle, float CooldownDuration, float CooldownTimeRemaining)
+{
+	UInventoryItemWidget** FoundWidget = PopulatedInventoryItemWidgetsMap.Find(ItemHandle);
+	if (FoundWidget && *FoundWidget)
+	{
+		(*FoundWidget)->StartCooldown(CooldownDuration, CooldownTimeRemaining);
 	}
 }
 

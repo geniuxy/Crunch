@@ -14,8 +14,12 @@ class UAbilitySystemComponent;
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnItemAddedDelegate, const UInventoryItem* /* NewItem */)
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnItemRemovedDelegate, const FInventoryItemHandle& /* ItemHandle */)
-DECLARE_MULTICAST_DELEGATE_TwoParams(FOnItemStackCountChangedDelegate, const FInventoryItemHandle& /* ItemHandle */,
-                                     int /* NewCount */)
+DECLARE_MULTICAST_DELEGATE_TwoParams(
+	FOnItemStackCountChangedDelegate, const FInventoryItemHandle& /* ItemHandle */, int /* NewCount */)
+DECLARE_MULTICAST_DELEGATE_ThreeParams(
+	FOnItemAbilityCommitted, const FInventoryItemHandle& /* ItemHandle */,
+	float /* CooldownDuration */, float /* CooldownTimeRemaining */
+)
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class CRUNCH_API UInventoryComponent : public UActorComponent
@@ -28,6 +32,7 @@ public:
 	FOnItemAddedDelegate OnItemAdded;
 	FOnItemRemovedDelegate OnItemRemoved;
 	FOnItemStackCountChangedDelegate OnItemStackCountChanged;
+	FOnItemAbilityCommitted OnItemAbilityCommitted;
 
 	void TryActivateItem(const FInventoryItemHandle& ItemHandle);
 	void TryPurchase(const UPA_ShopItem* ItemToPurchase);
@@ -60,6 +65,8 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, Category="Inventory")
 	int Capacity = 6;
+
+	void AbilityCommitted(UGameplayAbility* CommittedAbility);
 
 public:
 	FORCEINLINE int GetCapacity() const { return Capacity; }

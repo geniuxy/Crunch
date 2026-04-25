@@ -3,6 +3,7 @@
 
 #include "Widgets/Item/Inventory/InventoryItemWidget.h"
 
+#include "CrunchDebugHelper.h"
 #include "Blueprint/DragDropOperation.h"
 #include "Components/TextBlock.h"
 #include "Inventory/InventoryItem.h"
@@ -131,4 +132,9 @@ bool UInventoryItemWidget::NativeOnDrop(const FGeometry& InGeometry, const FDrag
 	}
 	
 	return Super::NativeOnDrop(InGeometry, InDragDropEvent, InOperation);
+}
+
+void UInventoryItemWidget::StartCooldown(float CooldownDuration, float TimeRemaining)
+{
+	Debug::Print(TEXT("开始物品冷却倒计时"));
 }
