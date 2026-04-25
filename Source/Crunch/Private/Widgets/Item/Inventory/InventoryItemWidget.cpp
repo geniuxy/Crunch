@@ -146,17 +146,23 @@ void UInventoryItemWidget::StartCooldown(float CooldownDuration, float TimeRemai
 		CooldownUpdateTimerHandle, this, &ThisClass::UpdateCooldown, CooldownUpdateInterval, true
 	);
 
+	FNumberFormattingOptions CooldownDisplayFormattingOptions;
+	CooldownDisplayFormattingOptions.MaximumFractionalDigits = CooldownTimerRemaining > 1.f ? 0 : 1;
+	CooldownCountText->SetText(FText::AsNumber(CooldownTimerRemaining, &CooldownDisplayFormattingOptions));
 	CooldownCountText->SetVisibility(ESlateVisibility::Visible);
 }
 
 void UInventoryItemWidget::CooldownFinished()
 {
 	GetWorld()->GetTimerManager().ClearTimer(CooldownDurationHandle);
+	GetWorld()->GetTimerManager().ClearTimer(CooldownUpdateTimerHandle);
 	CooldownCountText->SetVisibility(ESlateVisibility::Hidden);
 	if (ItemIcon)
 	{
 		ItemIcon->GetDynamicMaterial()->SetScalarParameterValue(CooldownAmtDynamicMaterialParamName, 1.f);
 	}
+	CooldownTimerRemaining = 0.f;
+	CooldownTimerDuration = 0.f;
 }
 
 void UInventoryItemWidget::UpdateCooldown()

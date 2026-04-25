@@ -22,6 +22,8 @@ public:
 
 	UTexture2D* GetIcon() const;
 
+	UGameplayAbility* GetGrantedAbilityCDO() const;
+
 private:
 	UPROPERTY(EditDefaultsOnly, Category="ShopItem")
 	TSoftObjectPtr<UTexture2D> Icon;

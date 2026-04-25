@@ -56,12 +56,15 @@ class CRUNCH_API UInventoryItem : public UObject
 	GENERATED_BODY()
 
 public:
-	void InitItem(const FInventoryItemHandle& NewHandle, const UPA_ShopItem* NewShopItem);
+	void InitItem(
+		const FInventoryItemHandle& NewHandle,
+		const UPA_ShopItem* NewShopItem,
+		UAbilitySystemComponent* AbilitySystemComponent
+	);
 
-	bool TryActivateGrantedAbility(UAbilitySystemComponent* AbilitySystemComponent);
-	void ApplyConsumeEffect(UAbilitySystemComponent* AbilitySystemComponent);
-	void ApplyGASModifications(UAbilitySystemComponent* AbilitySystemComponent);
-	void RemoveGASModifications(UAbilitySystemComponent* AbilitySystemComponent);
+	bool TryActivateGrantedAbility();
+	void ApplyConsumeEffect();
+	void RemoveGASModifications();
 
 	bool IsValid() const;
 
@@ -72,9 +75,16 @@ public:
 	bool IsForItem(const UPA_ShopItem* Item) const;
 
 	bool IsGrantingAbility(TSubclassOf<UGameplayAbility> AbilityClass) const;
-	bool IsGrantingAnyAbility();
+	bool IsGrantingAnyAbility() const;
+
+	float GetAbilityCooldownTimerRemaining() const;
+	float GetAbilityCooldownDuration() const;
+	float GetAbilityManaCost() const;
 
 private:
+	UPROPERTY()
+	UAbilitySystemComponent* OwnerAbilitySystemComponent;
+	
 	UPROPERTY()
 	const UPA_ShopItem* ShopItem;
 
@@ -85,10 +95,12 @@ private:
 
 	FActiveGameplayEffectHandle AppliedEquippedEffectHandle;
 	FGameplayAbilitySpecHandle GrantedAbilitySpecHandle;
+	
+	void ApplyGASModifications();
 
 public:
 	FORCEINLINE const UPA_ShopItem* GetShopItem() const { return ShopItem; }
 	FORCEINLINE FInventoryItemHandle GetHandle() const { return Handle; }
 	FORCEINLINE int GetStackCount() const { return StackCount; }
-	void SetSlot(int NewSlot) { Slot = NewSlot;}
+	void SetSlot(int NewSlot) { Slot = NewSlot; }
 };
