@@ -6,6 +6,7 @@
 #include "Blueprint/UserWidget.h"
 #include "GameplayWidget.generated.h"
 
+class USkeletalMeshRenderWidget;
 class UInventoryWidget;
 class UShopWidget;
 class UStatsGauge;
@@ -38,37 +39,40 @@ private:
 
 	UPROPERTY(meta=(BindWidget))
 	UAbilityListView* AbilityListView;
-	
+
 	UPROPERTY(meta=(BindWidget))
 	UStatsGauge* AttackDamageGauge;
-	
+
 	UPROPERTY(meta=(BindWidget))
 	UStatsGauge* ArmorGauge;
-	
+
 	UPROPERTY(meta=(BindWidget))
 	UStatsGauge* IntelligenceGauge;
-	
+
 	UPROPERTY(meta=(BindWidget))
 	UStatsGauge* StrengthGauge;
 
 	UPROPERTY(meta=(BindWidget))
 	UStatsGauge* MoveSpeedGauge;
-	
+
 	UPROPERTY(meta=(BindWidget))
 	UShopWidget* ShopWidget;
 
 	UPROPERTY(meta=(BindWidget))
 	UInventoryWidget* InventoryWidget;
 
+	UPROPERTY(meta=(BindWidget))
+	USkeletalMeshRenderWidget* HeadshotWidget;
+
 	UPROPERTY(Transient, meta=(BindWidgetAnim))
 	UWidgetAnimation* ShopPopUpAnimation;
-	
+
 	void PlayShopPopUpAnimation(bool bPlayForward);
 	void SetOwningPawnInputEnabled(bool bPawnInputEnabled);
 	void SetShowMouseCursor(bool bShowMouseCursor);
 	void SetFocusToGameAndUI();
 	void SetFocusToGameOnly();
-	
+
 	UPROPERTY()
 	TObjectPtr<UAbilitySystemComponent> OwnerAbilitySystemComponent;
 };
