@@ -3,15 +3,94 @@
 
 #include "Characters/CStormCore.h"
 
+#include "CrunchDebugHelper.h"
+#include "GenericTeamAgentInterface.h"
+#include "Components/SphereComponent.h"
+
 
 ACStormCore::ACStormCore()
 {
 	PrimaryActorTick.bCanEverTick = false;
+
+	InfluenceRange = CreateDefaultSubobject<USphereComponent>("InfluenceRange");
+	InfluenceRange->SetupAttachment(GetRootComponent());
+
+	InfluenceRange->OnComponentBeginOverlap.AddDynamic(this, &ThisClass::NewInfluencerInRange);
+	InfluenceRange->OnComponentEndOverlap.AddDynamic(this, &ThisClass::InfluencerLeftRange);
 }
 
 void ACStormCore::BeginPlay()
 {
 	Super::BeginPlay();
 	
+}
+
+void ACStormCore::NewInfluencerInRange(
+	UPrimitiveComponent* OverlappedComponent,
+	AActor* OtherActor,
+	UPrimitiveComponent* OtherComp,
+	int32 OtherBodyIndex,
+	bool bFromSweep,
+	const FHitResult& SweepResult)
+{
+	IGenericTeamAgentInterface* OtherTeamInterface = Cast<IGenericTeamAgentInterface>(OtherActor);
+	if (OtherTeamInterface)
+	{
+		if (OtherTeamInterface->GetGenericTeamId().GetId() == 0)
+		{
+			TeamOneInfluencerCount++;
+		}
+		else if (OtherTeamInterface->GetGenericTeamId().GetId() == 1)
+		{
+			TeamTwoInfluencerCount++;
+		}
+		UpdateTeamWeight();
+	}
+}
+
+void ACStormCore::InfluencerLeftRange(
+	UPrimitiveComponent* OverlappedComponent,
+	AActor* OtherActor,
+	UPrimitiveComponent* OtherComp,
+	int32 OtherBodyIndex)
+{
+	IGenericTeamAgentInterface* OtherTeamInterface = Cast<IGenericTeamAgentInterface>(OtherActor);
+	if (OtherTeamInterface)
+	{
+		if (OtherTeamInterface->GetGenericTeamId().GetId() == 0)
+		{
+			TeamOneInfluencerCount--;
+			if (TeamOneInfluencerCount < 0)
+			{
+				TeamOneInfluencerCount = 0;
+			}
+		}
+		else if (OtherTeamInterface->GetGenericTeamId().GetId() == 1)
+		{
+			TeamTwoInfluencerCount--;
+			if (TeamTwoInfluencerCount < 0)
+			{
+				TeamTwoInfluencerCount = 0;
+			}
+		}
+		UpdateTeamWeight();
+	}
+}
+
+void ACStormCore::UpdateTeamWeight()
+{
+	if (TeamOneInfluencerCount == TeamTwoInfluencerCount)
+	{
+		TeamWeight = 0;
+	}
+	else
+	{
+		float TeamOffset = TeamOneInfluencerCount - TeamTwoInfluencerCount;
+		float TeamTotal = TeamOneInfluencerCount + TeamTwoInfluencerCount;
+
+		TeamWeight = TeamOffset / TeamTotal;
+	}
+
+	Debug::Print(FString::Printf(TEXT("一队个数：%d, 二队个数：%d, 权重：%f"), TeamOneInfluencerCount, TeamTwoInfluencerCount, TeamWeight));
 }
 
