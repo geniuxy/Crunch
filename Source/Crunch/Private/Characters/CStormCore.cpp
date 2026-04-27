@@ -3,9 +3,11 @@
 
 #include "Characters/CStormCore.h"
 
+#include "AIController.h"
 #include "CrunchDebugHelper.h"
 #include "GenericTeamAgentInterface.h"
 #include "Components/SphereComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 
 ACStormCore::ACStormCore()
@@ -23,6 +25,12 @@ void ACStormCore::BeginPlay()
 {
 	Super::BeginPlay();
 	
+}
+
+void ACStormCore::PossessedBy(AController* NewController)
+{
+	Super::PossessedBy(NewController);
+	OwnerAIController = Cast<AAIController>(NewController);
 }
 
 void ACStormCore::NewInfluencerInRange(
@@ -92,5 +100,25 @@ void ACStormCore::UpdateTeamWeight()
 	}
 
 	Debug::Print(FString::Printf(TEXT("一队个数：%d, 二队个数：%d, 权重：%f"), TeamOneInfluencerCount, TeamTwoInfluencerCount, TeamWeight));
+	UpdateGoal();
+}
+
+void ACStormCore::UpdateGoal()
+{
+	if (!HasAuthority()) return;
+	if (!OwnerAIController) return;
+	if (!GetCharacterMovement()) return;
+
+	if (TeamWeight > 0.f)
+	{
+		OwnerAIController->MoveToActor(TeamOneGoal);
+	}
+	else
+	{
+		OwnerAIController->MoveToActor(TeamTwoGoal);
+	}
+
+	float Speed = MaxWalkSpeed * FMath::Abs(TeamWeight);
+	GetCharacterMovement()->MaxWalkSpeed = Speed;
 }
 
