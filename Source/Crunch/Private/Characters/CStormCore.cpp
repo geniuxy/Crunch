@@ -10,11 +10,12 @@
 #include "Components/DecalComponent.h"
 #include "Components/SphereComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Net/UnrealNetwork.h"
 
 
 ACStormCore::ACStormCore()
 {
-	PrimaryActorTick.bCanEverTick = false;
+	PrimaryActorTick.bCanEverTick = true;
 
 	InfluenceRange = CreateDefaultSubobject<USphereComponent>("InfluenceRange");
 	InfluenceRange->SetupAttachment(GetRootComponent());
@@ -40,6 +41,23 @@ void ACStormCore::PossessedBy(AController* NewController)
 	OwnerAIController = Cast<AAIController>(NewController);
 }
 
+void ACStormCore::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME_CONDITION_NOTIFY(ACStormCore, CoreToCapture, COND_None, REPNOTIFY_Always);
+}
+
+void ACStormCore::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+	if (CoreToCapture)
+	{
+		FVector CoreMoveDir = (GetMesh()->GetComponentLocation() - CoreToCapture->GetActorLocation()).GetSafeNormal();
+		CoreToCapture->AddActorWorldOffset(CoreMoveDir * CoreCaptureSpeed * DeltaSeconds);
+	}
+}
+
 void ACStormCore::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
 {
 	Super::PostEditChangeProperty(PropertyChangedEvent);
@@ -61,6 +79,15 @@ void ACStormCore::NewInfluencerInRange(
 	bool bFromSweep,
 	const FHitResult& SweepResult)
 {
+	if (OtherActor == TeamOneGoal)
+	{
+		GoalReached(0);
+	}
+	if (OtherActor == TeamTwoGoal)
+	{
+		GoalReached(1);
+	}
+	
 	IGenericTeamAgentInterface* OtherTeamInterface = Cast<IGenericTeamAgentInterface>(OtherActor);
 	if (OtherTeamInterface)
 	{
@@ -107,6 +134,7 @@ void ACStormCore::InfluencerLeftRange(
 
 void ACStormCore::UpdateTeamWeight()
 {
+	OnTeamInfluencerCountUpdatedDelegate.Broadcast(TeamOneInfluencerCount, TeamTwoInfluencerCount);
 	if (TeamOneInfluencerCount == TeamTwoInfluencerCount)
 	{
 		TeamWeight = 0;
@@ -138,5 +166,44 @@ void ACStormCore::UpdateGoal()
 
 	float Speed = MaxWalkSpeed * FMath::Abs(TeamWeight);
 	GetCharacterMovement()->MaxWalkSpeed = Speed;
+}
+
+void ACStormCore::OnRep_CoreToCapture()
+{
+	if (CoreToCapture)
+	{
+		CaptureCore();
+	}
+}
+
+void ACStormCore::GoalReached(int WinningTeam)
+{
+	OnGoalReachedDelegate.Broadcast(this, WinningTeam);
+
+	if (!HasAuthority()) return;
+
+	CoreToCapture = WinningTeam == 0 ? TeamTwoCore : TeamOneCore;
+	CaptureCore();
+}
+
+void ACStormCore::CaptureCore()
+{
+	float ExpandDuration = GetMesh()->GetAnimInstance()->Montage_Play(ExpandMontage);
+	CoreCaptureSpeed =
+		FVector::Distance(GetMesh()->GetComponentLocation(), CoreToCapture->GetActorLocation()) / ExpandDuration;
+
+	CoreToCapture->SetActorEnableCollision(false);
+	GetCharacterMovement()->MaxWalkSpeed = 0.f;
+
+	FTimerHandle ExpandTimerHandle;
+	GetWorldTimerManager().SetTimer(ExpandTimerHandle, this, &ThisClass::ExpandFinished, ExpandDuration);
+}
+
+void ACStormCore::ExpandFinished()
+{
+	CoreToCapture->SetActorLocation(GetMesh()->GetComponentLocation());
+	// 败方的基地和StormCore Attach在一起，一起消失
+	CoreToCapture->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepWorldTransform, "root");
+	GetMesh()->GetAnimInstance()->Montage_Play(CaptureMontage);
 }
 
