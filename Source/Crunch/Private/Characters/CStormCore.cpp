@@ -6,6 +6,8 @@
 #include "AIController.h"
 #include "CrunchDebugHelper.h"
 #include "GenericTeamAgentInterface.h"
+#include "Camera/CameraComponent.h"
+#include "Components/DecalComponent.h"
 #include "Components/SphereComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
@@ -19,18 +21,36 @@ ACStormCore::ACStormCore()
 
 	InfluenceRange->OnComponentBeginOverlap.AddDynamic(this, &ThisClass::NewInfluencerInRange);
 	InfluenceRange->OnComponentEndOverlap.AddDynamic(this, &ThisClass::InfluencerLeftRange);
+
+	ViewCam = CreateDefaultSubobject<UCameraComponent>("ViewCam");
+	ViewCam->SetupAttachment(GetRootComponent());
+
+	GroundDecalComponent = CreateDefaultSubobject<UDecalComponent>("GroundDecalComponent");
+	GroundDecalComponent->SetupAttachment(GetRootComponent());
 }
 
 void ACStormCore::BeginPlay()
 {
 	Super::BeginPlay();
-	
 }
 
 void ACStormCore::PossessedBy(AController* NewController)
 {
 	Super::PossessedBy(NewController);
 	OwnerAIController = Cast<AAIController>(NewController);
+}
+
+void ACStormCore::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
+{
+	Super::PostEditChangeProperty(PropertyChangedEvent);
+	
+	FName PropertyName = PropertyChangedEvent.GetPropertyName();
+	if (PropertyName == GET_MEMBER_NAME_CHECKED(ACStormCore, InfluenceRadius))
+	{
+		InfluenceRange->SetSphereRadius(InfluenceRadius);
+		FVector DecalSize = GroundDecalComponent->DecalSize;
+		GroundDecalComponent->DecalSize = FVector(DecalSize.X, InfluenceRadius, InfluenceRadius);
+	}
 }
 
 void ACStormCore::NewInfluencerInRange(

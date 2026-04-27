@@ -6,6 +6,7 @@
 #include "GameFramework/Character.h"
 #include "CStormCore.generated.h"
 
+class UCameraComponent;
 class AAIController;
 class USphereComponent;
 
@@ -21,13 +22,23 @@ protected:
 	virtual void BeginPlay() override;
 	virtual void PossessedBy(AController* NewController) override;
 
+	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
 private:
 	UPROPERTY(EditAnywhere, Category="Move")
 	float MaxWalkSpeed = 500.f;
+
+	UPROPERTY(EditAnywhere, Category="Detection")
+	float InfluenceRadius = 1000.f;
 	
 	UPROPERTY(VisibleDefaultsOnly, Category="Detection")
 	USphereComponent* InfluenceRange;
 
+	UPROPERTY(VisibleDefaultsOnly, Category="Detection")
+	UDecalComponent* GroundDecalComponent;
+
+	UPROPERTY(VisibleDefaultsOnly, Category="Detection")
+	UCameraComponent* ViewCam;
+	
 	UFUNCTION()
 	void NewInfluencerInRange(
 		UPrimitiveComponent* OverlappedComponent,
