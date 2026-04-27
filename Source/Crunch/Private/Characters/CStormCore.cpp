@@ -98,8 +98,6 @@ void ACStormCore::UpdateTeamWeight()
 
 		TeamWeight = TeamOffset / TeamTotal;
 	}
-
-	Debug::Print(FString::Printf(TEXT("一队个数：%d, 二队个数：%d, 权重：%f"), TeamOneInfluencerCount, TeamTwoInfluencerCount, TeamWeight));
 	UpdateGoal();
 }
 
