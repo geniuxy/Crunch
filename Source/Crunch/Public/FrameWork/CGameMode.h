@@ -7,6 +7,7 @@
 #include "GameFramework/GameModeBase.h"
 #include "CGameMode.generated.h"
 
+class ACStormCore;
 struct FGenericTeamId;
 /**
  * 
@@ -17,6 +18,8 @@ class CRUNCH_API ACGameMode : public AGameModeBase
 	GENERATED_BODY()
 
 public:
+	virtual void StartPlay() override;
+	
 	virtual APlayerController* SpawnPlayerController(ENetRole InRemoteRole, const FString& Options) override;
 
 private:
@@ -26,4 +29,8 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, Category="Team")
 	TMap<FGenericTeamId, FName> TeamStartSpotTagMap;
+
+	ACStormCore* GetStormCore() const;
+
+	void MatchFinished(AActor* ViewTarget, int WinningTeam);
 };

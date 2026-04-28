@@ -34,9 +34,9 @@ public:
 
 	virtual void SetupInputComponent() override;
 
-protected:
-	void SpawnGameplayWidget();
+	void MatchFinished(AActor* ViewTarget, int WinningTeam);
 
+protected:
 	UPROPERTY(EditDefaultsOnly, Category="UI")
 	TSubclassOf<UGameplayWidget> GameplayWidgetClass;
 
@@ -57,10 +57,20 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category="Input")
 	UInputAction* ToggleGameplayMenuAction;
+	
+	UPROPERTY(EditDefaultsOnly, Category="View")
+	float MatchFinishViewBlendTimerDuration = 2.f;
+
+	UFUNCTION(Client, Reliable)
+	void Client_MatchFinished(AActor* ViewTarget, int WinningTeam);
+	
+	void SpawnGameplayWidget();
 
 	UFUNCTION()
 	void ToggleShop();
 
 	UFUNCTION()
 	void ToggleGameplayMenu();
+
+	void ShowWinLoseState();
 };

@@ -4,7 +4,20 @@
 #include "Crunch/Public/FrameWork/CGameMode.h"
 
 #include "EngineUtils.h"
+#include "Characters/CStormCore.h"
 #include "GameFramework/PlayerStart.h"
+#include "Player/CPlayerController.h"
+
+void ACGameMode::StartPlay()
+{
+	Super::StartPlay();
+
+	ACStormCore* StormCore = GetStormCore();
+	if (StormCore)
+	{
+		StormCore->OnGoalReachedDelegate.AddUObject(this, &ThisClass::MatchFinished);
+	}
+}
 
 APlayerController* ACGameMode::SpawnPlayerController(ENetRole InRemoteRole, const FString& Options)
 {
@@ -46,4 +59,30 @@ AActor* ACGameMode::FindNextStartSpotForTeam(const FGenericTeamId& TeamID) const
 	}
 
 	return nullptr;
+}
+
+ACStormCore* ACGameMode::GetStormCore() const
+{
+	UWorld* World = GetWorld();
+	if (World)
+	{
+		for (TActorIterator<ACStormCore> It(World); It; ++It)
+		{
+			return *It;
+		}
+	}
+
+	return nullptr;
+}
+
+void ACGameMode::MatchFinished(AActor* ViewTarget, int WinningTeam)
+{
+	UWorld* World = GetWorld();
+	if (World)
+	{
+		for (TActorIterator<ACPlayerController> It(World); It; ++It)
+		{
+			It->MatchFinished(ViewTarget, WinningTeam);
+		}
+	}
 }

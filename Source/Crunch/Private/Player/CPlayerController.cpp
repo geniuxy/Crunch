@@ -75,6 +75,30 @@ void ACPlayerController::SetupInputComponent()
 	}
 }
 
+void ACPlayerController::MatchFinished(AActor* ViewTarget, int WinningTeam)
+{
+	if (!HasAuthority()) return;
+
+	OwningPlayerCharacter->DisableInput(this);
+	Client_MatchFinished(ViewTarget, WinningTeam);
+}
+
+void ACPlayerController::Client_MatchFinished_Implementation(AActor* ViewTarget, int WinningTeam)
+{
+	SetViewTargetWithBlend(ViewTarget, MatchFinishViewBlendTimerDuration);
+	FString WinLoseMsg = TEXT("你赢了！");
+	if (GetGenericTeamId().GetId() != WinningTeam)
+	{
+		WinLoseMsg = TEXT("你输了=_=");
+	}
+
+	GameplayWidget->SetGameplayMenuTitle(WinLoseMsg);
+	FTimerHandle ShowWinLoseStateTimerHandle;
+	GetWorldTimerManager().SetTimer(
+		ShowWinLoseStateTimerHandle, this, &ThisClass::ShowWinLoseState, MatchFinishViewBlendTimerDuration
+	);
+}
+
 void ACPlayerController::SpawnGameplayWidget()
 {
 	if (!IsLocalPlayerController()) // 排除在Client端，Server的副本角色的情况
@@ -103,5 +127,13 @@ void ACPlayerController::ToggleGameplayMenu()
 	if (GameplayWidget)
 	{
 		GameplayWidget->ToggleGameMenu();
+	}
+}
+
+void ACPlayerController::ShowWinLoseState()
+{
+	if (GameplayWidget)
+	{
+		GameplayWidget->ShowGameplayMenu();
 	}
 }
