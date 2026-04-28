@@ -17,21 +17,24 @@ class CRUNCH_API UGameplayMenu : public UUserWidget
 {
 	GENERATED_BODY()
 
-protected:
-	virtual void NativeConstruct() override;
-
+public:
 	FOnButtonClickedEvent& GetResumeButtonClickedEventDelegate();
+
+	void SetTitleText(const FString& NewTitle);
+
+protected :
+	virtual void NativeConstruct() override;
 
 private:
 	UPROPERTY(meta=(BindWidget))
 	UTextBlock* MenuTitle;
-	
+
 	UPROPERTY(meta=(BindWidget))
 	UButton* ResumeButton;
-	
+
 	UPROPERTY(meta=(BindWidget))
 	UButton* MainMenuButton;
-	
+
 	UPROPERTY(meta=(BindWidget))
 	UButton* QuitGameButton;
 
