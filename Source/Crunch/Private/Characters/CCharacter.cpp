@@ -17,7 +17,7 @@
 #include "Net/UnrealNetwork.h"
 #include "Perception/AIPerceptionStimuliSourceComponent.h"
 #include "Perception/AISense_Sight.h"
-#include "Widgets/OverHeadStatsGauge.h"
+#include "Widgets/Stats/OverHeadStatsGauge.h"
 
 
 ACCharacter::ACCharacter()
