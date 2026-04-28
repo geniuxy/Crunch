@@ -25,6 +25,8 @@ public:
 	FOnGoalReachedDelegate OnGoalReachedDelegate;
 	FOnTeamInfluencerCountUpdatedDelegate OnTeamInfluencerCountUpdatedDelegate;
 
+	float GetProgress() const;
+
 protected:
 	virtual void BeginPlay() override;
 	virtual void PossessedBy(AController* NewController) override;
@@ -95,6 +97,7 @@ private:
 	void OnRep_CoreToCapture();
 
 	float CoreCaptureSpeed = 0.f; // 捕获目标基地的播放速度
+	float TravelLength = 0.f; // 双方目标点Goal之间的距离
 
 	void GoalReached(int WinningTeam);
 

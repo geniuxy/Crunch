@@ -30,9 +30,23 @@ ACStormCore::ACStormCore()
 	GroundDecalComponent->SetupAttachment(GetRootComponent());
 }
 
+float ACStormCore::GetProgress() const
+{
+	FVector TeamTwoGoalLoc = TeamTwoGoal->GetActorLocation();
+	FVector VectorFromTeamOne = GetActorLocation() - TeamTwoGoalLoc;
+	VectorFromTeamOne.Z = 0.f;
+	return VectorFromTeamOne.Length() / TravelLength;
+}
+
 void ACStormCore::BeginPlay()
 {
 	Super::BeginPlay();
+
+	FVector TeamOneGoalLoc = TeamOneGoal->GetActorLocation();
+	FVector TeamTwoGoalLoc = TeamTwoGoal->GetActorLocation();
+	FVector GoalOffset = TeamOneGoalLoc - TeamTwoGoalLoc;
+	GoalOffset.Z = 0.f;
+	TravelLength = GoalOffset.Length();
 }
 
 void ACStormCore::PossessedBy(AController* NewController)
