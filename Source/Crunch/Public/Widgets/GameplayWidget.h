@@ -6,6 +6,7 @@
 #include "Blueprint/UserWidget.h"
 #include "GameplayWidget.generated.h"
 
+class UMatchStatWidget;
 class USkeletalMeshRenderWidget;
 class UInventoryWidget;
 class UShopWidget;
@@ -64,6 +65,9 @@ private:
 	UPROPERTY(meta=(BindWidget))
 	USkeletalMeshRenderWidget* HeadshotWidget;
 
+	UPROPERTY(meta=(BindWidget))
+	UMatchStatWidget* MatchStatWidget;
+	
 	UPROPERTY(Transient, meta=(BindWidgetAnim))
 	UWidgetAnimation* ShopPopUpAnimation;
 
