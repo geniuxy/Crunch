@@ -138,6 +138,25 @@ void UCGameplayAbilityBase::PushTargets(
 	PushTargets(Targets, PushVel);
 }
 
+void UCGameplayAbilityBase::PlayMontageLocally(UAnimMontage* MontageToPlay)
+{
+	UAnimInstance* OwnerAnimInst = GetOwnerAnimInstance();
+	if (OwnerAnimInst && !OwnerAnimInst->Montage_IsPlaying(MontageToPlay))
+	{
+		OwnerAnimInst->Montage_Play(MontageToPlay);
+	}
+}
+
+void UCGameplayAbilityBase::StopMontageAfterCurrentSection(UAnimMontage* MontageToStop)
+{
+	UAnimInstance* OwnerAnimInst = GetOwnerAnimInstance();
+	if (OwnerAnimInst)
+	{
+		FName CurrentSectionName = OwnerAnimInst->Montage_GetCurrentSection(MontageToStop);
+		OwnerAnimInst->Montage_SetNextSection(CurrentSectionName, NAME_None, MontageToStop);
+	}
+}
+
 ACharacter* UCGameplayAbilityBase::GetOwnerAvatarCharacter()
 {
 	if (!OwnerAvatarCharacter)

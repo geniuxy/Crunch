@@ -45,6 +45,9 @@ protected:
 	void PushTargets(const TArray<AActor*>& Targets, const FVector& PushVel);
 	void PushTargets(const FGameplayAbilityTargetDataHandle& TargetDataHandle, const FVector& PushVel);
 
+	void PlayMontageLocally(UAnimMontage* MontageToPlay);
+	void StopMontageAfterCurrentSection(UAnimMontage* MontageToStop);
+
 	ACharacter* GetOwnerAvatarCharacter();
 
 	UPROPERTY()

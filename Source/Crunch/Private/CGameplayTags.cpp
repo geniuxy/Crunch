@@ -82,6 +82,12 @@ namespace CGameplayTags
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(
 		Crunch_Ability_Shoot, "Crunch.Ability.Shoot", "用于在Shoot Ability中，触发子弹的生成"
 	);
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(
+		Crunch_Ability_Shoot_Handl, "Crunch.Ability.Shoot.Handl", "用于在Shoot Ability中，表示子弹是从左手生成"
+	);
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(
+		Crunch_Ability_Shoot_Handr, "Crunch.Ability.Shoot.Handr", "用于在Shoot Ability中，表示子弹是从右手生成"
+	);
 	
 	UE_DEFINE_GAMEPLAY_TAG(
 		Crunch_SetByCaller_Experience, "Crunch.SetByCaller.Experience"

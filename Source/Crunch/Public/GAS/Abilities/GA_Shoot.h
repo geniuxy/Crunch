@@ -31,6 +31,9 @@ public:
 	) override;
 
 private:
+	UPROPERTY(EditDefaultsOnly, Category="Anim")
+	UAnimMontage* ShootMontage;
+	
 	UFUNCTION()
 	void StartShooting(FGameplayEventData Payload);
 	
