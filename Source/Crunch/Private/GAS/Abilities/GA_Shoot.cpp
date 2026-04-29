@@ -12,6 +12,7 @@
 UGA_Shoot::UGA_Shoot()
 {
 	ActivationOwnedTags.AddTag(CGameplayTags::Crunch_Stats_Aim);
+	ActivationOwnedTags.AddTag(CGameplayTags::Crunch_Stats_Crosshair);
 	ActivationBlockedTags.AddTag(CGameplayTags::Crunch_Stats_DisableAim);
 }
 

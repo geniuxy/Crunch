@@ -15,6 +15,9 @@ namespace CGameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(
 		Crunch_Stats_Aim, "Crunch.Stats.Aim"
 	);
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(
+		Crunch_Stats_Crosshair, "Crunch.Stats.Crosshair", "有这个tag时，则绘制屏幕中心的瞄准十字"
+	);
 	UE_DEFINE_GAMEPLAY_TAG(
 		Crunch_Stats_DisableAim, "Crunch.Stats.DisableAim"
 	);
