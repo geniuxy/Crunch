@@ -57,6 +57,10 @@ namespace CGameplayTags
 		Crunch_Ability_BasicAttack_Event_Pressed, "Crunch.Ability.BasicAttack.Event.Pressed",
 		"可以用在其他Ability需要普攻Combo时，对技能输入的检测，比如UpperCut时需要输入普攻进行Combo"
 	);
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(
+		Crunch_Ability_BasicAttack_Event_Released, "Crunch.Ability.BasicAttack.Event.Released",
+		"检测普攻键的松开事件，可以用于比如标志Shooting动作的结束"
+	); 
 	UE_DEFINE_GAMEPLAY_TAG(
 		Crunch_Ability_BasicAttack_Event_Damage, "Crunch.Ability.BasicAttack.Event.Damage"
 	);
@@ -73,6 +77,10 @@ namespace CGameplayTags
 
 	UE_DEFINE_GAMEPLAY_TAG(
 		Crunch_Ability_GroundBlast_Cooldown, "Crunch.Ability.GroundBlast.Cooldown"
+	);
+
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(
+		Crunch_Ability_Shoot, "Crunch.Ability.Shoot", "用于在Shoot Ability中，触发子弹的生成"
 	);
 	
 	UE_DEFINE_GAMEPLAY_TAG(

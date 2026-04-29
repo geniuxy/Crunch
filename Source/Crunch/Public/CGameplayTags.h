@@ -28,6 +28,7 @@ namespace CGameplayTags
 
 	CRUNCH_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Crunch_Ability_BasicAttack);
 	CRUNCH_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Crunch_Ability_BasicAttack_Event_Pressed);
+	CRUNCH_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Crunch_Ability_BasicAttack_Event_Released);
 	CRUNCH_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Crunch_Ability_BasicAttack_Event_Damage);
 
 	CRUNCH_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Crunch_Ability_UpperCut_Event_Damage);
@@ -35,6 +36,8 @@ namespace CGameplayTags
 	CRUNCH_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Crunch_Ability_Passive_Launched_Event_Activate);
 
 	CRUNCH_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Crunch_Ability_GroundBlast_Cooldown);
+
+	CRUNCH_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Crunch_Ability_Shoot);
 	
 	CRUNCH_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Crunch_SetByCaller_Experience);
 	CRUNCH_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Crunch_SetByCaller_Gold);
