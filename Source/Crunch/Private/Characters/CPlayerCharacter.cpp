@@ -91,7 +91,7 @@ void ACPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 
 void ACPlayerCharacter::OnAimStateChanged(bool bIsAiming)
 {
-	if(IsLocallyControlledByPlayer())
+	if (IsLocallyControlledByPlayer())
 	{
 		LerpCameraToLocalOffsetLocation(bIsAiming ? CameraAimLocalOffset : FVector(0.f));
 	}
@@ -161,11 +161,20 @@ void ACPlayerCharacter::HandleAbilityInput(const FInputActionValue& InputActionV
 
 	if (InputID == ECAbilityInputID::BasicAttack)
 	{
+		FGameplayTag BasicAttackTag;
+		if (bPressed)
+		{
+			BasicAttackTag = CGameplayTags::Crunch_Ability_BasicAttack_Event_Pressed;
+		}
+		else
+		{
+			BasicAttackTag = CGameplayTags::Crunch_Ability_BasicAttack_Event_Released;
+		}
 		// 这里Client和Server都发送GameplayEvent，我猜是因为需要做到本地预测
 		UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(
-			this, CGameplayTags::Crunch_Ability_BasicAttack_Event_Pressed, FGameplayEventData()
+			this, BasicAttackTag, FGameplayEventData()
 		);
-		Server_SendGameplayEventToSelf(CGameplayTags::Crunch_Ability_BasicAttack_Event_Pressed, FGameplayEventData());
+		Server_SendGameplayEventToSelf(BasicAttackTag, FGameplayEventData());
 	}
 }
 
