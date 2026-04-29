@@ -29,7 +29,7 @@ bool UCGameplayAbilityBase::CanActivateAbility(
 	{
 		return false;
 	}
-	
+
 	return Super::CanActivateAbility(Handle, ActorInfo, SourceTags, TargetTags, OptionalRelevantTags);
 }
 
@@ -155,6 +155,16 @@ void UCGameplayAbilityBase::StopMontageAfterCurrentSection(UAnimMontage* Montage
 		FName CurrentSectionName = OwnerAnimInst->Montage_GetCurrentSection(MontageToStop);
 		OwnerAnimInst->Montage_SetNextSection(CurrentSectionName, NAME_None, MontageToStop);
 	}
+}
+
+FGenericTeamId UCGameplayAbilityBase::GetOwnerTeamID() const
+{
+	IGenericTeamAgentInterface* OwnerTeamInterface = Cast<IGenericTeamAgentInterface>(GetAvatarActorFromActorInfo());
+	if (OwnerTeamInterface)
+	{
+		return OwnerTeamInterface->GetGenericTeamId();
+	}
+	return FGenericTeamId::NoTeam;
 }
 
 ACharacter* UCGameplayAbilityBase::GetOwnerAvatarCharacter()

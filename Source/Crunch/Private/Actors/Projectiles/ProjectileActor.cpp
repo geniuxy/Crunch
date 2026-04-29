@@ -8,7 +8,7 @@
 
 AProjectileActor::AProjectileActor()
 {
-	PrimaryActorTick.bCanEverTick = false;
+	PrimaryActorTick.bCanEverTick = true;
 	bReplicates = true; // 开启了这个 Actor 的网络复制通道，不会自动复制所有属性
 
 	USceneComponent* RootComp = CreateDefaultSubobject<USceneComponent>("RootComp");

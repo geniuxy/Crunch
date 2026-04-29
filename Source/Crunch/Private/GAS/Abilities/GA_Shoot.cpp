@@ -7,7 +7,7 @@
 #include "CrunchDebugHelper.h"
 #include "Abilities/Tasks/AbilityTask_PlayMontageAndWait.h"
 #include "Abilities/Tasks/AbilityTask_WaitGameplayEvent.h"
-#include "Abilities/Tasks/AbilityTask_NetworkSyncPoint.h"
+#include "Actors/Projectiles/ProjectileActor.h"
 
 UGA_Shoot::UGA_Shoot()
 {
@@ -95,4 +95,41 @@ void UGA_Shoot::StopShooting(FGameplayEventData Payload)
 void UGA_Shoot::ShootProjectile(FGameplayEventData Payload)
 {
 	Debug::Print(TEXT("生成子弹！"));
+
+	if (K2_HasAuthority())
+	{
+		AActor* OwnerActor = GetAvatarActorFromActorInfo();
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.Owner = OwnerActor;
+		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+		FVector SocketLocation = OwnerActor->GetActorLocation();
+		USkeletalMeshComponent* MeshComp = GetOwningComponentFromActorInfo(); // 这个方法竟然是用来获取SkeletalComponent的
+		if (MeshComp)
+		{
+			TArray<FName> OutNames;
+			UGameplayTagsManager::Get().SplitGameplayTagFName(Payload.EventTag, OutNames);
+			if (OutNames.Num() != 0)
+			{
+				FName SocketName = OutNames.Last();
+				SocketLocation = MeshComp->GetSocketLocation(SocketName);
+			}
+		}
+
+		AProjectileActor* Projectile = GetWorld()->SpawnActor<AProjectileActor>(
+			ProjectileClass, SocketLocation, OwnerActor->GetActorRotation(), SpawnParams
+		);
+		if (Projectile)
+		{
+			Projectile->ShootProjectile(
+				ShootProjectileSpeed,
+				ShootProjectileRange,
+				nullptr,
+				GetOwnerTeamID(),
+				MakeOutgoingGameplayEffectSpec(
+					ProjectileHitEffect, GetAbilityLevel(CurrentSpecHandle, CurrentActorInfo)
+				)
+			);
+		}
+	}
 }

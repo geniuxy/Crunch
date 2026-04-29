@@ -48,6 +48,8 @@ protected:
 	void PlayMontageLocally(UAnimMontage* MontageToPlay);
 	void StopMontageAfterCurrentSection(UAnimMontage* MontageToStop);
 
+	FGenericTeamId GetOwnerTeamID() const;
+	
 	ACharacter* GetOwnerAvatarCharacter();
 
 	UPROPERTY()

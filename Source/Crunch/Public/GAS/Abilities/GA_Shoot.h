@@ -6,6 +6,7 @@
 #include "CGameplayAbilityBase.h"
 #include "GA_Shoot.generated.h"
 
+class AProjectileActor;
 /**
  * 
  */
@@ -31,6 +32,18 @@ public:
 	) override;
 
 private:
+	UPROPERTY(EditDefaultsOnly, Category="Shoot")
+	TSubclassOf<UGameplayEffect> ProjectileHitEffect;
+	
+	UPROPERTY(EditDefaultsOnly, Category="Shoot")
+	TSubclassOf<AProjectileActor> ProjectileClass;
+	
+	UPROPERTY(EditDefaultsOnly, Category="Shoot")
+	float ShootProjectileSpeed = 2000.f;
+	
+	UPROPERTY(EditDefaultsOnly, Category="Shoot")
+	float ShootProjectileRange = 3000.f;
+	
 	UPROPERTY(EditDefaultsOnly, Category="Anim")
 	UAnimMontage* ShootMontage;
 	
