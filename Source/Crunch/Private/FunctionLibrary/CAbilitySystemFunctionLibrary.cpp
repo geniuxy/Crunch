@@ -32,13 +32,23 @@ float UCAbilitySystemFunctionLibrary::GetStaticCostForAbility(const UGameplayAbi
 	return FMath::Abs(Cost);
 }
 
+bool UCAbilitySystemFunctionLibrary::IsActorDead(const AActor* ActorToCheck)
+{
+	return ActorHasTag(ActorToCheck, CGameplayTags::Crunch_Stats_Dead);
+}
+
 bool UCAbilitySystemFunctionLibrary::IsHero(const AActor* ActorToCheck)
+{
+	return ActorHasTag(ActorToCheck, CGameplayTags::Crunch_Role_Hero);
+}
+
+bool UCAbilitySystemFunctionLibrary::ActorHasTag(const AActor* ActorToCheck, const FGameplayTag& Tag)
 {
 	if (const IAbilitySystemInterface* ActorASI = Cast<IAbilitySystemInterface>(ActorToCheck))
 	{
 		if (UAbilitySystemComponent* ActorASC = ActorASI->GetAbilitySystemComponent())
 		{
-			return ActorASC->HasMatchingGameplayTag(CGameplayTags::Crunch_Role_Hero);
+			return ActorASC->HasMatchingGameplayTag(Tag);
 		}
 	}
 	return false;
