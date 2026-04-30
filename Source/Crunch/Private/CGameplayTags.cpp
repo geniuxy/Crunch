@@ -125,4 +125,7 @@ namespace CGameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(
 		GameplayCue_Hit_Impact_GroundBlast, "GameplayCue.Hit.Impact.GroundBlast"
 	);
+	UE_DEFINE_GAMEPLAY_TAG(
+		GameplayCue_Hit_Impact_Phase_Projectile, "GameplayCue.Hit.Impact.Phase.Projectile"
+	);
 }

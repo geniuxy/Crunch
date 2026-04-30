@@ -3,6 +3,10 @@
 
 #include "Actors/Projectiles/ProjectileActor.h"
 
+#include "AbilitySystemBlueprintLibrary.h"
+#include "AbilitySystemComponent.h"
+#include "AbilitySystemGlobals.h"
+#include "GameplayCueManager.h"
 #include "Net/UnrealNetwork.h"
 
 
@@ -73,12 +77,47 @@ FGenericTeamId AProjectileActor::GetGenericTeamId() const
 	return TeamID;
 }
 
-void AProjectileActor::TravelMaxDistanceReached()
+void AProjectileActor::NotifyActorBeginOverlap(AActor* OtherActor)
 {
-	Destroy();
+	if (!OtherActor || OtherActor == GetOwner()) return;
+	if (GetTeamAttitudeTowards(*OtherActor) != ETeamAttitude::Hostile) return;
+
+	UAbilitySystemComponent* OtherASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(OtherActor);
+	if (IsValid(OtherASC))
+	{
+		if (HasAuthority() && HitEffectSpecHandle.IsValid())
+		{
+			OtherASC->ApplyGameplayEffectSpecToSelf(*HitEffectSpecHandle.Data.Get());
+			GetWorldTimerManager().ClearTimer(ShootTimerHandle);
+		}
+
+		FHitResult HitResult;
+		HitResult.ImpactPoint = GetActorLocation();
+		HitResult.ImpactNormal = GetActorForwardVector();
+
+		SendLocalGameplayCue(OtherActor, HitResult);
+
+		Destroy();
+	}
 }
 
 void AProjectileActor::BeginPlay()
 {
 	Super::BeginPlay();
+}
+
+void AProjectileActor::TravelMaxDistanceReached()
+{
+	Destroy();
+}
+
+void AProjectileActor::SendLocalGameplayCue(AActor* CurTargetActor, const FHitResult& HitResult)
+{
+	FGameplayCueParameters CueParams;
+	CueParams.Location = HitResult.ImpactPoint;
+	CueParams.Normal = HitResult.ImpactNormal;
+
+	UAbilitySystemGlobals::Get().GetGameplayCueManager()->HandleGameplayCue(
+		CurTargetActor, HitGameplayCueTag, EGameplayCueEvent::Executed, CueParams
+	);
 }

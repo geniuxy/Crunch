@@ -59,4 +59,5 @@ namespace CGameplayTags
 	CRUNCH_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(GameplayCue_Hit_Impact_Minion_Punch);
 	CRUNCH_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(GameplayCue_Hit_Reaction);
 	CRUNCH_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(GameplayCue_Hit_Impact_GroundBlast);
+	CRUNCH_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(GameplayCue_Hit_Impact_Phase_Projectile);
 }

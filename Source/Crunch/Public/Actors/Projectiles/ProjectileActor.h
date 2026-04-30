@@ -32,12 +32,15 @@ public:
 
 	virtual FGenericTeamId GetGenericTeamId() const override;
 
-	void TravelMaxDistanceReached();
-
+	virtual void NotifyActorBeginOverlap(AActor* OtherActor) override;
+	
 protected:
 	virtual void BeginPlay() override;
 
 private:
+	UPROPERTY(EditDefaultsOnly, Category="Gameplay Cue")
+	FGameplayTag HitGameplayCueTag;
+	
 	UPROPERTY(Replicated)
 	FGenericTeamId TeamID;
 	
@@ -52,4 +55,8 @@ private:
 	
 	FGameplayEffectSpecHandle HitEffectSpecHandle;
 	FTimerHandle ShootTimerHandle;
+	
+	void TravelMaxDistanceReached();
+
+	void SendLocalGameplayCue(AActor* CurTargetActor, const FHitResult& HitResult);
 };
