@@ -6,6 +6,7 @@
 #include "Blueprint/UserWidget.h"
 #include "GameplayWidget.generated.h"
 
+class UCrosshairWidget;
 class UCanvasPanel;
 class UWidgetSwitcher;
 class UGameplayMenu;
@@ -89,6 +90,9 @@ private:
 
 	UPROPERTY(meta=(BindWidget))
 	UCanvasPanel* GameplayMenuRootPanel;
+
+	UPROPERTY(meta=(BindWidget))
+	UCrosshairWidget* CrosshairWidget;
 
 	UPROPERTY(Transient, meta=(BindWidgetAnim))
 	UWidgetAnimation* ShopPopUpAnimation;
