@@ -25,6 +25,8 @@ public:
 	virtual void PawnClientRestart() override;
 	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
 
+	virtual void GetActorEyesViewPoint(FVector& OutLocation, FRotator& OutRotation) const override;
+
 	/**********************************************************************/
 	/*                         Gameplay Ability                           */
 	/**********************************************************************/

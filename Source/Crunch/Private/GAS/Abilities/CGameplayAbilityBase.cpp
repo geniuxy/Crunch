@@ -167,6 +167,21 @@ FGenericTeamId UCGameplayAbilityBase::GetOwnerTeamID() const
 	return FGenericTeamId::NoTeam;
 }
 
+bool UCGameplayAbilityBase::IsOtherActorTeamAttitudeIs(const AActor* OtherActor,
+                                                       ETeamAttitude::Type TargetTeamAttitude) const
+{
+	if (!OtherActor) return false;
+
+	IGenericTeamAgentInterface* OwnerTeamAgentInterface =
+		Cast<IGenericTeamAgentInterface>(GetAvatarActorFromActorInfo());
+	if (OwnerTeamAgentInterface)
+	{
+		return OwnerTeamAgentInterface->GetTeamAttitudeTowards(*OtherActor) == TargetTeamAttitude;
+	}
+
+	return false;
+}
+
 ACharacter* UCGameplayAbilityBase::GetOwnerAvatarCharacter()
 {
 	if (!OwnerAvatarCharacter)
@@ -195,4 +210,41 @@ void UCGameplayAbilityBase::ApplyGameplayEffectToHitResultActor(
 		EffectSpecHandle,
 		UAbilitySystemBlueprintLibrary::AbilityTargetDataFromHitResult(HitResult)
 	);
+}
+
+AActor* UCGameplayAbilityBase::GetAimTarget(float AimDistance, ETeamAttitude::Type TeamAttitude) const
+{
+	if (AActor* OwnerAvatarActor = GetAvatarActorFromActorInfo())
+	{
+		FVector Location;
+		FRotator Rotation;
+		OwnerAvatarActor->GetActorEyesViewPoint(Location, Rotation);
+
+		FVector AimEnd = Location + Rotation.Vector() * AimDistance;
+
+		FCollisionQueryParams CollisionQueryParams;
+		CollisionQueryParams.AddIgnoredActor(OwnerAvatarActor);
+
+		FCollisionObjectQueryParams CollisionObjectQueryParams;
+		CollisionObjectQueryParams.AddObjectTypesToQuery(ECC_Pawn);
+
+		if (ShouldDrawDebug())
+		{
+			DrawDebugLine(GetWorld(), Location, AimEnd, FColor::Red, false, 2.f, 0, 3.f);
+		}
+
+		TArray<FHitResult> HitResults;
+		if (GetWorld()->LineTraceMultiByObjectType(
+			HitResults, Location, AimEnd, CollisionObjectQueryParams, CollisionQueryParams))
+		{
+			for (const FHitResult& HitResult : HitResults)
+			{
+				if (IsOtherActorTeamAttitudeIs(HitResult.GetActor(), ETeamAttitude::Hostile))
+				{
+					return HitResult.GetActor();
+				}
+			}
+		}
+	}
+	return nullptr;
 }

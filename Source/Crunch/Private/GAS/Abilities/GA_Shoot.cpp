@@ -125,7 +125,7 @@ void UGA_Shoot::ShootProjectile(FGameplayEventData Payload)
 			Projectile->ShootProjectile(
 				ShootProjectileSpeed,
 				ShootProjectileRange,
-				nullptr,
+				GetAimTargetIfValid(),
 				GetOwnerTeamID(),
 				MakeOutgoingGameplayEffectSpec(
 					ProjectileHitEffect, GetAbilityLevel(CurrentSpecHandle, CurrentActorInfo)
@@ -133,4 +133,10 @@ void UGA_Shoot::ShootProjectile(FGameplayEventData Payload)
 			);
 		}
 	}
+}
+
+AActor* UGA_Shoot::GetAimTargetIfValid() const
+{
+	AActor* AimTarget = GetAimTarget(ShootProjectileRange, ETeamAttitude::Hostile);
+	return AimTarget;
 }

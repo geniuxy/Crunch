@@ -49,6 +49,8 @@ protected:
 	void StopMontageAfterCurrentSection(UAnimMontage* MontageToStop);
 
 	FGenericTeamId GetOwnerTeamID() const;
+
+	bool IsOtherActorTeamAttitudeIs(const AActor* OtherActor, ETeamAttitude::Type TargetTeamAttitude) const;
 	
 	ACharacter* GetOwnerAvatarCharacter();
 
@@ -58,6 +60,8 @@ protected:
 	void ApplyGameplayEffectToHitResultActor(
 		const FHitResult& HitResult, TSubclassOf<UGameplayEffect> GameplayEffect, int Level = 1
 	);
+
+	AActor* GetAimTarget(float AimDistance, ETeamAttitude::Type TeamAttitude) const;
 
 public:
 	FORCEINLINE bool ShouldDrawDebug() const { return bShouldDrawDebug; }
