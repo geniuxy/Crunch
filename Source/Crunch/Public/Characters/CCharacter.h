@@ -9,6 +9,7 @@
 #include "GameFramework/Character.h"
 #include "GameplayTagContainer.h"
 #include "GenericTeamAgentInterface.h"
+#include "Widgets/Render/RenderActorTargetInterface.h"
 #include "CCharacter.generated.h"
 
 class UGameplayAbility;
@@ -17,7 +18,8 @@ class UCAbilitySystemComponent;
 class UWidgetComponent;
 
 UCLASS()
-class CRUNCH_API ACCharacter : public ACharacter, public IAbilitySystemInterface, public IGenericTeamAgentInterface
+class CRUNCH_API ACCharacter : public ACharacter, public IAbilitySystemInterface, public IGenericTeamAgentInterface,
+                               public IRenderActorTargetInterface
 {
 	GENERATED_BODY()
 
@@ -147,7 +149,7 @@ protected:
 	UFUNCTION()
 	virtual void OnRep_TeamID();
 	/**********************************************************************/
-	/*                                UI                                  */
+	/*                                AI                                  */
 	/**********************************************************************/
 private:
 	void SetAIPerceptionStimuliSourceEnabled(bool bIsEnabled);
@@ -156,6 +158,19 @@ private:
 	UPROPERTY()
 	class UAIPerceptionStimuliSourceComponent* PerceptionStimuliSourceComponent;
 
+	/**********************************************************************/
+	/*                           Render Actor                             */
+	/**********************************************************************/
+public:
+	virtual FVector GetCaptureLocalPosition() const override;
+	virtual FRotator GetCaptureLocalRotation() const override;
+
+private:
+	UPROPERTY(EditDefaultsOnly, Category="Capture")
+	FVector HeadshotCaptureLocalPosition;
+	
+	UPROPERTY(EditDefaultsOnly, Category="Capture")
+	FRotator HeadshotCaptureLocalRotation;
 
 	/**********************************************************************/
 	/*                               Net                                  */

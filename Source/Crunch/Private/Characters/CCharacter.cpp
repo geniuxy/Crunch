@@ -410,6 +410,16 @@ void ACCharacter::SetAIPerceptionStimuliSourceEnabled(bool bIsEnabled)
 	}
 }
 
+FVector ACCharacter::GetCaptureLocalPosition() const
+{
+	return HeadshotCaptureLocalPosition;
+}
+
+FRotator ACCharacter::GetCaptureLocalRotation() const
+{
+	return HeadshotCaptureLocalRotation;
+}
+
 void ACCharacter::GetNetworkDebugInfo() const
 {
 	if (!bDebugNetworkInfo) return;

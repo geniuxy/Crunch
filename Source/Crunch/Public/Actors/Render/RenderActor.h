@@ -26,4 +26,7 @@ private:
 
 	UPROPERTY(VisibleDefaultsOnly, Category="Render Actor")
 	USceneCaptureComponent2D* CaptureComponent;
+
+public:
+	FORCEINLINE USceneCaptureComponent2D* GetCaptureComponent() const { return CaptureComponent; }
 };
