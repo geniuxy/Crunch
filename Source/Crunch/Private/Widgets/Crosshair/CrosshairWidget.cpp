@@ -62,7 +62,11 @@ void UCrosshairWidget::UpdateCrosshairPosition()
 	int32 SizeX, SizeY;
 	CachedPlayerController->GetViewportSize(SizeX, SizeY);
 
-	if (!AimTarget)
+	UCAbilitySystemComponent* OwnerASC = Cast<UCAbilitySystemComponent>(
+		UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(GetOwningPlayerPawn())
+	);
+	AActor* CurrentAimTarget = OwnerASC->GetAimTarget();
+	if (!CurrentAimTarget)
 	{
 		FVector2D ViewportSize = FVector2D((float)SizeX, (float)SizeY);
 		CrosshairCanvasPanelSlot->SetPosition(ViewportSize / ViewportScale / 2.f);
@@ -70,7 +74,7 @@ void UCrosshairWidget::UpdateCrosshairPosition()
 	}
 
 	FVector2D TargetScreenPosition;
-	CachedPlayerController->ProjectWorldLocationToScreen(AimTarget->GetActorLocation(), TargetScreenPosition);
+	CachedPlayerController->ProjectWorldLocationToScreen(CurrentAimTarget->GetActorLocation(), TargetScreenPosition);
 	if (TargetScreenPosition.X > 0 && TargetScreenPosition.X < SizeX &&
 		TargetScreenPosition.Y > 0 && TargetScreenPosition.Y < SizeY)
 	{
@@ -78,9 +82,7 @@ void UCrosshairWidget::UpdateCrosshairPosition()
 	}
 	else
 	{
-		UCAbilitySystemComponent* OwnerASC = Cast<UCAbilitySystemComponent>(
-			UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(GetOwningPlayerPawn())
-		);
+		// 当镜头不包含目标时，清空锁定目标
 		if (OwnerASC)
 		{
 			OwnerASC->ClearAimTarget();
@@ -90,6 +92,6 @@ void UCrosshairWidget::UpdateCrosshairPosition()
 
 void UCrosshairWidget::TargetUpdated(const FGameplayEventData* EventData)
 {
-	AimTarget = EventData->Target;
+	const AActor* AimTarget = EventData->Target;
 	CrosshairImage->SetColorAndOpacity(AimTarget ? HasTargetColor : NoTargetColor);
 }
