@@ -248,3 +248,12 @@ AActor* UCGameplayAbilityBase::GetAimTarget(float AimDistance, ETeamAttitude::Ty
 	}
 	return nullptr;
 }
+
+void UCGameplayAbilityBase::SendLocalGameplayEvent(const FGameplayTag& EventTag, const FGameplayEventData& EventData)
+{
+	UAbilitySystemComponent* OwnerASC = GetAbilitySystemComponentFromActorInfo();
+	if (OwnerASC)
+	{
+		OwnerASC->HandleGameplayEvent(EventTag, &EventData);
+	}
+}

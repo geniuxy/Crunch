@@ -12,6 +12,7 @@
 #include "GAS/CAttributeSet.h"
 #include "GAS/CHeroAttributeSet.h"
 #include "GAS/Data/PA_AbilitySystemGenerics.h"
+#include "Net/UnrealNetwork.h"
 
 UCAbilitySystemComponent::UCAbilitySystemComponent()
 {
@@ -27,6 +28,12 @@ UCAbilitySystemComponent::UCAbilitySystemComponent()
 
 	GenericConfirmInputID = (int32)ECAbilityInputID::Confirm;
 	GenericCancelInputID = (int32)ECAbilityInputID::Cancel;
+}
+
+void UCAbilitySystemComponent::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(UCAbilitySystemComponent, AimTarget);
 }
 
 void UCAbilitySystemComponent::ServerSideInit()
@@ -304,4 +311,29 @@ void UCAbilitySystemComponent::ExperienceUpdated(const FOnAttributeChangeData& C
 	SetNumericAttributeBase(UCHeroAttributeSet::GetPrevLevelExperienceAttribute(), PrevLevelExp);
 	SetNumericAttributeBase(UCHeroAttributeSet::GetNextLevelExperienceAttribute(), NextLevelExp);
 	SetNumericAttributeBase(UCHeroAttributeSet::GetUpgradePointAttribute(), NewUpgradePoint);
+}
+
+void UCAbilitySystemComponent::Server_SetAimTarget_Implementation(AActor* NewTarget)
+{
+	AimTarget = NewTarget;
+}
+
+void UCAbilitySystemComponent::ClearAimTarget()
+{
+	if (GetOwnerRole() == ROLE_Authority)
+	{
+		AimTarget = nullptr;
+	}
+	else if (GetOwnerRole() == ROLE_AutonomousProxy)
+	{
+		// 客户端直接预测清空（可选），同时通知服务器
+		AimTarget = nullptr;
+		Server_SetAimTarget(nullptr);
+	}
+}
+
+void UCAbilitySystemComponent::SetAimTarget(AActor* NewAimTarget)
+{
+	AimTarget = NewAimTarget;
+	Server_SetAimTarget(NewAimTarget);
 }

@@ -65,16 +65,16 @@ private:
 	void ShootProjectile(FGameplayEventData Payload);
 
 	AActor* GetAimTargetIfValid() const;
-
-	UPROPERTY()
-	AActor* AimTarget;
-
-	UPROPERTY()
-	UAbilitySystemComponent* AimTargetAbilitySystemComponent;
 	
 	FTimerHandle AimTargetCheckTimerHandle;
 
 	void FindAimTarget();
+
+	AActor* GetCurrentAimTarget() const;
+
+	void SetCurrentAimTarget(AActor* NewAimTarget);
+
+	UAbilitySystemComponent* GetCurrentAimTargetASC();
 
 	UPROPERTY(EditDefaultsOnly, Category="Target")
 	float AimTargetCheckTimeInterval = 0.1f;

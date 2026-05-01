@@ -63,6 +63,8 @@ protected:
 
 	AActor* GetAimTarget(float AimDistance, ETeamAttitude::Type TeamAttitude) const;
 
+	void SendLocalGameplayEvent(const FGameplayTag& EventTag, const FGameplayEventData& EventData);
+
 public:
 	FORCEINLINE bool ShouldDrawDebug() const { return bShouldDrawDebug; }
 };

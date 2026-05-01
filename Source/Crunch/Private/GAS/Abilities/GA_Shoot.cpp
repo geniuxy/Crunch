@@ -10,6 +10,7 @@
 #include "Abilities/Tasks/AbilityTask_WaitGameplayEvent.h"
 #include "Actors/Projectiles/ProjectileActor.h"
 #include "FunctionLibrary/CAbilitySystemFunctionLibrary.h"
+#include "GAS/CAbilitySystemComponent.h"
 
 UGA_Shoot::UGA_Shoot()
 {
@@ -71,11 +72,13 @@ void UGA_Shoot::EndAbility(
 	bool bReplicateEndAbility,
 	bool bWasCancelled)
 {
-	if (AimTargetAbilitySystemComponent)
+	if (UAbilitySystemComponent* PrevAimTargetASC = GetCurrentAimTargetASC())
 	{
-		AimTargetAbilitySystemComponent->RegisterGameplayTagEvent(CGameplayTags::Crunch_Stats_Dead).RemoveAll(this);
-		AimTargetAbilitySystemComponent = nullptr;
+		PrevAimTargetASC->RegisterGameplayTagEvent(CGameplayTags::Crunch_Stats_Dead).RemoveAll(this);
 	}
+	SetCurrentAimTarget(nullptr);
+
+	SendLocalGameplayEvent(CGameplayTags::Crunch_Event_Target_Updated, FGameplayEventData());
 
 	StopShooting(FGameplayEventData());
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
@@ -163,7 +166,7 @@ AActor* UGA_Shoot::GetAimTargetIfValid() const
 {
 	if (HasValidTarget())
 	{
-		return AimTarget;
+		return GetCurrentAimTarget();
 	}
 	return nullptr;
 }
@@ -172,23 +175,51 @@ void UGA_Shoot::FindAimTarget()
 {
 	if (HasValidTarget()) return;
 
-	if (AimTargetAbilitySystemComponent)
+	if (UAbilitySystemComponent* PrevAimTargetASC = GetCurrentAimTargetASC())
 	{
-		AimTargetAbilitySystemComponent->RegisterGameplayTagEvent(CGameplayTags::Crunch_Stats_Dead).RemoveAll(this);
-		AimTargetAbilitySystemComponent = nullptr;
+		PrevAimTargetASC->RegisterGameplayTagEvent(CGameplayTags::Crunch_Stats_Dead).RemoveAll(this);
 	}
 
-	AimTarget = GetAimTarget(ShootProjectileRange, ETeamAttitude::Hostile);
-	if (AimTarget)
+	SetCurrentAimTarget(GetAimTarget(ShootProjectileRange, ETeamAttitude::Hostile));
+	if (UAbilitySystemComponent* CurrentAimTargetASC = GetCurrentAimTargetASC())
 	{
-		AimTargetAbilitySystemComponent = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(AimTarget);
-		if (AimTargetAbilitySystemComponent)
-		{
-			AimTargetAbilitySystemComponent->RegisterGameplayTagEvent(CGameplayTags::Crunch_Stats_Dead).AddUObject(
-				this, &ThisClass::TargetDeadTagUpdated
-			);
-		}
+		CurrentAimTargetASC->RegisterGameplayTagEvent(CGameplayTags::Crunch_Stats_Dead).AddUObject(
+			this, &ThisClass::TargetDeadTagUpdated
+		);
 	}
+
+	FGameplayEventData EventData;
+	EventData.Target = GetCurrentAimTarget();
+	SendLocalGameplayEvent(CGameplayTags::Crunch_Event_Target_Updated, EventData);
+}
+
+AActor* UGA_Shoot::GetCurrentAimTarget() const
+{
+	UCAbilitySystemComponent* OwnerASC = Cast<UCAbilitySystemComponent>(GetAbilitySystemComponentFromActorInfo());
+	if (OwnerASC)
+	{
+		return OwnerASC->GetAimTarget();
+	}
+
+	return nullptr;
+}
+
+void UGA_Shoot::SetCurrentAimTarget(AActor* NewAimTarget)
+{
+	UCAbilitySystemComponent* OwnerASC = Cast<UCAbilitySystemComponent>(GetAbilitySystemComponentFromActorInfo());
+	if (OwnerASC)
+	{
+		OwnerASC->SetAimTarget(NewAimTarget);
+	}
+}
+
+UAbilitySystemComponent* UGA_Shoot::GetCurrentAimTargetASC()
+{
+	if (AActor* CurrentAimTarget = GetCurrentAimTarget())
+	{
+		return UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(CurrentAimTarget);
+	}
+	return nullptr;
 }
 
 void UGA_Shoot::StartAimTargetCheckTimer()
@@ -213,8 +244,8 @@ void UGA_Shoot::StopAimTargetCheckTimer()
 
 bool UGA_Shoot::HasValidTarget() const
 {
-	if (!AimTarget) return false;
-	if (UCAbilitySystemFunctionLibrary::IsActorDead(AimTarget)) return false;
+	if (!GetCurrentAimTarget()) return false;
+	if (UCAbilitySystemFunctionLibrary::IsActorDead(GetCurrentAimTarget())) return false;
 	if (!IsTargetInRange()) return false;
 
 	return true;
@@ -222,10 +253,10 @@ bool UGA_Shoot::HasValidTarget() const
 
 bool UGA_Shoot::IsTargetInRange() const
 {
-	if (!AimTarget) return false;
+	if (!GetCurrentAimTarget()) return false;
 
 	float Distance = FVector::Distance(
-		AimTarget->GetActorLocation(), GetAvatarActorFromActorInfo()->GetActorLocation()
+		GetCurrentAimTarget()->GetActorLocation(), GetAvatarActorFromActorInfo()->GetActorLocation()
 	);
 	return Distance <= ShootProjectileRange;
 }

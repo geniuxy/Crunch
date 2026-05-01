@@ -19,6 +19,8 @@ class CRUNCH_API UCAbilitySystemComponent : public UAbilitySystemComponent
 public:
 	UCAbilitySystemComponent();
 
+	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
+
 	void ServerSideInit();
 
 	void ApplyFullStatsEffect();
@@ -32,7 +34,7 @@ public:
 
 	UFUNCTION(Client, Reliable)
 	void Client_AbilitySpecLevelUpdated(FGameplayAbilitySpecHandle Handle, int NewLevel);
-	
+
 private:
 	void InitializeBaseAttributes();
 
@@ -57,4 +59,20 @@ private:
 
 public:
 	FORCEINLINE const TMap<ECAbilityInputID, TSubclassOf<UGameplayAbility>>& GetAbilities() const { return Abilities; }
+
+	/**********************************************************************/
+	/*                            Aim Target                              */
+	/**********************************************************************/
+private:
+	UPROPERTY(Replicated)
+	TObjectPtr<AActor> AimTarget;
+
+	UFUNCTION(Server, Reliable)
+	void Server_SetAimTarget(AActor* NewTarget);
+
+public:
+	void ClearAimTarget();
+	
+	FORCEINLINE AActor* GetAimTarget() const { return AimTarget; }
+	void SetAimTarget(AActor* NewAimTarget);
 };

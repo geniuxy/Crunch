@@ -99,6 +99,10 @@ namespace CGameplayTags
 		Crunch_SetByCaller_Gold, "Crunch.SetByCaller.Gold"
 	);
 
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(
+		Crunch_Event_Target_Updated, "Crunch.Event.Target.Updated", "表示瞄准目标的变化事件"
+	);
+
 	/*
 	 * Items
 	 */

@@ -7,6 +7,7 @@
 #include "Blueprint/UserWidget.h"
 #include "CrosshairWidget.generated.h"
 
+struct FGameplayEventData;
 class UCanvasPanelSlot;
 class UImage;
 /**
@@ -34,4 +35,15 @@ private:
 	APlayerController* CachedPlayerController;
 
 	void UpdateCrosshairPosition();
+
+	UPROPERTY(EditDefaultsOnly, Category="View")
+	FLinearColor HasTargetColor = FLinearColor::Red;
+
+	UPROPERTY(EditDefaultsOnly, Category="View")
+	FLinearColor NoTargetColor = FLinearColor::White;
+
+	UPROPERTY()
+	const AActor* AimTarget;
+
+	void TargetUpdated(const FGameplayEventData* EventData);
 };
