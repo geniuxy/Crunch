@@ -8,6 +8,8 @@
 #include "Abilities/Tasks/AbilityTask_PlayMontageAndWait.h"
 #include "Abilities/Tasks/AbilityTask_WaitGameplayEvent.h"
 #include "Abilities/Tasks/AbilityTask_WaitCancel.h"
+#include "Abilities/Tasks/AbilityTask_WaitTargetData.h"
+#include "GAS/TargetActors/TargetActor_Line.h"
 #include "GAS/CAttributeSet.h"
 
 void UGA_Laser::ActivateAbility(
@@ -73,6 +75,26 @@ void UGA_Laser::ShootLaser(FGameplayEventData Payload)
 				UCAttributeSet::GetManaAttribute()).AddUObject(this, &ThisClass::ManaUpdated);
 		}
 	}
+
+	UAbilityTask_WaitTargetData* WaitDamageTargetData = UAbilityTask_WaitTargetData::WaitTargetData(
+		this, NAME_None, EGameplayTargetingConfirmation::CustomMulti, LaserTargetActorClass
+	);
+	WaitDamageTargetData->ValidData.AddDynamic(this, &ThisClass::TargetActorReceived);
+	WaitDamageTargetData->ReadyForActivation();
+
+	AGameplayAbilityTargetActor* TargetActor;
+	WaitDamageTargetData->BeginSpawningActor(this, LaserTargetActorClass, TargetActor);
+	WaitDamageTargetData->FinishSpawningActor(this, TargetActor);
+
+	ATargetActor_Line* LineTargetActor = Cast<ATargetActor_Line>(TargetActor);
+	if (LineTargetActor)
+	{
+		LineTargetActor->AttachToComponent(
+			GetOwningComponentFromActorInfo(),
+			FAttachmentTransformRules::SnapToTargetNotIncludingScale,
+			TargetActorAttachSocketName
+		);
+	}
 }
 
 void UGA_Laser::ManaUpdated(const FOnAttributeChangeData& ChangeData)
@@ -87,4 +109,8 @@ void UGA_Laser::ManaUpdated(const FOnAttributeChangeData& ChangeData)
 	{
 		K2_EndAbility();
 	}
+}
+
+void UGA_Laser::TargetActorReceived(const FGameplayAbilityTargetDataHandle& TargetDataHandle)
+{
 }
