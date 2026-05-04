@@ -42,6 +42,9 @@ namespace CGameplayTags
 	CRUNCH_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Crunch_Ability_Shoot_Handl);
 	CRUNCH_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Crunch_Ability_Shoot_Handr);
 	
+	CRUNCH_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Crunch_Ability_Laser_Event_Shoot);
+	CRUNCH_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Crunch_Ability_Laser_Cooldown);
+	
 	CRUNCH_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Crunch_SetByCaller_Experience);
 	CRUNCH_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Crunch_SetByCaller_Gold);
 	

@@ -93,6 +93,13 @@ namespace CGameplayTags
 	);
 	
 	UE_DEFINE_GAMEPLAY_TAG(
+		Crunch_Ability_Laser_Event_Shoot, "Crunch.Ability.Laser.Event.Shoot"
+	);
+	UE_DEFINE_GAMEPLAY_TAG(
+		Crunch_Ability_Laser_Cooldown, "Crunch.Ability.Laser.Cooldown"
+	);
+	
+	UE_DEFINE_GAMEPLAY_TAG(
 		Crunch_SetByCaller_Experience, "Crunch.SetByCaller.Experience"
 	);
 	UE_DEFINE_GAMEPLAY_TAG(
