@@ -46,6 +46,15 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category="Targeting")
 	TSubclassOf<ATargetActor_Line> LaserTargetActorClass;
 
+	UPROPERTY(EditDefaultsOnly, Category="Targeting")
+	float TargetRange = 4000.f;
+	
+	UPROPERTY(EditDefaultsOnly, Category="Targeting")
+	float DetectionCylinderRadius = 30.f;
+
+	UPROPERTY(EditDefaultsOnly, Category="Targeting")
+	float TargetingInterval = 0.3f;
+
 	UFUNCTION()
 	void ShootLaser(FGameplayEventData Payload);
 

@@ -5,6 +5,7 @@
 
 #include "NiagaraComponent.h"
 #include "Components/SphereComponent.h"
+#include "Net/UnrealNetwork.h"
 
 
 ATargetActor_Line::ATargetActor_Line()
@@ -24,5 +25,29 @@ ATargetActor_Line::ATargetActor_Line()
 	LaserVFX->SetupAttachment(GetRootComponent());
 
 	AvatarActor = nullptr;
+}
+
+void ATargetActor_Line::ConfigureTargetSetting(
+	float NewTargetRange,
+	float NewDetectionCylinderRadius,
+	float NewTargetingInterval,
+	FGenericTeamId OwnerTeamID,
+	bool bShouldDrawDebug)
+{
+	TargetRange = NewTargetRange;
+	DetectionCylinderRadius = NewDetectionCylinderRadius;
+	TargetingInterval = NewTargetingInterval;
+	SetGenericTeamId(OwnerTeamID);
+	bDrawDebug = bShouldDrawDebug;
+}
+
+void ATargetActor_Line::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ATargetActor_Line, TeamID);
+	DOREPLIFETIME(ATargetActor_Line, TargetRange);
+	DOREPLIFETIME(ATargetActor_Line, DetectionCylinderRadius);
+	DOREPLIFETIME(ATargetActor_Line, AvatarActor);
 }
 
