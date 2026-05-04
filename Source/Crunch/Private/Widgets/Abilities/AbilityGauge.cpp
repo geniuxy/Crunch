@@ -118,7 +118,10 @@ void UAbilityGauge::UpdateCooldown()
 	CachedCooldownTimeRemaining -= CooldownUpdateInterval;
 	FNumberFormattingOptions* FormattingOptions =
 		CachedCooldownTimeRemaining > 1.f ? &WholeNumberFormattingOptions : &OneDigitNumberFormattingOptions;
-	CooldownCounterText->SetText(FText::AsNumber(CachedCooldownTimeRemaining, FormattingOptions));
+	if (CachedCooldownTimeRemaining >= 0.05f)
+	{
+		CooldownCounterText->SetText(FText::AsNumber(CachedCooldownTimeRemaining, FormattingOptions));
+	}
 	Icon->GetDynamicMaterial()->SetScalarParameterValue(
 		CooldownPercentParamName, 1.f - CachedCooldownTimeRemaining / CachedCooldownDuration
 	);
