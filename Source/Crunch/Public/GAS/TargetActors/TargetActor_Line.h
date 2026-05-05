@@ -31,6 +31,10 @@ public:
 
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
+	virtual void StartTargeting(UGameplayAbility* Ability) override;
+
+	virtual void Tick(float DeltaSeconds) override;
+
 private:
 	UPROPERTY(VisibleDefaultsOnly, Category="Component")
 	USceneComponent* RootComp;
@@ -41,6 +45,9 @@ private:
 	UPROPERTY(VisibleDefaultsOnly, Category="Component")
 	UNiagaraComponent* LaserVFX;
 
+	UPROPERTY(EditDefaultsOnly, Category="VFX")
+	FName LaserFXLengthParamName = "Length";
+	
 	UPROPERTY(Replicated)
 	float TargetRange;
 
@@ -58,4 +65,10 @@ private:
 
 	UPROPERTY(Replicated)
 	const AActor* AvatarActor;
+
+	FTimerHandle PeriodicalTargetingTimerHandle;
+
+	void DoTargetCheckAndReport();
+
+	void UpdateTargetTrace();
 };
