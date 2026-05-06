@@ -36,7 +36,7 @@ private:
 	float TargetAreaRadius = 300.f;
 	
 	UPROPERTY(EditDefaultsOnly, Category="Targeting")
-	float TargetTraceRange = 300.f;
+	float TargetTraceRange = 2000.f;
 
 	UPROPERTY(EditDefaultsOnly, Category="Targeting")
 	TSubclassOf<ATargetActor_GroundPick> TargetActorClass;
