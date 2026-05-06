@@ -73,8 +73,38 @@ void ATargetActor_Line::Tick(float DeltaSeconds)
 	UpdateTargetTrace();
 }
 
+void ATargetActor_Line::BeginDestroy()
+{
+	if (GetWorld() && PeriodicalTargetingTimerHandle.IsValid())
+	{
+		GetWorldTimerManager().ClearTimer(PeriodicalTargetingTimerHandle);
+	}
+	Super::BeginDestroy();
+}
+
 void ATargetActor_Line::DoTargetCheckAndReport()
 {
+	if (!HasAuthority()) return;
+
+	TSet<AActor*> OverlappingActorSet;
+	TargetEndDetectionSphere->GetOverlappingActors(OverlappingActorSet);
+
+	TArray<TWeakObjectPtr<AActor>> OverlappingActors;
+	for (AActor* OverlappingActor : OverlappingActorSet)
+	{
+		if (ShouldReportActorAsTarget(OverlappingActor))
+		{
+			OverlappingActors.Add(OverlappingActor);
+		}
+	}
+
+	FGameplayAbilityTargetDataHandle TargetDataHandle;
+
+	FGameplayAbilityTargetData_ActorArray* ActorArray = new FGameplayAbilityTargetData_ActorArray;
+	ActorArray->SetActors(OverlappingActors);
+	TargetDataHandle.Add(ActorArray);
+
+	TargetDataReadyDelegate.Broadcast(TargetDataHandle);
 }
 
 void ATargetActor_Line::UpdateTargetTrace()
@@ -132,4 +162,14 @@ void ATargetActor_Line::UpdateTargetTrace()
 	{
 		LaserVFX->SetVariableFloat(LaserFXLengthParamName, LineLength / 100.f); // LineLength的单位是cm，ue中需要的是m
 	}
+}
+
+bool ATargetActor_Line::ShouldReportActorAsTarget(const AActor* ActorToCheck) const
+{
+	if (!ActorToCheck) return false;
+	if (ActorToCheck == AvatarActor) return false;
+	if (ActorToCheck == this) return false;
+	if (GetTeamAttitudeTowards(*ActorToCheck) != ETeamAttitude::Hostile) return false;
+
+	return true;
 }

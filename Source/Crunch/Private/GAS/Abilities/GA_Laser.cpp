@@ -82,16 +82,19 @@ void UGA_Laser::ShootLaser(FGameplayEventData Payload)
 	WaitDamageTargetData->ValidData.AddDynamic(this, &ThisClass::TargetActorReceived);
 	WaitDamageTargetData->ReadyForActivation();
 
-	AGameplayAbilityTargetActor* TargetActor;
+	AGameplayAbilityTargetActor* TargetActor; // 当 Ability 结束时，关联的 AbilityTask 会清理资源，包括销毁生成的 TargetActor，即destroy
 	WaitDamageTargetData->BeginSpawningActor(this, LaserTargetActorClass, TargetActor);
-	WaitDamageTargetData->FinishSpawningActor(this, TargetActor);
-
 	ATargetActor_Line* LineTargetActor = Cast<ATargetActor_Line>(TargetActor);
 	if (LineTargetActor)
 	{
 		LineTargetActor->ConfigureTargetSetting(
 			TargetRange, DetectionCylinderRadius, TargetingInterval, GetOwnerTeamID(), ShouldDrawDebug()
 		);
+	}
+
+	WaitDamageTargetData->FinishSpawningActor(this, TargetActor);
+	if (LineTargetActor)
+	{
 		LineTargetActor->AttachToComponent(
 			GetOwningComponentFromActorInfo(),
 			FAttachmentTransformRules::SnapToTargetNotIncludingScale,
@@ -116,4 +119,9 @@ void UGA_Laser::ManaUpdated(const FOnAttributeChangeData& ChangeData)
 
 void UGA_Laser::TargetActorReceived(const FGameplayAbilityTargetDataHandle& TargetDataHandle)
 {
+	if (K2_HasAuthority())
+	{
+		BP_ApplyGameplayEffectToTarget(TargetDataHandle, HitDamageEffect, GetAbilityLevel(CurrentSpecHandle, CurrentActorInfo));
+	}
+	PushTargets(TargetDataHandle, GetAvatarActorFromActorInfo()->GetActorForwardVector() * HitPushSpeed);
 }

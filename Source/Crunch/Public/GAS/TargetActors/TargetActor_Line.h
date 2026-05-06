@@ -35,6 +35,8 @@ public:
 
 	virtual void Tick(float DeltaSeconds) override;
 
+	virtual void BeginDestroy() override;
+
 private:
 	UPROPERTY(VisibleDefaultsOnly, Category="Component")
 	USceneComponent* RootComp;
@@ -71,4 +73,6 @@ private:
 	void DoTargetCheckAndReport();
 
 	void UpdateTargetTrace();
+
+	bool ShouldReportActorAsTarget(const AActor* ActorToCheck) const;
 };
