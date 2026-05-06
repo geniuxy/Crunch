@@ -66,7 +66,7 @@ private:
 	UPROPERTY()
 	UAbilitySystemComponent* OwnerAbilitySystemComponent;
 
-	const FGameplayAbilitySpec* CachedAbilitySpec;
+	FGameplayAbilitySpecHandle CachedAbilitySpecHandle;
 
 	const FGameplayAbilitySpec* GetAbilitySpec();
 
