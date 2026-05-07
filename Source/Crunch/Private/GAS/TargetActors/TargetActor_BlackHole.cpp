@@ -89,11 +89,23 @@ void ATargetActor_BlackHole::Tick(float DeltaSeconds)
 		{
 			AActor* Target = TargetPair.Key;
 
-			FVector PullDir = (GetActorLocation() - Target->GetActorLocation()).GetSafeNormal();
+			FVector PullDir = GetActorLocation() - Target->GetActorLocation();
 			PullDir.Z = 0;
+			PullDir.Normalize();
 			Target->SetActorLocation(Target->GetActorLocation() + PullDir * PullSpeed * DeltaSeconds);
 		}
 	}
+}
+
+void ATargetActor_BlackHole::ConfirmTargetingAndContinue()
+{
+	StopBlackHole();
+}
+
+void ATargetActor_BlackHole::CancelTargeting()
+{
+	StopBlackHole();
+	Super::CancelTargeting();
 }
 
 void ATargetActor_BlackHole::OnRep_BlackHoleRange()
@@ -161,4 +173,26 @@ void ATargetActor_BlackHole::RemoveTarget(AActor* OtherTarget)
 
 void ATargetActor_BlackHole::StopBlackHole()
 {
+	TArray<TWeakObjectPtr<AActor>> FinalTargets;
+	for (TPair<AActor*, UNiagaraComponent*>& TargetPair : ActorsInRangeMap)
+	{
+		FinalTargets.Add(TargetPair.Key);
+		UNiagaraComponent* NiagaraComponent = TargetPair.Value;
+		if (IsValid(NiagaraComponent))
+		{
+			NiagaraComponent->DestroyComponent();
+		}
+	}
+
+	FGameplayAbilityTargetDataHandle TargetDataHandle;
+
+	FGameplayAbilityTargetData_ActorArray* TargetActorArray = new FGameplayAbilityTargetData_ActorArray;
+	TargetActorArray->SetActors(FinalTargets);
+	TargetDataHandle.Add(TargetActorArray);
+
+	FGameplayAbilityTargetData_SingleTargetHit* BlowUpLocation = new FGameplayAbilityTargetData_SingleTargetHit;
+	BlowUpLocation->HitResult.ImpactPoint = GetActorLocation();
+	TargetDataHandle.Add(BlowUpLocation);
+
+	TargetDataReadyDelegate.Broadcast(TargetDataHandle);
 }

@@ -59,9 +59,18 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category="Animation")
 	UAnimMontage* HoldBlackHoleMontage;
 
+	UPROPERTY(EditDefaultsOnly, Category="Animation")
+	UAnimMontage* FinalBlowMontage;
+
 	UPROPERTY(EditDefaultsOnly, Category="Effects")
 	TSubclassOf<UGameplayEffect> AimEffect;
 
+	UPROPERTY(EditDefaultsOnly, Category="Effects")
+	TSubclassOf<UGameplayEffect> FinalBlowDamageEffect;
+
+	UPROPERTY(EditDefaultsOnly, Category="Final Blow")
+	float BlowPushSpeed = 3000.f;
+	
 	FActiveGameplayEffectHandle AimEffectHandle;
 
 	void AddAimEffect();

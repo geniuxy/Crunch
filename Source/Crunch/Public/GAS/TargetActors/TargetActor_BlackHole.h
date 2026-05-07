@@ -33,6 +33,10 @@ public:
 
 	virtual void Tick(float DeltaSeconds) override;
 
+	virtual void ConfirmTargetingAndContinue() override;
+
+	virtual void CancelTargeting() override;
+
 private:
 	UPROPERTY(Replicated)
 	FGenericTeamId TeamID;
