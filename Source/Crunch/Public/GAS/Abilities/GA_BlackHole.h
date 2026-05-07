@@ -42,7 +42,7 @@ private:
 	float TargetTraceRange = 2000.f;
 
 	UPROPERTY(EditDefaultsOnly, Category="Targeting")
-	float BlackHolePullSpeed = 3000.f;
+	float BlackHolePullSpeed = 500.f;
 
 	UPROPERTY(EditDefaultsOnly, Category="Targeting")
 	float BlackHoleDuration = 6.f;

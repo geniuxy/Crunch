@@ -5,6 +5,8 @@
 
 #include "Components/SphereComponent.h"
 #include "Net/UnrealNetwork.h"
+#include "NiagaraComponent.h"
+#include "NiagaraFunctionLibrary.h"
 #include "Particles/ParticleSystemComponent.h"
 
 
@@ -38,14 +40,60 @@ void ATargetActor_BlackHole::GetLifetimeReplicatedProps(TArray<FLifetimeProperty
 void ATargetActor_BlackHole::ConfigureBlackHole(
 	float InBlackHoleRange, float InPullSpeed, float InBlackHoleDuration, const FGenericTeamId& InTeamID)
 {
-	PullSpeed= InPullSpeed;
-	
+	PullSpeed = InPullSpeed;
+
 	BlackHoleRange = InBlackHoleRange;
 	DetectionSphereComponent->SetSphereRadius(InBlackHoleRange);
 
 	SetGenericTeamId(InTeamID);
 
 	BlackHoleDuration = InBlackHoleDuration;
+}
+
+void ATargetActor_BlackHole::SetBlackHoleLinkOrigin()
+{
+	if (HasAuthority())
+	{
+		for (TPair<AActor*, UNiagaraComponent*>& TargetPair : ActorsInRangeMap)
+		{
+			UNiagaraComponent* NiagaraComponent = TargetPair.Value;
+			if (NiagaraComponent)
+			{
+				NiagaraComponent->SetVariablePosition(
+					BlackHoleVFXOriginVariableName, VFXComponent->GetComponentLocation()
+				);
+			}
+		}
+	}
+}
+
+void ATargetActor_BlackHole::StartTargeting(UGameplayAbility* Ability)
+{
+	Super::StartTargeting(Ability);
+
+	UWorld* World = GetWorld();
+	if (World)
+	{
+		World->GetTimerManager().SetTimer(
+			BlackHoleDurationTimerHandle, this, &ThisClass::StopBlackHole, BlackHoleDuration
+		);
+	}
+}
+
+void ATargetActor_BlackHole::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+	if (HasAuthority())
+	{
+		for (TPair<AActor*, UNiagaraComponent*>& TargetPair : ActorsInRangeMap)
+		{
+			AActor* Target = TargetPair.Key;
+
+			FVector PullDir = (GetActorLocation() - Target->GetActorLocation()).GetSafeNormal();
+			PullDir.Z = 0;
+			Target->SetActorLocation(Target->GetActorLocation() + PullDir * PullSpeed * DeltaSeconds);
+		}
+	}
 }
 
 void ATargetActor_BlackHole::OnRep_BlackHoleRange()
@@ -61,6 +109,7 @@ void ATargetActor_BlackHole::ActorInBlackHoleRange(
 	bool bFromSweep,
 	const FHitResult& SweepResult)
 {
+	TryAddTarget(OtherActor);
 }
 
 void ATargetActor_BlackHole::ActorLeftBlackHoleRange(
@@ -69,5 +118,47 @@ void ATargetActor_BlackHole::ActorLeftBlackHoleRange(
 	UPrimitiveComponent* OtherComp,
 	int OtherBodyIndex)
 {
+	RemoveTarget(OtherActor);
 }
 
+void ATargetActor_BlackHole::TryAddTarget(AActor* OtherTarget)
+{
+	if (!OtherTarget || ActorsInRangeMap.Contains(OtherTarget)) return;
+	if (GetTeamAttitudeTowards(*OtherTarget) != ETeamAttitude::Hostile) return;
+
+	UNiagaraComponent* NiagaraComponent = nullptr;
+	if (BlackHoleLinkVFX)
+	{
+		NiagaraComponent = UNiagaraFunctionLibrary::SpawnSystemAttached(
+			BlackHoleLinkVFX, OtherTarget->GetRootComponent(), NAME_None, FVector::Zero(), FRotator::ZeroRotator,
+			EAttachLocation::KeepRelativeOffset, false
+		);
+		if (NiagaraComponent)
+		{
+			NiagaraComponent->SetVariablePosition(
+				BlackHoleVFXOriginVariableName, VFXComponent->GetComponentLocation()
+			);
+		}
+	}
+
+	ActorsInRangeMap.Add(OtherTarget, NiagaraComponent);
+}
+
+void ATargetActor_BlackHole::RemoveTarget(AActor* OtherTarget)
+{
+	if (!OtherTarget) return;
+
+	if (ActorsInRangeMap.Contains(OtherTarget))
+	{
+		UNiagaraComponent* VFXComp;
+		ActorsInRangeMap.RemoveAndCopyValue(OtherTarget, VFXComp);
+		if (IsValid(VFXComp))
+		{
+			VFXComp->DestroyComponent();
+		}
+	}
+}
+
+void ATargetActor_BlackHole::StopBlackHole()
+{
+}

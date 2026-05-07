@@ -7,6 +7,8 @@
 #include "Abilities/GameplayAbilityTargetActor.h"
 #include "TargetActor_BlackHole.generated.h"
 
+class UNiagaraSystem;
+class UNiagaraComponent;
 class USphereComponent;
 
 UCLASS()
@@ -22,9 +24,14 @@ public:
 	void ConfigureBlackHole(
 		float InBlackHoleRange, float InPullSpeed, float InBlackHoleDuration, const FGenericTeamId& InTeamID
 	);
+	void SetBlackHoleLinkOrigin();
 
 	virtual void SetGenericTeamId(const FGenericTeamId& InTeamID) override { TeamID = InTeamID; }
 	virtual FGenericTeamId GetGenericTeamId() const override { return TeamID; }
+
+	virtual void StartTargeting(UGameplayAbility* Ability) override;
+
+	virtual void Tick(float DeltaSeconds) override;
 
 private:
 	UPROPERTY(Replicated)
@@ -48,6 +55,14 @@ private:
 	UPROPERTY(VisibleDefaultsOnly, Category="Component")
 	UParticleSystemComponent* VFXComponent;
 
+	FTimerHandle BlackHoleDurationTimerHandle;
+
+	UPROPERTY(EditDefaultsOnly, Category="VFX")
+	FName BlackHoleVFXOriginVariableName = "Origin";
+	
+	UPROPERTY(EditDefaultsOnly, Category="VFX")
+	UNiagaraSystem* BlackHoleLinkVFX;
+
 	UFUNCTION()
 	void ActorInBlackHoleRange(
 		UPrimitiveComponent* OverlappedComponent,
@@ -65,4 +80,12 @@ private:
 		UPrimitiveComponent* OtherComp,
 		int OtherBodyIndex
 	);
+
+	void TryAddTarget(AActor* OtherTarget);
+	void RemoveTarget(AActor* OtherTarget);
+
+	UPROPERTY()
+	TMap<AActor*, UNiagaraComponent*> ActorsInRangeMap;
+
+	void StopBlackHole();
 };

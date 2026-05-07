@@ -127,6 +127,9 @@ void UGA_BlackHole::PlaceBlackHole(const FGameplayAbilityTargetDataHandle& Targe
 		BlackHoleTargetActor->SetActorLocation(
 			UAbilitySystemBlueprintLibrary::GetHitResultFromTargetData(TargetDataHandle, 1).ImpactPoint
 		);
+		// TargetActorTask的FinishSpawningActor位置默认在Owner的位置
+		// 所以需要在SetActorLocation之后设置黑洞Link中心的位置
+		BlackHoleTargetActor->SetBlackHoleLinkOrigin();
 	}
 }
 
