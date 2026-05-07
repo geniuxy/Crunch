@@ -64,17 +64,28 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, Category="Effects")
 	TSubclassOf<UGameplayEffect> AimEffect;
-
-	UPROPERTY(EditDefaultsOnly, Category="Effects")
-	TSubclassOf<UGameplayEffect> FinalBlowDamageEffect;
-
-	UPROPERTY(EditDefaultsOnly, Category="Final Blow")
-	float BlowPushSpeed = 3000.f;
 	
 	FActiveGameplayEffectHandle AimEffectHandle;
 
 	void AddAimEffect();
 	void RemoveAimEffect();
+	
+	UPROPERTY(EditDefaultsOnly, Category="Effects")
+	TSubclassOf<UGameplayEffect> FinalBlowDamageEffect;
+
+	UPROPERTY(EditDefaultsOnly, Category="Effects")
+	TSubclassOf<UGameplayEffect> FocusEffect;
+
+	FActiveGameplayEffectHandle FocusEffectHandle;
+
+	void AddFocusEffect();
+	void RemoveFocusEffect();
+
+	UPROPERTY(EditDefaultsOnly, Category="Final Blow")
+	float BlowPushSpeed = 3000.f;
+
+	UPROPERTY(EditDefaultsOnly, Category="Final Blow", meta=(Categories="GameplayCue"))
+	FGameplayTag FinalBlowCueTag;
 	
 	UPROPERTY()
 	UAbilityTask_PlayMontageAndWait* PlayCastBlackHoleMontageTask;

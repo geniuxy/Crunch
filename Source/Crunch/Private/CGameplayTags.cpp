@@ -15,6 +15,9 @@ namespace CGameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(
 		Crunch_Stats_Aim, "Crunch.Stats.Aim"
 	);
+	UE_DEFINE_GAMEPLAY_TAG(
+		Crunch_Stats_Focus, "Crunch.Stats.Focus"
+	);
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(
 		Crunch_Stats_Crosshair, "Crunch.Stats.Crosshair", "有这个tag时，则绘制屏幕中心的瞄准十字"
 	);
@@ -142,5 +145,8 @@ namespace CGameplayTags
 	);
 	UE_DEFINE_GAMEPLAY_TAG(
 		GameplayCue_Hit_Impact_Phase_Projectile, "GameplayCue.Hit.Impact.Phase.Projectile"
+	);
+	UE_DEFINE_GAMEPLAY_TAG(
+		GameplayCue_Blow_Impact_Phase_BlackHole, "GameplayCue.Blow.Impact.Phase.BlackHole"
 	);
 }

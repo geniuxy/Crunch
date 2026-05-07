@@ -130,6 +130,9 @@ void ACCharacter::BindGASChangeDelegates()
 		AbilitySystemComponent->RegisterGameplayTagEvent(CGameplayTags::Crunch_Stats_Aim).AddUObject(
 			this, &ThisClass::AimTagUpdated
 		);
+		AbilitySystemComponent->RegisterGameplayTagEvent(CGameplayTags::Crunch_Stats_Focus).AddUObject(
+			this, &ThisClass::FocusTagUpdated
+		);
 
 		AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(
 			UCAttributeSet::GetMoveSpeedAttribute()
@@ -189,6 +192,11 @@ void ACCharacter::SetIsAiming(bool bIsAiming)
 	bUseControllerRotationYaw = bIsAiming;
 	GetCharacterMovement()->bOrientRotationToMovement = !bIsAiming;
 	OnAimStateChanged(bIsAiming);
+}
+
+void ACCharacter::FocusTagUpdated(FGameplayTag Tag, int NewCount)
+{
+	bIsInFocusMode = NewCount > 0;
 }
 
 void ACCharacter::OnAimStateChanged(bool bIsAiming)

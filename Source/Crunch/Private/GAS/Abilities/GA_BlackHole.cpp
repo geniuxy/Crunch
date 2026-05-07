@@ -4,6 +4,8 @@
 #include "GAS/Abilities/GA_BlackHole.h"
 
 #include "AbilitySystemBlueprintLibrary.h"
+#include "AbilitySystemComponent.h"
+#include "CGameplayTags.h"
 #include "Abilities/Tasks/AbilityTask_PlayMontageAndWait.h"
 #include "Abilities/Tasks/AbilityTask_WaitTargetData.h"
 #include "GAS/TargetActors/TargetActor_GroundPick.h"
@@ -59,6 +61,8 @@ void UGA_BlackHole::EndAbility(
 	bool bWasCancelled)
 {
 	RemoveAimEffect();
+	RemoveFocusEffect();
+
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }
 
@@ -75,6 +79,19 @@ void UGA_BlackHole::RemoveAimEffect()
 	}
 }
 
+void UGA_BlackHole::AddFocusEffect()
+{
+	FocusEffectHandle = BP_ApplyGameplayEffectToOwner(FocusEffect);
+}
+
+void UGA_BlackHole::RemoveFocusEffect()
+{
+	if (FocusEffectHandle.IsValid())
+	{
+		BP_RemoveGameplayEffectFromOwnerWithHandle(FocusEffectHandle);
+	}
+}
+
 void UGA_BlackHole::PlaceBlackHole(const FGameplayAbilityTargetDataHandle& TargetDataHandle)
 {
 	if (!K2_CommitAbility())
@@ -84,6 +101,7 @@ void UGA_BlackHole::PlaceBlackHole(const FGameplayAbilityTargetDataHandle& Targe
 	}
 
 	RemoveAimEffect();
+	AddFocusEffect();
 
 	if (PlayCastBlackHoleMontageTask)
 	{
@@ -161,4 +179,12 @@ void UGA_BlackHole::FinalTargetsReceived(const FGameplayAbilityTargetDataHandle&
 	{
 		PlayMontageLocally(FinalBlowMontage);
 	}
+
+	FGameplayCueParameters FinalBlowCueParameters;
+	FinalBlowCueParameters.Location =
+		UAbilitySystemBlueprintLibrary::GetHitResultFromTargetData(TargetDataHandle, 1).ImpactPoint;
+	FinalBlowCueParameters.RawMagnitude = TargetAreaRadius;
+
+	GetAbilitySystemComponentFromActorInfo()->ExecuteGameplayCue(FinalBlowCueTag, FinalBlowCueParameters);
+	GetAbilitySystemComponentFromActorInfo()->ExecuteGameplayCue(CGameplayTags::GameplayCue_CameraShake);
 }

@@ -56,8 +56,13 @@ private:
 
 	void DeathTagUpdated(FGameplayTag Tag, int NewCount);
 	void StunTagUpdated(FGameplayTag Tag, int NewCount);
+
 	void AimTagUpdated(FGameplayTag Tag, int NewCount);
 	void SetIsAiming(bool bIsAiming);
+
+	void FocusTagUpdated(FGameplayTag Tag, int NewCount);
+	bool bIsInFocusMode = false;
+
 	virtual void OnAimStateChanged(bool bIsAiming);
 	void MoveSpeedUpdated(const FOnAttributeChangeData& Data);
 	void MaxHealthUpdated(const FOnAttributeChangeData& Data);
@@ -69,6 +74,8 @@ private:
 	UPROPERTY()
 	UCAttributeSet* AttributeSet;
 
+public:
+	FORCEINLINE bool GetIsInFocusMode() const { return bIsInFocusMode; }
 	/**********************************************************************/
 	/*                                UI                                  */
 	/**********************************************************************/
@@ -168,7 +175,7 @@ public:
 private:
 	UPROPERTY(EditDefaultsOnly, Category="Capture")
 	FVector HeadshotCaptureLocalPosition;
-	
+
 	UPROPERTY(EditDefaultsOnly, Category="Capture")
 	FRotator HeadshotCaptureLocalRotation;
 
