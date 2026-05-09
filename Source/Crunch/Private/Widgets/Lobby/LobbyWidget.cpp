@@ -6,6 +6,9 @@
 #include "CrunchDebugHelper.h"
 #include "Components/UniformGridPanel.h"
 #include "Components/UniformGridSlot.h"
+#include "Controllers/LobbyPlayerController.h"
+#include "CTypes/PlayerInfoTypes.h"
+#include "FrameWork/CGameState.h"
 #include "FunctionLibrary/NetFunctionLibrary.h"
 #include "Widgets/Lobby/TeamSelectionWidget.h"
 
@@ -13,6 +16,8 @@ void ULobbyWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
 	ClearAndPopulateTeamSelectionSlots();
+	LobbyPlayerController = GetOwningPlayer<ALobbyPlayerController>();
+	ConfigureGameState();
 }
 
 void ULobbyWidget::ClearAndPopulateTeamSelectionSlots()
@@ -42,5 +47,40 @@ void ULobbyWidget::ClearAndPopulateTeamSelectionSlots()
 
 void ULobbyWidget::SlotSelected(uint8 NewSlotID)
 {
-	Debug::Print(FString::Printf(TEXT("尝试切换到槽位(%d)"), NewSlotID));
+	if (LobbyPlayerController)
+	{
+		LobbyPlayerController->Server_RequestSlotSelectionChange(NewSlotID);
+	}
+}
+
+void ULobbyWidget::ConfigureGameState()
+{
+	UWorld* World = GetWorld();
+	if (!World) return;
+
+	CGameState = World->GetGameState<ACGameState>();
+	if (!CGameState)
+	{
+		World->GetTimerManager().SetTimer(ConfigureGameStateTimerHandle, this, &ThisClass::ConfigureGameState, 1.f);
+	}
+	else
+	{
+		CGameState->OnPlayerSelectionUpdated.AddUObject(this, &ThisClass::UpdatePlayerSelectionDisplay);
+		UpdatePlayerSelectionDisplay(CGameState->GetPlayerSelection());
+	}
+}
+
+void ULobbyWidget::UpdatePlayerSelectionDisplay(const TArray<FPlayerSelection>& PlayerSelections)
+{
+	for (UTeamSelectionWidget* SelectionSlot : TeamSelectionSlots)
+	{
+		SelectionSlot->UpdateSlotInfo(TEXT("-"));
+	}
+
+	for (const FPlayerSelection& PlayerSelection : PlayerSelections)
+	{
+		if (!PlayerSelection.IsValid()) continue;
+
+		TeamSelectionSlots[PlayerSelection.GetPlayerSlot()]->UpdateSlotInfo(PlayerSelection.GetPlayerNickName());
+	}
 }

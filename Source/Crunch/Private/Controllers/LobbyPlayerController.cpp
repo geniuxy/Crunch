@@ -2,3 +2,20 @@
 
 
 #include "Controllers/LobbyPlayerController.h"
+#include "GameFramework/PlayerState.h"
+#include "FrameWork/CGameState.h"
+
+void ALobbyPlayerController::Server_RequestSlotSelectionChange_Implementation(uint8 NewSlotID)
+{
+	if (!GetWorld()) return;
+
+	ACGameState* CGameState = GetWorld()->GetGameState<ACGameState>();
+	if (!CGameState) return;
+
+	CGameState->RequestPlayerSelectionChange(GetPlayerState<APlayerState>(), NewSlotID);
+}
+
+bool ALobbyPlayerController::Server_RequestSlotSelectionChange_Validate(uint8 NewSlotID)
+{
+	return true;
+}
