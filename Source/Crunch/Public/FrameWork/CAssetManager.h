@@ -5,9 +5,9 @@
 #include "CoreMinimal.h"
 #include "CTypes/CStruct.h"
 #include "Engine/AssetManager.h"
-#include "Inventory/Data/PA_ShopItem.h"
 #include "CAssetManager.generated.h"
 
+class UPA_CharacterDefinition;
 class UPA_ShopItem;
 /**
  * 
@@ -19,6 +19,9 @@ class CRUNCH_API UCAssetManager : public UAssetManager
 
 public:
 	static UCAssetManager& Get();
+
+	void LoadCharacterDefinitions(const FStreamableDelegate& LoadFinishedCallback);
+	bool GetLoadedCharacterDefinitions(TArray<UPA_CharacterDefinition*>& OutDefinitions);
 
 	void LoadShopItems(const FStreamableDelegate& LoadFinishedCallback); // 异步加载ShopItems
 	bool GetLoadedShopItems(TArray<UPA_ShopItem*>& OutItems) const; // 获取ShopItem的合集

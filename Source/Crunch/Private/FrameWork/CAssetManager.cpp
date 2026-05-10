@@ -4,6 +4,8 @@
 #include "FrameWork/CAssetManager.h"
 
 #include "CrunchDebugHelper.h"
+#include "Characters/Data/PA_CharacterDefinition.h"
+#include "Inventory/Data/PA_ShopItem.h"
 #include "CTypes/CStruct.h"
 
 UCAssetManager& UCAssetManager::Get()
@@ -16,6 +18,29 @@ UCAssetManager& UCAssetManager::Get()
 
 	Debug::Print(TEXT("AssetManager的类型需要是CAssetManager"));
 	return *NewObject<UCAssetManager>();
+}
+
+void UCAssetManager::LoadCharacterDefinitions(const FStreamableDelegate& LoadFinishedCallback)
+{
+	LoadPrimaryAssetsWithType(
+		UPA_CharacterDefinition::GetCharacterDefinitionAssetType(),
+		TArray<FName>(),
+		LoadFinishedCallback
+	);
+}
+
+bool UCAssetManager::GetLoadedCharacterDefinitions(TArray<UPA_CharacterDefinition*>& OutDefinitions)
+{
+	TArray<UObject*> LoadedObjects;
+	bool bLoaded = GetPrimaryAssetObjectList(UPA_CharacterDefinition::GetCharacterDefinitionAssetType(), LoadedObjects);
+	if (bLoaded)
+	{
+		for (UObject* LoadedObject : LoadedObjects)
+		{
+			OutDefinitions.Add(Cast<UPA_CharacterDefinition>(LoadedObject));
+		}
+	}
+	return bLoaded;
 }
 
 void UCAssetManager::LoadShopItems(const FStreamableDelegate& LoadFinishedCallback)
