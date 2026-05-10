@@ -47,6 +47,11 @@ bool ACGameState::IsSlotOccupied(uint8 SlotID) const
 	return false;
 }
 
+bool ACGameState::CanStartHeroSelection() const
+{
+	return PlayerSelectionArray.Num() == PlayerArray.Num();
+}
+
 void ACGameState::OnRep_PlayerSelectionArray()
 {
 	OnPlayerSelectionUpdated.Broadcast(PlayerSelectionArray);

@@ -23,6 +23,8 @@ public:
 	void RequestPlayerSelectionChange(const APlayerState* RequestingPlayer, uint8 DesiredSlot);
 	bool IsSlotOccupied(uint8 SlotID) const;
 
+	bool CanStartHeroSelection() const;
+
 	FOnPlayerSelectionUpdated OnPlayerSelectionUpdated;
 
 private:

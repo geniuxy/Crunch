@@ -37,6 +37,9 @@ private:
 	UPROPERTY(meta=(BindWidget))
 	UUniformGridPanel* TeamSelectionSlotGridPanel;
 
+	UPROPERTY(meta=(BindWidget))
+	UWidget* HeroSelectionRoot;
+
 	UPROPERTY(EditDefaultsOnly, Category="TeamSelection")
 	TSubclassOf<UTeamSelectionWidget> TeamSelectionWidgetClass;
 
@@ -57,4 +60,9 @@ private:
 	FTimerHandle ConfigureGameStateTimerHandle;
 
 	void UpdatePlayerSelectionDisplay(const TArray<FPlayerSelection>& PlayerSelections);
+	
+	UFUNCTION()
+	void StartHeroSelectionButtonClicked();
+	
+	void SwitchToHeroSelection();
 };
