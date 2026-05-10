@@ -6,6 +6,7 @@
 #include "CrunchDebugHelper.h"
 #include "Characters/Data/PA_CharacterDefinition.h"
 #include "Components/Button.h"
+#include "Components/TileView.h"
 #include "Components/UniformGridPanel.h"
 #include "Components/UniformGridSlot.h"
 #include "Components/WidgetSwitcher.h"
@@ -120,9 +121,6 @@ void ULobbyWidget::CharacterDefinitionLoaded()
 	TArray<UPA_CharacterDefinition*> LoadedCharacterDefinitions;
 	if (UCAssetManager::Get().GetLoadedCharacterDefinitions(LoadedCharacterDefinitions))
 	{
-		for (UPA_CharacterDefinition* LoadedCharacterDefinition : LoadedCharacterDefinitions)
-		{
-			Debug::Print(FString::Printf(TEXT("加载角色：%s"), *LoadedCharacterDefinition->GetCharacterDisplayName()));
-		}
+		CharacterSelectionTileView->SetListItems(LoadedCharacterDefinitions);
 	}
 }

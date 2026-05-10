@@ -6,6 +6,7 @@
 #include "Blueprint/UserWidget.h"
 #include "LobbyWidget.generated.h"
 
+class UTileView;
 struct FPlayerSelection;
 class ACGameState;
 class ALobbyPlayerController;
@@ -40,6 +41,9 @@ private:
 	UPROPERTY(meta=(BindWidget))
 	UWidget* HeroSelectionRoot;
 
+	UPROPERTY(meta=(BindWidget))
+	UTileView* CharacterSelectionTileView;
+	
 	UPROPERTY(EditDefaultsOnly, Category="TeamSelection")
 	TSubclassOf<UTeamSelectionWidget> TeamSelectionWidgetClass;
 
