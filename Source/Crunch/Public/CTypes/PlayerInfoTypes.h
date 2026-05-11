@@ -32,7 +32,7 @@ private:
 	FString PlayerNickName;
 
 	UPROPERTY()
-	const UPA_CharacterDefinition* CharacterDefinition;
+	const UPA_CharacterDefinition* CharacterDefinition = nullptr;
 
 public:
 	FORCEINLINE void SetSlot(uint8 NewSlot) { Slot = NewSlot; }
