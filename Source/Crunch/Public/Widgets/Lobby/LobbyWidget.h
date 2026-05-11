@@ -6,6 +6,7 @@
 #include "Blueprint/UserWidget.h"
 #include "LobbyWidget.generated.h"
 
+class ACPlayerState;
 class UTileView;
 struct FPlayerSelection;
 class ACGameState;
@@ -57,6 +58,9 @@ private:
 	ALobbyPlayerController* LobbyPlayerController;
 
 	UPROPERTY()
+	ACPlayerState* CPlayerState;
+	
+	UPROPERTY()
 	ACGameState* CGameState;
 	
 	void ConfigureGameState();
@@ -71,4 +75,6 @@ private:
 	void SwitchToHeroSelection();
 	
 	void CharacterDefinitionLoaded();
+
+	void CharacterSelected(UObject* SelectedUObject);
 };
