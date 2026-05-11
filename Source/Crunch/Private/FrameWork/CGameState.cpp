@@ -52,6 +52,55 @@ bool ACGameState::CanStartHeroSelection() const
 	return PlayerSelectionArray.Num() == PlayerArray.Num();
 }
 
+bool ACGameState::IsDefinitionSelected(const UPA_CharacterDefinition* Definition) const
+{
+	const FPlayerSelection* FoundPlayerSelection = PlayerSelectionArray.FindByPredicate(
+		[&](const FPlayerSelection& PlayerSelection)
+		{
+			return PlayerSelection.GetCharacterDefinition() == Definition;
+		}
+	);
+
+	return FoundPlayerSelection != nullptr;
+}
+
+void ACGameState::SetCharacterSelected(
+	const APlayerState* SelectingPlayer, const UPA_CharacterDefinition* SelectedDefinition)
+{
+	if (IsDefinitionSelected(SelectedDefinition)) return;
+
+	FPlayerSelection* FoundPlayerSelection = PlayerSelectionArray.FindByPredicate(
+		[&](const FPlayerSelection& PlayerSelection)
+		{
+			return PlayerSelection.IsForPlayer(SelectingPlayer);
+		}
+	);
+
+	if (FoundPlayerSelection)
+	{
+		FoundPlayerSelection->SetCharacterDefinition(SelectedDefinition);
+		OnPlayerSelectionUpdated.Broadcast(PlayerSelectionArray);
+	}
+}
+
+void ACGameState::SetCharacterDeselected(const UPA_CharacterDefinition* DefinitionToDeselect)
+{
+	if (!DefinitionToDeselect) return;
+
+	FPlayerSelection* FoundPlayerSelection = PlayerSelectionArray.FindByPredicate(
+		[&](const FPlayerSelection& PlayerSelection)
+		{
+			return PlayerSelection.GetCharacterDefinition() == DefinitionToDeselect;
+		}
+	);
+
+	if (FoundPlayerSelection)
+	{
+		FoundPlayerSelection->SetCharacterDefinition(nullptr);
+		OnPlayerSelectionUpdated.Broadcast(PlayerSelectionArray);
+	}
+}
+
 void ACGameState::OnRep_PlayerSelectionArray()
 {
 	OnPlayerSelectionUpdated.Broadcast(PlayerSelectionArray);

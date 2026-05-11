@@ -3,9 +3,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Characters/Data/PA_CharacterDefinition.h"
 #include "GameFramework/GameStateBase.h"
 #include "CGameState.generated.h"
 
+class UPA_CharacterDefinition;
 struct FPlayerSelection;
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnPlayerSelectionUpdated, const TArray<FPlayerSelection>& /* NewPlayerSelection*/)
@@ -18,6 +20,8 @@ class CRUNCH_API ACGameState : public AGameStateBase
 	GENERATED_BODY()
 
 public:
+	FOnPlayerSelectionUpdated OnPlayerSelectionUpdated;
+	
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 	void RequestPlayerSelectionChange(const APlayerState* RequestingPlayer, uint8 DesiredSlot);
@@ -25,7 +29,9 @@ public:
 
 	bool CanStartHeroSelection() const;
 
-	FOnPlayerSelectionUpdated OnPlayerSelectionUpdated;
+	bool IsDefinitionSelected(const UPA_CharacterDefinition* Definition) const;
+	void SetCharacterSelected(const APlayerState* SelectingPlayer, const UPA_CharacterDefinition* SelectedDefinition);
+	void SetCharacterDeselected(const UPA_CharacterDefinition* DefinitionToDeselect);
 
 private:
 	UPROPERTY(ReplicatedUsing=OnRep_PlayerSelectionArray)
