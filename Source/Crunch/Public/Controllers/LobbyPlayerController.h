@@ -16,6 +16,8 @@ class CRUNCH_API ALobbyPlayerController : public AMenuPlayerController
 	GENERATED_BODY()
 
 public:
+	ALobbyPlayerController();
+	
 	FOnSwitchToHeroSelection OnSwitchToHeroSelection;
 	
 	UFUNCTION(Server, Reliable, WithValidation)

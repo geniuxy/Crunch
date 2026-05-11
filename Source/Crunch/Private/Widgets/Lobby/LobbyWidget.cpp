@@ -4,6 +4,7 @@
 #include "Widgets/Lobby/LobbyWidget.h"
 
 #include "CrunchDebugHelper.h"
+#include "Actors/Lobby/CharacterDisplay.h"
 #include "Characters/Data/PA_CharacterDefinition.h"
 #include "Components/Button.h"
 #include "Components/TileView.h"
@@ -15,6 +16,8 @@
 #include "FrameWork/CAssetManager.h"
 #include "FrameWork/CGameState.h"
 #include "FunctionLibrary/NetFunctionLibrary.h"
+#include "GameFramework/PlayerStart.h"
+#include "Kismet/GameplayStatics.h"
 #include "Player/CPlayerState.h"
 #include "Widgets/Lobby/CharacterEntryWidget.h"
 #include "Widgets/Lobby/TeamSelectionWidget.h"
@@ -41,6 +44,8 @@ void ULobbyWidget::NativeConstruct()
 		// OnItemSelectionChanged()在取消选择时，不会做任何反应
 		CharacterSelectionTileView->OnItemSelectionChanged().AddUObject(this, &ThisClass::CharacterSelected);
 	}
+
+	SpawnCharacterDisplay();
 }
 
 void ULobbyWidget::ClearAndPopulateTeamSelectionSlots()
@@ -122,6 +127,11 @@ void ULobbyWidget::UpdatePlayerSelectionDisplay(const TArray<FPlayerSelection>& 
 		{
 			SelectedEntry->SetSelected(true);
 		}
+
+		if (PlayerSelection.IsForPlayer(GetOwningPlayerState()))
+		{
+			UpdateCharacterDisplay(PlayerSelection);
+		}
 	}
 
 	if (CGameState)
@@ -164,4 +174,29 @@ void ULobbyWidget::CharacterSelected(UObject* SelectedUObject)
 	{
 		CPlayerState->Server_SetSelectedCharacterDefinition(CharacterDefinition);
 	}
+}
+
+void ULobbyWidget::SpawnCharacterDisplay()
+{
+	if (CharacterDisplay) return;
+	if (!CharacterDisplayClass) return;
+
+	FTransform CharacterDisplayTransform = FTransform::Identity;
+	AActor* PlayerStart = UGameplayStatics::GetActorOfClass(GetWorld(), APlayerStart::StaticClass());
+	if (PlayerStart)
+	{
+		CharacterDisplayTransform = PlayerStart->GetActorTransform();
+	}
+
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	CharacterDisplay = GetWorld()->SpawnActor<ACharacterDisplay>(CharacterDisplayClass, SpawnParams);
+	GetOwningPlayer()->SetViewTarget(CharacterDisplay);
+}
+
+void ULobbyWidget::UpdateCharacterDisplay(const FPlayerSelection& PlayerSelection)
+{
+	if (!PlayerSelection.GetCharacterDefinition()) return;
+
+	CharacterDisplay->ConfigureWithCharacterDefinition(PlayerSelection.GetCharacterDefinition());
 }

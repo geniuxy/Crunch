@@ -4,8 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "CTypes/PlayerInfoTypes.h"
 #include "LobbyWidget.generated.h"
 
+class ACharacterDisplay;
 class ACPlayerState;
 class UTileView;
 struct FPlayerSelection;
@@ -77,4 +79,13 @@ private:
 	void CharacterDefinitionLoaded();
 
 	void CharacterSelected(UObject* SelectedUObject);
+
+	UPROPERTY(EditDefaultsOnly, Category="Character Display")
+	TSubclassOf<ACharacterDisplay> CharacterDisplayClass;
+
+	UPROPERTY()
+	ACharacterDisplay* CharacterDisplay;
+
+	void SpawnCharacterDisplay();
+	void UpdateCharacterDisplay(const FPlayerSelection& PlayerSelection);
 };
