@@ -3,7 +3,6 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Characters/Data/PA_CharacterDefinition.h"
 #include "PlayerInfoTypes.generated.h"
 
 class UPA_CharacterDefinition;
