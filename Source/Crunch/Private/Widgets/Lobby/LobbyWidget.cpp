@@ -19,6 +19,7 @@
 #include "GameFramework/PlayerStart.h"
 #include "Kismet/GameplayStatics.h"
 #include "Player/CPlayerState.h"
+#include "Widgets/Abilities/AbilityListView.h"
 #include "Widgets/Lobby/CharacterEntryWidget.h"
 #include "Widgets/Lobby/TeamSelectionWidget.h"
 
@@ -200,4 +201,12 @@ void ULobbyWidget::UpdateCharacterDisplay(const FPlayerSelection& PlayerSelectio
 	if (!PlayerSelection.GetCharacterDefinition()) return;
 
 	CharacterDisplay->ConfigureWithCharacterDefinition(PlayerSelection.GetCharacterDefinition());
+
+	AbilityListView->ClearListItems();
+	const TMap<ECAbilityInputID, TSubclassOf<UGameplayAbility>>* Abilities =
+		PlayerSelection.GetCharacterDefinition()->GetAbilities();
+	if (Abilities)
+	{
+		AbilityListView->ConfigureAbilities(*Abilities);
+	}
 }

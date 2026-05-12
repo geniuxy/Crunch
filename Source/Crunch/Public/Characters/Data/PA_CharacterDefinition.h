@@ -6,6 +6,8 @@
 #include "Engine/DataAsset.h"
 #include "PA_CharacterDefinition.generated.h"
 
+enum class ECAbilityInputID : uint8;
+class UGameplayAbility;
 class ACCharacter;
 /**
  * 
@@ -24,6 +26,8 @@ public:
 	TSubclassOf<ACCharacter> LoadCharacterClass() const;
 	TSubclassOf<UAnimInstance> LoadDisplayAnimationBP() const;
 	USkeletalMesh* LoadDisplayMesh() const;
+
+	const TMap<ECAbilityInputID, TSubclassOf<UGameplayAbility>>* GetAbilities() const;
 
 private:
 	UPROPERTY(EditDefaultsOnly, Category="Character")

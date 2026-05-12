@@ -7,6 +7,7 @@
 #include "CTypes/PlayerInfoTypes.h"
 #include "LobbyWidget.generated.h"
 
+class UAbilityListView;
 class ACharacterDisplay;
 class ACPlayerState;
 class UTileView;
@@ -46,6 +47,9 @@ private:
 
 	UPROPERTY(meta=(BindWidget))
 	UTileView* CharacterSelectionTileView;
+	
+	UPROPERTY(meta=(BindWidget))
+	UAbilityListView* AbilityListView;
 	
 	UPROPERTY(EditDefaultsOnly, Category="TeamSelection")
 	TSubclassOf<UTeamSelectionWidget> TeamSelectionWidgetClass;
