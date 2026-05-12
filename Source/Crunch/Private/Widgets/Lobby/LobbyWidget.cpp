@@ -190,7 +190,8 @@ void ULobbyWidget::SpawnCharacterDisplay()
 
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-	CharacterDisplay = GetWorld()->SpawnActor<ACharacterDisplay>(CharacterDisplayClass, SpawnParams);
+	CharacterDisplay =
+		GetWorld()->SpawnActor<ACharacterDisplay>(CharacterDisplayClass, CharacterDisplayTransform, SpawnParams);
 	GetOwningPlayer()->SetViewTarget(CharacterDisplay);
 }
 
