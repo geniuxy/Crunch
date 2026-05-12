@@ -11,6 +11,7 @@
 #include "FunctionLibrary/CAbilitySystemFunctionLibrary.h"
 #include "GAS/CAttributeSet.h"
 #include "GAS/CHeroAttributeSet.h"
+#include "Widgets/Abilities/AbilityToolTip.h"
 
 void UAbilityGauge::NativeConstruct()
 {
@@ -67,6 +68,7 @@ void UAbilityGauge::ConfigureWithWidgetData(const FAbilityWidgetData* WidgetData
 	if (Icon && WidgetData)
 	{
 		Icon->GetDynamicMaterial()->SetTextureParameterValue(IconMaterialParamName, WidgetData->Icon.LoadSynchronous());
+		CreateToolTipWidget(WidgetData);
 	}
 }
 
@@ -135,7 +137,8 @@ const FGameplayAbilitySpec* UAbilityGauge::GetAbilitySpec()
 	}
 	if (!CachedAbilitySpecHandle.IsValid())
 	{
-		FGameplayAbilitySpec* FoundAbilitySpec = OwnerAbilitySystemComponent->FindAbilitySpecFromClass(AbilityCDO->GetClass());
+		FGameplayAbilitySpec* FoundAbilitySpec = OwnerAbilitySystemComponent->FindAbilitySpecFromClass(
+			AbilityCDO->GetClass());
 		CachedAbilitySpecHandle = FoundAbilitySpec->Handle;
 		return FoundAbilitySpec;
 	}
@@ -204,4 +207,25 @@ void UAbilityGauge::UpgradePointUpdated(const FOnAttributeChangeData& Data)
 void UAbilityGauge::ManaUpdated(const FOnAttributeChangeData& Data)
 {
 	UpdateCanCast();
+}
+
+void UAbilityGauge::CreateToolTipWidget(const FAbilityWidgetData* AbilityWidgetData)
+{
+	if (!AbilityWidgetData || !AbilityToolTipClass || !AbilityCDO) return;
+
+	UAbilityToolTip* InstantiatedToolTip = CreateWidget<UAbilityToolTip>(GetOwningPlayer(), AbilityToolTipClass);
+	if (InstantiatedToolTip)
+	{
+		float CooldownDuration = UCAbilitySystemFunctionLibrary::GetStaticCooldownDurationForAbility(AbilityCDO);
+		float Cost = UCAbilitySystemFunctionLibrary::GetStaticCostForAbility(AbilityCDO);
+		InstantiatedToolTip->SetAbilityInfo(
+			AbilityWidgetData->AbilityName,
+			AbilityWidgetData->Icon.LoadSynchronous(),
+			AbilityWidgetData->Description,
+			CooldownDuration,
+			Cost
+		);
+
+		SetToolTip(InstantiatedToolTip);
+	}
 }

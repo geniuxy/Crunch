@@ -6,8 +6,10 @@
 #include "GameplayAbilitySpec.h"
 #include "Blueprint/IUserObjectListEntry.h"
 #include "Blueprint/UserWidget.h"
+#include "CTypes/CStruct.h"
 #include "AbilityGauge.generated.h"
 
+class UAbilityToolTip;
 struct FGameplayAbilitySpec;
 class UAbilitySystemComponent;
 class UGameplayAbility;
@@ -94,4 +96,9 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, Category="Visual")
 	FName UpgradePointAvaliableParamName = "UpgradeAvaliable";
+
+	UPROPERTY(EditDefaultsOnly, Category="Tool Tip")
+	TSubclassOf<UAbilityToolTip> AbilityToolTipClass;
+
+	void CreateToolTipWidget(const FAbilityWidgetData* AbilityWidgetData);
 };

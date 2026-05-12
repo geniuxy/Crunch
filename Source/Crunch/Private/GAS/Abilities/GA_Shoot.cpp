@@ -17,6 +17,8 @@ UGA_Shoot::UGA_Shoot()
 	ActivationOwnedTags.AddTag(CGameplayTags::Crunch_Stats_Aim);
 	ActivationOwnedTags.AddTag(CGameplayTags::Crunch_Stats_Crosshair);
 	ActivationBlockedTags.AddTag(CGameplayTags::Crunch_Stats_DisableAim);
+	// 如果别的技能正在瞄准状态，在按下取消按钮(与瞄准按钮相关)时不会触发GA_Shoot
+	ActivationBlockedTags.AddTag(CGameplayTags::Crunch_Stats_Aim);
 }
 
 void UGA_Shoot::ActivateAbility(
