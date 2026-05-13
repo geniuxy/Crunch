@@ -25,7 +25,7 @@ public:
 	void UpdateSlot(const FString& PlayerName, const UPA_CharacterDefinition* CharacterDefinition);
 
 private:
-	UPROPERTY(meta=(BindWidget))
+	UPROPERTY(Transient, meta=(BindWidgetAnim))
 	UWidgetAnimation* HoverAnim;
 	
 	UPROPERTY(meta=(BindWidget))
