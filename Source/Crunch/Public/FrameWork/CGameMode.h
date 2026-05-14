@@ -21,11 +21,16 @@ public:
 	virtual void StartPlay() override;
 	
 	virtual APlayerController* SpawnPlayerController(ENetRole InRemoteRole, const FString& Options) override;
+	virtual UClass* GetDefaultPawnClassForController_Implementation(AController* InController) override;
+	virtual APawn* SpawnDefaultPawnFor_Implementation(AController* NewPlayer, AActor* StartSpot) override;
 
 private:
 	FGenericTeamId GetTeamIDForPlayer(const AController* InController) const;
 
 	AActor* FindNextStartSpotForTeam(const FGenericTeamId& TeamID) const;
+
+	UPROPERTY(EditDefaultsOnly, Category="Team")
+	TSubclassOf<APawn> BackUpPawn; // 备用 Pawn
 
 	UPROPERTY(EditDefaultsOnly, Category="Team")
 	TMap<FGenericTeamId, FName> TeamStartSpotTagMap;

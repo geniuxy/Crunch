@@ -33,6 +33,8 @@ void ACPlayerState::BeginPlay()
 
 void ACPlayerState::CopyProperties(APlayerState* PlayerState)
 {
+	// 在UE5.4中，如果想要正确执行CopyProperties，需要以下两种方法中的一种来执行
+	// 1. StandAlone模式启动 2. 控制台输入net.AllowPIESeamlessTravel 1 （但是目前5.4有bug，会导致崩溃，可能之后的版本会修复）
 	Super::CopyProperties(PlayerState);
 	ACPlayerState* NewPlayerState = Cast<ACPlayerState>(PlayerState);
 	if (NewPlayerState)
@@ -43,7 +45,12 @@ void ACPlayerState::CopyProperties(APlayerState* PlayerState)
 
 TSubclassOf<APawn> ACPlayerState::GetSelectedPawnClass() const
 {
-	return PlayerSelection.GetCharacterDefinition()->LoadCharacterClass();
+	if (PlayerSelection.GetCharacterDefinition())
+	{
+		return PlayerSelection.GetCharacterDefinition()->LoadCharacterClass();
+	}
+
+	return nullptr;
 }
 
 FGenericTeamId ACPlayerState::GetTeamIDBaseOnSlot() const
