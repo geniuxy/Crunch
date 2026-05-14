@@ -17,6 +17,6 @@ void UCGameInstance::LoadLevelAndListen(TSoftObjectPtr<UWorld> Level)
 
 	if (LevelURL != "")
 	{
-		GetWorld()->ServerTravel(Level.ToString() + "?listen");
+		GetWorld()->ServerTravel(LevelURL.ToString() + "?listen");
 	}
 }

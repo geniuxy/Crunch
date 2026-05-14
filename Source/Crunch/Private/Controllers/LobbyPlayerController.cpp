@@ -2,6 +2,8 @@
 
 
 #include "Controllers/LobbyPlayerController.h"
+
+#include "FrameWork/CGameInstance.h"
 #include "GameFramework/PlayerState.h"
 #include "FrameWork/CGameState.h"
 
@@ -37,6 +39,20 @@ void ALobbyPlayerController::Server_StartHeroSelection_Implementation()
 }
 
 bool ALobbyPlayerController::Server_StartHeroSelection_Validate()
+{
+	return true;
+}
+
+void ALobbyPlayerController::Server_RequestStartMatch_Implementation()
+{
+	UCGameInstance* CGameInstance = GetWorld()->GetGameInstance<UCGameInstance>();
+	if (CGameInstance)
+	{
+		CGameInstance->StartMatch();
+	}
+}
+
+bool ALobbyPlayerController::Server_RequestStartMatch_Validate()
 {
 	return true;
 }

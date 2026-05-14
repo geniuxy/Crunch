@@ -28,6 +28,7 @@ public:
 	bool IsSlotOccupied(uint8 SlotID) const;
 
 	bool CanStartHeroSelection() const;
+	bool CanStartMatch() const;
 
 	bool IsDefinitionSelected(const UPA_CharacterDefinition* Definition) const;
 	void SetCharacterSelected(const APlayerState* SelectingPlayer, const UPA_CharacterDefinition* SelectedDefinition);

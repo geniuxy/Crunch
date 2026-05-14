@@ -52,6 +52,18 @@ bool ACGameState::CanStartHeroSelection() const
 	return PlayerSelectionArray.Num() == PlayerArray.Num();
 }
 
+bool ACGameState::CanStartMatch() const
+{
+	for (const FPlayerSelection& PlayerSelection : PlayerSelectionArray)
+	{
+		if (PlayerSelection.GetCharacterDefinition() == nullptr)
+		{
+			return false;
+		}
+	}
+	return true;
+}
+
 bool ACGameState::IsDefinitionSelected(const UPA_CharacterDefinition* Definition) const
 {
 	const FPlayerSelection* FoundPlayerSelection = PlayerSelectionArray.FindByPredicate(

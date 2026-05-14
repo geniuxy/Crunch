@@ -55,6 +55,9 @@ private:
 	UPROPERTY(meta=(BindWidget))
 	UPlayerTeamLayoutWidget* PlayerTeamLayoutWidget;
 	
+	UPROPERTY(meta=(BindWidget))
+	UButton* StartMatchButton;
+	
 	UPROPERTY(EditDefaultsOnly, Category="TeamSelection")
 	TSubclassOf<UTeamSelectionWidget> TeamSelectionWidgetClass;
 
@@ -96,4 +99,7 @@ private:
 
 	void SpawnCharacterDisplay();
 	void UpdateCharacterDisplay(const FPlayerSelection& PlayerSelection);
+
+	UFUNCTION()
+	void StartMatchButtonClicked();
 };
