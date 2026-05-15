@@ -16,4 +16,18 @@ class CRUNCH_API UNetFunctionLibrary : public UBlueprintFunctionLibrary
 
 public:
 	static uint8 GetPlayerCountPerTeam();
+
+	static bool IsSessionServer(const UObject* WorldContextObject);
+
+	static FString GetSessionNameStr();
+	static FName GetSessionNameKey();
+
+	static FString GetSessionSearchIdStr();
+	static FName GetSessionSearchIdKey();
+
+	static int GetSessionPort();
+	static FName GetPortKey();
+
+	static FString GetCommandLineArgAsString(const FName& ParamName);
+	static int GetCommandLineArgAsInt(const FName& ParamName);
 };

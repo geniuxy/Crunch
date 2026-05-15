@@ -3,12 +3,37 @@
 
 #include "FrameWork/CGameInstance.h"
 
+#include "CrunchDebugHelper.h"
+#include "FunctionLibrary/NetFunctionLibrary.h"
+
 void UCGameInstance::StartMatch()
 {
 	if (GetWorld()->GetNetMode() == NM_DedicatedServer || GetWorld()->GetNetMode() == NM_ListenServer)
 	{
 		LoadLevelAndListen(GameLevel);
 	}
+}
+
+void UCGameInstance::Init()
+{
+	Super::Init();
+	if (GetWorld()->IsEditorWorld())return;
+	if (UNetFunctionLibrary::IsSessionServer(this))
+	{
+		CreateSession();
+	}
+}
+
+void UCGameInstance::CreateSession()
+{
+	ServerSessionName = UNetFunctionLibrary::GetSessionNameStr();
+	FString SessionSearchId = UNetFunctionLibrary::GetSessionSearchIdStr();
+	SessionServerPort = UNetFunctionLibrary::GetSessionPort();
+
+	Debug::Print(FString::Printf(
+		TEXT("#### Create Session With Name: %s, ID: %s, Port: %d"), *(ServerSessionName), *(SessionSearchId),
+		SessionServerPort)
+	);
 }
 
 void UCGameInstance::LoadLevelAndListen(TSoftObjectPtr<UWorld> Level)
