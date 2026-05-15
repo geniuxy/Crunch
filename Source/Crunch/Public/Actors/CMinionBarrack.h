@@ -7,7 +7,7 @@
 #include "GameFramework/Actor.h"
 #include "CMinionBarrack.generated.h"
 
-
+class APlayerStart;
 class ACMinion;
 
 UCLASS()

@@ -3,6 +3,7 @@
 
 #include "Crunch/Public/FrameWork/CGameMode.h"
 
+#include "CrunchDebugHelper.h"
 #include "EngineUtils.h"
 #include "Characters/CStormCore.h"
 #include "GameFramework/PlayerStart.h"
@@ -47,17 +48,46 @@ UClass* ACGameMode::GetDefaultPawnClassForController_Implementation(AController*
 
 APawn* ACGameMode::SpawnDefaultPawnFor_Implementation(AController* NewPlayer, AActor* StartSpot)
 {
+	if (!NewPlayer)
+	{
+		return nullptr;
+	}
+
 	IGenericTeamAgentInterface* NewPlayerTeamInterface = Cast<IGenericTeamAgentInterface>(NewPlayer);
-	FGenericTeamId TeamID = GetTeamIDForPlayer(NewPlayer);
+	const FGenericTeamId TeamID = GetTeamIDForPlayer(NewPlayer);
 	if (NewPlayerTeamInterface)
 	{
 		NewPlayerTeamInterface->SetGenericTeamId(TeamID);
 	}
 
-	StartSpot = FindNextStartSpotForTeam(TeamID);
-	NewPlayer->StartSpot = StartSpot;
+	// 尝试获取队伍专属出生点
+	AActor* FinalStartSpot = FindNextStartSpotForTeam(TeamID);
 
-	return Super::SpawnDefaultPawnFor_Implementation(NewPlayer, StartSpot);
+	// 【关键】如果队伍出生点不足，按优先级回退：
+	//  队伍出生点 -> 传入的 StartSpot -> 引擎默认查找
+	if (!FinalStartSpot)
+	{
+		FinalStartSpot = StartSpot; // 先保留原本传入的
+		if (!FinalStartSpot)
+		{
+			FinalStartSpot = FindPlayerStart(NewPlayer); // 再让引擎找一个可用的
+		}
+	}
+
+	// 【防御】如果所有方式都找不到，记录日志并直接返回 nullptr
+	//  避免把 nullptr 传给 Super 导致底层崩溃
+	if (!FinalStartSpot)
+	{
+		Debug::Print(FString::Printf(
+				TEXT("SpawnDefaultPawnFor: No valid StartSpot found for player %s (TeamID: %d). Aborting pawn spawn."),
+				*GetNameSafe(NewPlayer), TeamID.GetId())
+		);
+		return nullptr;
+	}
+
+	// 确认有效后再赋值和调用父类
+	NewPlayer->StartSpot = FinalStartSpot;
+	return Super::SpawnDefaultPawnFor_Implementation(NewPlayer, FinalStartSpot);
 }
 
 FGenericTeamId ACGameMode::GetTeamIDForPlayer(const AController* InController) const

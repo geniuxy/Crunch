@@ -72,6 +72,7 @@ void ACStormCore::Tick(float DeltaSeconds)
 	}
 }
 
+#if WITH_EDITOR
 void ACStormCore::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
 {
 	Super::PostEditChangeProperty(PropertyChangedEvent);
@@ -84,6 +85,7 @@ void ACStormCore::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedE
 		GroundDecalComponent->DecalSize = FVector(DecalSize.X, InfluenceRadius, InfluenceRadius);
 	}
 }
+#endif
 
 void ACStormCore::NewInfluencerInRange(
 	UPrimitiveComponent* OverlappedComponent,
