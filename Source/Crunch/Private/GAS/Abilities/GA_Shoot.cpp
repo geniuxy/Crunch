@@ -80,7 +80,7 @@ void UGA_Shoot::EndAbility(
 	}
 	SetCurrentAimTarget(nullptr);
 
-	SendLocalGameplayEvent(CGameplayTags::Crunch_Event_Target_Updated, FGameplayEventData());
+	// SendLocalGameplayEvent(CGameplayTags::Crunch_Event_Target_Updated, FGameplayEventData());
 
 	StopShooting(FGameplayEventData());
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
@@ -190,9 +190,9 @@ void UGA_Shoot::FindAimTarget()
 		);
 	}
 
-	FGameplayEventData EventData;
-	EventData.Target = GetCurrentAimTarget();
-	SendLocalGameplayEvent(CGameplayTags::Crunch_Event_Target_Updated, EventData);
+	// FGameplayEventData EventData;
+	// EventData.Target = GetCurrentAimTarget();
+	// SendLocalGameplayEvent(CGameplayTags::Crunch_Event_Target_Updated, EventData);
 }
 
 AActor* UGA_Shoot::GetCurrentAimTarget() const

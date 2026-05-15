@@ -42,5 +42,5 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category="View")
 	FLinearColor NoTargetColor = FLinearColor::White;
 
-	void TargetUpdated(const FGameplayEventData* EventData);
+	// void TargetUpdated(const FGameplayEventData* EventData);
 };

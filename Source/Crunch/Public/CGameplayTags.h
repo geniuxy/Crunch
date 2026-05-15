@@ -51,7 +51,7 @@ namespace CGameplayTags
 	CRUNCH_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Crunch_SetByCaller_Experience);
 	CRUNCH_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Crunch_SetByCaller_Gold);
 	
-	CRUNCH_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Crunch_Event_Target_Updated);
+	// CRUNCH_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Crunch_Event_Target_Updated);
 
 	/*
 	 * Items

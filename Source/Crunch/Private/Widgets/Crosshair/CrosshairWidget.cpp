@@ -25,9 +25,9 @@ void UCrosshairWidget::NativeConstruct()
 		OwnerASC->RegisterGameplayTagEvent(CGameplayTags::Crunch_Stats_Crosshair).AddUObject(
 			this, &ThisClass::CrosshairTagUpdated
 		);
-		OwnerASC->GenericGameplayEventCallbacks.Add(CGameplayTags::Crunch_Event_Target_Updated).AddUObject(
-			this, &ThisClass::TargetUpdated
-		);
+		// OwnerASC->GenericGameplayEventCallbacks.Add(CGameplayTags::Crunch_Event_Target_Updated).AddUObject(
+		// 	this, &ThisClass::TargetUpdated
+		// );
 	}
 
 	CachedPlayerController = GetOwningPlayer();
@@ -70,9 +70,11 @@ void UCrosshairWidget::UpdateCrosshairPosition()
 	{
 		FVector2D ViewportSize = FVector2D((float)SizeX, (float)SizeY);
 		CrosshairCanvasPanelSlot->SetPosition(ViewportSize / ViewportScale / 2.f);
+		CrosshairImage->SetColorAndOpacity(NoTargetColor);
 		return;
 	}
 
+	CrosshairImage->SetColorAndOpacity(HasTargetColor);
 	FVector2D TargetScreenPosition;
 	CachedPlayerController->ProjectWorldLocationToScreen(CurrentAimTarget->GetActorLocation(), TargetScreenPosition);
 	if (TargetScreenPosition.X > 0 && TargetScreenPosition.X < SizeX &&
@@ -90,8 +92,8 @@ void UCrosshairWidget::UpdateCrosshairPosition()
 	}
 }
 
-void UCrosshairWidget::TargetUpdated(const FGameplayEventData* EventData)
-{
-	const AActor* AimTarget = EventData->Target;
-	CrosshairImage->SetColorAndOpacity(AimTarget ? HasTargetColor : NoTargetColor);
-}
+// void UCrosshairWidget::TargetUpdated(const FGameplayEventData* EventData)
+// {
+// 	const AActor* AimTarget = EventData->Target;
+// 	CrosshairImage->SetColorAndOpacity(AimTarget ? HasTargetColor : NoTargetColor);
+// }
