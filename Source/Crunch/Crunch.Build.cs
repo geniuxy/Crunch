@@ -22,7 +22,13 @@ public class Crunch : ModuleRules
 				"Slate",
 				"SlateCore",
 				"AIModule",
-				"Niagara"
+				"Niagara",
+				"OnlineSubsystem",
+				"OnlineSubsystemEOS",
+				"OnlineSubsystemUtils",
+				"Networking",
+				"HTTP",
+				"Json"
 			}
 		);
 
