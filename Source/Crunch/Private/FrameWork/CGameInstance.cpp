@@ -31,8 +31,8 @@ void UCGameInstance::CreateSession()
 	SessionServerPort = UNetFunctionLibrary::GetSessionPort();
 
 	Debug::Print(FString::Printf(
-		TEXT("#### Create Session With Name: %s, ID: %s, Port: %d"), *(ServerSessionName), *(SessionSearchId),
-		SessionServerPort)
+			TEXT("#### Create Session With Name: %s, ID: %s, Port: %d"),
+			*(ServerSessionName), *(SessionSearchId), SessionServerPort)
 	);
 }
 

@@ -26,6 +26,9 @@ private:
 	FString ServerSessionName;
 	int SessionServerPort;
 
+	/**********************************************************************/
+	/*                              Level                                 */
+	/**********************************************************************/
 private:
 	UPROPERTY(EditDefaultsOnly, Category="Map")
 	TSoftObjectPtr<UWorld> MainMenuLevel;
