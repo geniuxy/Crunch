@@ -13,6 +13,7 @@ bool ACGameSession::ProcessAutoLogin()
 void ACGameSession::RegisterPlayer(APlayerController* NewPlayer, const FUniqueNetIdRepl& UniqueId, bool bWasFromInvite)
 {
 	Super::RegisterPlayer(NewPlayer, UniqueId, bWasFromInvite);
+	if (GetWorld()->IsEditorWorld()) return;
 	if (UCGameInstance* GameInst = GetGameInstance<UCGameInstance>())
 	{
 		GameInst->PlayerJoined(UniqueId);
@@ -22,6 +23,7 @@ void ACGameSession::RegisterPlayer(APlayerController* NewPlayer, const FUniqueNe
 void ACGameSession::UnregisterPlayer(FName InSessionName, const FUniqueNetIdRepl& UniqueId)
 {
 	Super::UnregisterPlayer(InSessionName, UniqueId);
+	if (GetWorld()->IsEditorWorld()) return;
 	if (UCGameInstance* GameInst = GetGameInstance<UCGameInstance>())
 	{
 		GameInst->PlayerLeft(UniqueId);
