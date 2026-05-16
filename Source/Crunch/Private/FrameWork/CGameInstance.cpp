@@ -42,11 +42,67 @@ void UCGameInstance::CreateSession()
 		FOnlineSessionSettings OnlineSessionSettings = UNetFunctionLibrary::GenerateOnlineSessionSettings(
 			FName(ServerSessionName), SessionSearchId, SessionServerPort
 		);
+		SessionPtr->OnCreateSessionCompleteDelegates.RemoveAll(this);
+		SessionPtr->OnCreateSessionCompleteDelegates.AddUObject(this, &ThisClass::OnSessionCreated);
 		if (!SessionPtr->CreateSession(0, FName(ServerSessionName), OnlineSessionSettings))
 		{
 			Debug::Print(TEXT("Session Creating Failed Right away!!!!"));
+			SessionPtr->OnCreateSessionCompleteDelegates.RemoveAll(this);
+			TerminateSessionServer();
 		}
 	}
+}
+
+void UCGameInstance::OnSessionCreated(FName SessionName, bool bWasSuccessful)
+{
+	if (bWasSuccessful)
+	{
+		Debug::Print(TEXT("------------------ Session Created Successful!"));
+		GetWorld()->GetTimerManager().SetTimer(
+			WaitPlayerJoinTimeoutHandle, this, &ThisClass::WaitPlayerJoinTimeOutReached, WaitPlayerJoinTimeOutDuration
+		);
+		LoadLevelAndListen(LobbyLevel);
+	}
+	else
+	{
+		Debug::Print(TEXT("------------------ Session Created Failed"));
+		TerminateSessionServer();
+	}
+
+	if (IOnlineSessionPtr SessionPtr = UNetFunctionLibrary::GetSessionPtr())
+	{
+		SessionPtr->OnCreateSessionCompleteDelegates.RemoveAll(this);
+	}
+}
+
+void UCGameInstance::EndSessionCompleted(FName SessionName, bool bWasSuccessful)
+{
+	FGenericPlatformMisc::RequestExit(false);
+}
+
+void UCGameInstance::TerminateSessionServer()
+{
+	if (IOnlineSessionPtr SessionPtr = UNetFunctionLibrary::GetSessionPtr())
+	{
+		SessionPtr->OnEndSessionCompleteDelegates.RemoveAll(this);
+		SessionPtr->OnEndSessionCompleteDelegates.AddUObject(this, &ThisClass::EndSessionCompleted);
+		if (!SessionPtr->EndSession(FName(ServerSessionName)))
+		{
+			FGenericPlatformMisc::RequestExit(false);
+		}
+	}
+	else
+	{
+		FGenericPlatformMisc::RequestExit(false);
+	}
+}
+
+void UCGameInstance::WaitPlayerJoinTimeOutReached()
+{
+	Debug::Print(FString::Printf(
+			TEXT("Session Sever shut down after %.1f seconds without player joining"), WaitPlayerJoinTimeOutDuration)
+	);
+	TerminateSessionServer();
 }
 
 void UCGameInstance::LoadLevelAndListen(TSoftObjectPtr<UWorld> Level)
@@ -55,6 +111,16 @@ void UCGameInstance::LoadLevelAndListen(TSoftObjectPtr<UWorld> Level)
 
 	if (LevelURL != "")
 	{
-		GetWorld()->ServerTravel(LevelURL.ToString() + "?listen");
+		FString TravelStr = "";
+		if (SessionServerPort == 0)
+		{
+			TravelStr = FString::Printf(TEXT("%s?listen"), *LevelURL.ToString());
+		}
+		else
+		{
+			TravelStr = FString::Printf(TEXT("%s?listen?port=%d"), *LevelURL.ToString(), SessionServerPort);
+		}
+		Debug::Print(FString::Printf(TEXT("Server traveling to: %s"), *TravelStr));
+		GetWorld()->ServerTravel(TravelStr);
 	}
 }
