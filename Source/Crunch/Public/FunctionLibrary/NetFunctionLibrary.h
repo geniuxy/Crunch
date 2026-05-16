@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
+#include "OnlineSubsystem.h"
 #include "NetFunctionLibrary.generated.h"
 
 /**
@@ -15,6 +16,11 @@ class CRUNCH_API UNetFunctionLibrary : public UBlueprintFunctionLibrary
 	GENERATED_BODY()
 
 public:
+	static FOnlineSessionSettings GenerateOnlineSessionSettings(const FName& SessionName, const FString& SessionSearchId, int Port);
+
+	static IOnlineSessionPtr GetSessionPtr();
+	static IOnlineIdentityPtr GetIdentityPtr();
+	
 	static uint8 GetPlayerCountPerTeam();
 
 	static bool IsSessionServer(const UObject* WorldContextObject);

@@ -4,6 +4,8 @@
 #include "FrameWork/CGameInstance.h"
 
 #include "CrunchDebugHelper.h"
+#include "OnlineSessionSettings.h"
+#include "Interfaces/OnlineSessionInterface.h"
 #include "FunctionLibrary/NetFunctionLibrary.h"
 
 void UCGameInstance::StartMatch()
@@ -26,14 +28,25 @@ void UCGameInstance::Init()
 
 void UCGameInstance::CreateSession()
 {
-	ServerSessionName = UNetFunctionLibrary::GetSessionNameStr();
-	FString SessionSearchId = UNetFunctionLibrary::GetSessionSearchIdStr();
-	SessionServerPort = UNetFunctionLibrary::GetSessionPort();
+	IOnlineSessionPtr SessionPtr = UNetFunctionLibrary::GetSessionPtr();
+	if (SessionPtr)
+	{
+		ServerSessionName = UNetFunctionLibrary::GetSessionNameStr();
+		FString SessionSearchId = UNetFunctionLibrary::GetSessionSearchIdStr();
+		SessionServerPort = UNetFunctionLibrary::GetSessionPort();
+		Debug::Print(FString::Printf(
+				TEXT("#### Create Session With Name: %s, ID: %s, Port: %d"),
+				*(ServerSessionName), *(SessionSearchId), SessionServerPort)
+		);
 
-	Debug::Print(FString::Printf(
-			TEXT("#### Create Session With Name: %s, ID: %s, Port: %d"),
-			*(ServerSessionName), *(SessionSearchId), SessionServerPort)
-	);
+		FOnlineSessionSettings OnlineSessionSettings = UNetFunctionLibrary::GenerateOnlineSessionSettings(
+			FName(ServerSessionName), SessionSearchId, SessionServerPort
+		);
+		if (!SessionPtr->CreateSession(0, FName(ServerSessionName), OnlineSessionSettings))
+		{
+			Debug::Print(TEXT("Session Creating Failed Right away!!!!"));
+		}
+	}
 }
 
 void UCGameInstance::LoadLevelAndListen(TSoftObjectPtr<UWorld> Level)
