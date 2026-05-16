@@ -6,7 +6,7 @@
 #include "OnlineSessionSettings.h"
 
 FOnlineSessionSettings UNetFunctionLibrary::GenerateOnlineSessionSettings(
-	const FName& SessionName, const FString& SessionSearchId, int Port)
+	const FName& SessionName, const FString& SessionSearchID, int Port)
 {
 	FOnlineSessionSettings OnlineSessionSettings;
 	OnlineSessionSettings.bIsLANMatch = false;
@@ -25,7 +25,7 @@ FOnlineSessionSettings UNetFunctionLibrary::GenerateOnlineSessionSettings(
 		GetSessionNameKey(), SessionName.ToString(), EOnlineDataAdvertisementType::ViaOnlineServiceAndPing
 	);
 	OnlineSessionSettings.Set(
-		GetSessionSearchIdKey(), SessionSearchId, EOnlineDataAdvertisementType::ViaOnlineServiceAndPing
+		GetSessionSearchIDKey(), SessionSearchID, EOnlineDataAdvertisementType::ViaOnlineServiceAndPing
 	);
 	OnlineSessionSettings.Set(
 		GetPortKey(), Port, EOnlineDataAdvertisementType::ViaOnlineServiceAndPing
@@ -74,12 +74,12 @@ FName UNetFunctionLibrary::GetSessionNameKey()
 	return FName("SESSION_NAME");
 }
 
-FString UNetFunctionLibrary::GetSessionSearchIdStr()
+FString UNetFunctionLibrary::GetSessionSearchIDStr()
 {
-	return GetCommandLineArgAsString(GetSessionSearchIdKey());
+	return GetCommandLineArgAsString(GetSessionSearchIDKey());
 }
 
-FName UNetFunctionLibrary::GetSessionSearchIdKey()
+FName UNetFunctionLibrary::GetSessionSearchIDKey()
 {
 	return FName("SESSION_SEARCH_ID");
 }

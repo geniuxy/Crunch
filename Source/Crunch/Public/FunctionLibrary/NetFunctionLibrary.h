@@ -16,7 +16,7 @@ class CRUNCH_API UNetFunctionLibrary : public UBlueprintFunctionLibrary
 	GENERATED_BODY()
 
 public:
-	static FOnlineSessionSettings GenerateOnlineSessionSettings(const FName& SessionName, const FString& SessionSearchId, int Port);
+	static FOnlineSessionSettings GenerateOnlineSessionSettings(const FName& SessionName, const FString& SessionSearchID, int Port);
 
 	static IOnlineSessionPtr GetSessionPtr();
 	static IOnlineIdentityPtr GetIdentityPtr();
@@ -28,8 +28,8 @@ public:
 	static FString GetSessionNameStr();
 	static FName GetSessionNameKey();
 
-	static FString GetSessionSearchIdStr();
-	static FName GetSessionSearchIdKey();
+	static FString GetSessionSearchIDStr();
+	static FName GetSessionSearchIDKey();
 
 	static int GetSessionPort();
 	static FName GetPortKey();

@@ -26,21 +26,42 @@ void UCGameInstance::Init()
 	}
 }
 
+void UCGameInstance::PlayerJoined(const FUniqueNetIdRepl& UniqueId)
+{
+	if (WaitPlayerJoinTimeoutHandle.IsValid())
+	{
+		GetWorld()->GetTimerManager().ClearTimer(WaitPlayerJoinTimeoutHandle);
+	}
+	
+	PlayerRecord.Add(UniqueId);
+}
+
+void UCGameInstance::PlayerLeft(const FUniqueNetIdRepl& UniqueId)
+{
+	PlayerRecord.Remove(UniqueId);
+
+	if (PlayerRecord.Num() == 0)
+	{
+		Debug::Print(TEXT("All player left the session, terminating"));
+		TerminateSessionServer();
+	}
+}
+
 void UCGameInstance::CreateSession()
 {
 	IOnlineSessionPtr SessionPtr = UNetFunctionLibrary::GetSessionPtr();
 	if (SessionPtr)
 	{
 		ServerSessionName = UNetFunctionLibrary::GetSessionNameStr();
-		FString SessionSearchId = UNetFunctionLibrary::GetSessionSearchIdStr();
+		FString SessionSearchID = UNetFunctionLibrary::GetSessionSearchIDStr();
 		SessionServerPort = UNetFunctionLibrary::GetSessionPort();
 		Debug::Print(FString::Printf(
 				TEXT("#### Create Session With Name: %s, ID: %s, Port: %d"),
-				*(ServerSessionName), *(SessionSearchId), SessionServerPort)
+				*(ServerSessionName), *(SessionSearchID), SessionServerPort)
 		);
 
 		FOnlineSessionSettings OnlineSessionSettings = UNetFunctionLibrary::GenerateOnlineSessionSettings(
-			FName(ServerSessionName), SessionSearchId, SessionServerPort
+			FName(ServerSessionName), SessionSearchID, SessionServerPort
 		);
 		SessionPtr->OnCreateSessionCompleteDelegates.RemoveAll(this);
 		SessionPtr->OnCreateSessionCompleteDelegates.AddUObject(this, &ThisClass::OnSessionCreated);
@@ -50,6 +71,11 @@ void UCGameInstance::CreateSession()
 			SessionPtr->OnCreateSessionCompleteDelegates.RemoveAll(this);
 			TerminateSessionServer();
 		}
+	}
+	else
+	{
+		Debug::Print(TEXT("Can't find SessionPtr, Terminating"));
+		TerminateSessionServer();
 	}
 }
 

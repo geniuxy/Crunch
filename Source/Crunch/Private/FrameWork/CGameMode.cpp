@@ -7,8 +7,14 @@
 #include "EngineUtils.h"
 #include "Characters/CStormCore.h"
 #include "GameFramework/PlayerStart.h"
+#include "NetWork/CGameSession.h"
 #include "Player/CPlayerController.h"
 #include "Player/CPlayerState.h"
+
+ACGameMode::ACGameMode()
+{
+	GameSessionClass = ACGameSession::StaticClass();
+}
 
 void ACGameMode::StartPlay()
 {
