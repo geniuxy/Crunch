@@ -1,7 +1,7 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Crunch/Public/FrameWork/CGameMode.h"
+#include "Crunch/Public/FrameWork/GameModes/CGameMode.h"
 
 #include "CrunchDebugHelper.h"
 #include "EngineUtils.h"
