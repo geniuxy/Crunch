@@ -14,7 +14,7 @@ void UMainMenuWidget::NativeConstruct()
 	CGameInstance = GetGameInstance<UCGameInstance>();
 	if (CGameInstance)
 	{
-		
+		CGameInstance->OnLoginCompleted.AddUObject(this, &ThisClass::LoginCompleted);
 	}
 
 	LoginButton->OnClicked.AddDynamic(this, &ThisClass::LoginButtonClicked);
@@ -23,6 +23,10 @@ void UMainMenuWidget::NativeConstruct()
 void UMainMenuWidget::LoginButtonClicked()
 {
 	Debug::Print(TEXT("正在登录中！"));
+	if (CGameInstance)
+	{
+		CGameInstance->ClientAccountPortalLogin();
+	}
 }
 
 void UMainMenuWidget::LoginCompleted(bool bWasSuccessful, const FString& PlayerNickName, const FString& ErrorMsg)

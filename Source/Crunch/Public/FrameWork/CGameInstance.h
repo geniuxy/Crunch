@@ -6,6 +6,9 @@
 #include "Engine/GameInstance.h"
 #include "CGameInstance.generated.h"
 
+DECLARE_MULTICAST_DELEGATE_ThreeParams(
+	FOnLoginCompleted, bool /* bWasSuccessful */, const FString& /* PlayerNickName */, const FString& /* ErrorMsg */
+)
 /**
  * 
  */
@@ -19,17 +22,33 @@ public:
 	virtual void Init() override;
 
 	/**********************************************************************/
+	/*                              Login                                 */
+	/**********************************************************************/
+public:
+	bool IsLoggedIn() const;
+	bool IsLoggingIn() const;
+	void ClientAccountPortalLogin();
+
+	FOnLoginCompleted OnLoginCompleted;
+
+private:
+	void ClientLogin(const FString& Type, const FString& ID, const FString& Token);
+	void LoginCompleted(int NumOfLocalPlayer, bool bWasSuccessful, const FUniqueNetId& UserID, const FString& Error);
+
+	FDelegateHandle LoggingInDelegateHandle;
+
+	/**********************************************************************/
 	/*                          Session Server                            */
 	/**********************************************************************/
 public:
 	void PlayerJoined(const FUniqueNetIdRepl& UniqueId);
 	void PlayerLeft(const FUniqueNetIdRepl& UniqueId);
-	
+
 private:
 	void CreateSession();
 	void OnSessionCreated(FName SessionName, bool bWasSuccessful);
 	void EndSessionCompleted(FName SessionName, bool bWasSuccessful);
-	
+
 	FString ServerSessionName;
 	int SessionServerPort;
 
@@ -50,10 +69,10 @@ private:
 private:
 	UPROPERTY(EditDefaultsOnly, Category="Map")
 	TSoftObjectPtr<UWorld> MainMenuLevel;
-	
+
 	UPROPERTY(EditDefaultsOnly, Category="Map")
 	TSoftObjectPtr<UWorld> LobbyLevel;
-	
+
 	UPROPERTY(EditDefaultsOnly, Category="Map")
 	TSoftObjectPtr<UWorld> GameLevel;
 

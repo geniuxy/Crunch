@@ -6,6 +6,7 @@
 #include "CrunchDebugHelper.h"
 #include "OnlineSessionSettings.h"
 #include "Interfaces/OnlineSessionInterface.h"
+#include "Interfaces/OnlineIdentityInterface.h"
 #include "FunctionLibrary/NetFunctionLibrary.h"
 
 void UCGameInstance::StartMatch()
@@ -26,13 +27,86 @@ void UCGameInstance::Init()
 	}
 }
 
+bool UCGameInstance::IsLoggedIn() const
+{
+	if (IOnlineIdentityPtr IdentityPtr = UNetFunctionLibrary::GetIdentityPtr())
+	{
+		return IdentityPtr->GetLoginStatus(0) == ELoginStatus::LoggedIn;
+	}
+	return false;
+}
+
+bool UCGameInstance::IsLoggingIn() const
+{
+	return LoggingInDelegateHandle.IsValid();
+}
+
+void UCGameInstance::ClientAccountPortalLogin()
+{
+	ClientLogin("AccountPortal", "", "");
+}
+
+void UCGameInstance::ClientLogin(const FString& Type, const FString& ID, const FString& Token)
+{
+	if (IOnlineIdentityPtr IdentityPtr = UNetFunctionLibrary::GetIdentityPtr())
+	{
+		if (LoggingInDelegateHandle.IsValid())
+		{
+			IdentityPtr->OnLoginCompleteDelegates->Remove(LoggingInDelegateHandle);
+			LoggingInDelegateHandle.Reset();
+		}
+
+		LoggingInDelegateHandle = IdentityPtr->OnLoginCompleteDelegates->AddUObject(this, &ThisClass::LoginCompleted);
+		if (!IdentityPtr->Login(0, FOnlineAccountCredentials(Type, ID, Token)))
+		{
+			Debug::Print(TEXT("登入失败"));
+			if (LoggingInDelegateHandle.IsValid())
+			{
+				IdentityPtr->OnLoginCompleteDelegates->Remove(LoggingInDelegateHandle);
+				LoggingInDelegateHandle.Reset();
+			}
+			OnLoginCompleted.Broadcast(false, "", "登入失败");
+		}
+	}
+}
+
+void UCGameInstance::LoginCompleted(
+	int NumOfLocalPlayer, bool bWasSuccessful, const FUniqueNetId& UserID, const FString& Error)
+{
+	if (IOnlineIdentityPtr IdentityPtr = UNetFunctionLibrary::GetIdentityPtr())
+	{
+		if (LoggingInDelegateHandle.IsValid())
+		{
+			IdentityPtr->OnLoginCompleteDelegates->Remove(LoggingInDelegateHandle);
+			LoggingInDelegateHandle.Reset();
+		}
+
+		FString PlayerNickName = "";
+		if (bWasSuccessful)
+		{
+			PlayerNickName = IdentityPtr->GetPlayerNickname(UserID);
+			Debug::Print(FString::Printf(TEXT("登录成功，用户名为: %s"), *(PlayerNickName)));
+		}
+		else
+		{
+			Debug::Print(FString::Printf(TEXT("登录失败，原因为: %s"), *(Error)));
+		}
+
+		OnLoginCompleted.Broadcast(bWasSuccessful, PlayerNickName, Error);
+	}
+	else
+	{
+		OnLoginCompleted.Broadcast(false, "", TEXT("Can't find the Identity Pointer"));
+	}
+}
+
 void UCGameInstance::PlayerJoined(const FUniqueNetIdRepl& UniqueId)
 {
 	if (WaitPlayerJoinTimeoutHandle.IsValid())
 	{
 		GetWorld()->GetTimerManager().ClearTimer(WaitPlayerJoinTimeoutHandle);
 	}
-	
+
 	PlayerRecord.Add(UniqueId);
 }
 
