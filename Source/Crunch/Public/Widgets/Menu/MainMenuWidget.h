@@ -6,6 +6,8 @@
 #include "Blueprint/UserWidget.h"
 #include "MainMenuWidget.generated.h"
 
+class FOnButtonClickedEvent;
+class UWaitingWidget;
 class UButton;
 class UCGameInstance;
 class UWidgetSwitcher;
@@ -28,13 +30,19 @@ private:
 
 	UPROPERTY()
 	UCGameInstance* CGameInstance;
+
+	void SwitchToMainWidget();
+
+	UPROPERTY(meta=(BindWidget))
+	UWidget* MainWidgetRoot;
+
 	/**********************************************************************/
 	/*                              Login                                 */
 	/**********************************************************************/
 private:
 	UPROPERTY(meta=(BindWidget))
 	UWidget* LoginWidgetRoot;
-	
+
 	UPROPERTY(meta=(BindWidget))
 	UButton* LoginButton;
 
@@ -42,4 +50,13 @@ private:
 	void LoginButtonClicked();
 
 	void LoginCompleted(bool bWasSuccessful, const FString& PlayerNickName, const FString& ErrorMsg);
+
+	/**********************************************************************/
+	/*                             Waiting                                */
+	/**********************************************************************/
+private:
+	UPROPERTY(meta=(BindWidget))
+	UWaitingWidget* WaitingWidget;
+
+	FOnButtonClickedEvent& SwitchToWaitingWidget(const FText& WaitingInfo, bool bAllowCancel = false);
 };
