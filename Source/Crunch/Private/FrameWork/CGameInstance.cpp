@@ -100,6 +100,16 @@ void UCGameInstance::LoginCompleted(
 	}
 }
 
+void UCGameInstance::RequestCreateAndJoinSession(const FName& NewSessionName)
+{
+	Debug::Print(TEXT("请求创建并加入房间"), NewSessionName.ToString());
+}
+
+void UCGameInstance::CancelSessionCreation()
+{
+	Debug::Print(TEXT("取消创建房间"));
+}
+
 void UCGameInstance::PlayerJoined(const FUniqueNetIdRepl& UniqueId)
 {
 	if (WaitPlayerJoinTimeoutHandle.IsValid())

@@ -6,6 +6,7 @@
 #include "Blueprint/UserWidget.h"
 #include "MainMenuWidget.generated.h"
 
+class UEditableText;
 class FOnButtonClickedEvent;
 class UWaitingWidget;
 class UButton;
@@ -35,6 +36,25 @@ private:
 
 	UPROPERTY(meta=(BindWidget))
 	UWidget* MainWidgetRoot;
+
+	/**********************************************************************/
+	/*                             Session                                */
+	/**********************************************************************/
+private:
+	UPROPERTY(meta=(BindWidget))
+	UButton* CreateSessionButton;
+
+	UPROPERTY(meta=(BindWidget))
+	UEditableText* NewSessionNameText;
+
+	UFUNCTION()
+	void CreateSessuibButtonClicked();
+
+	UFUNCTION()
+	void CancelSessionCreation();
+
+	UFUNCTION()
+	void NewSessionNameTextChanged(const FText& NewText);
 
 	/**********************************************************************/
 	/*                              Login                                 */

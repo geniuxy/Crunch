@@ -5,6 +5,7 @@
 
 #include "CrunchDebugHelper.h"
 #include "Components/Button.h"
+#include "Components/EditableText.h"
 #include "Components/WidgetSwitcher.h"
 #include "FrameWork/CGameInstance.h"
 #include "Widgets/Menu/WaitingWidget.h"
@@ -24,6 +25,11 @@ void UMainMenuWidget::NativeConstruct()
 	}
 
 	LoginButton->OnClicked.AddDynamic(this, &ThisClass::LoginButtonClicked);
+
+	CreateSessionButton->OnClicked.AddDynamic(this, &ThisClass::CreateSessuibButtonClicked);
+	CreateSessionButton->SetIsEnabled(false);
+
+	NewSessionNameText->OnTextChanged.AddDynamic(this, &ThisClass::NewSessionNameTextChanged);
 }
 
 void UMainMenuWidget::SwitchToMainWidget()
@@ -32,6 +38,31 @@ void UMainMenuWidget::SwitchToMainWidget()
 	{
 		MainSwitcher->SetActiveWidget(MainWidgetRoot);
 	}
+}
+
+void UMainMenuWidget::CreateSessuibButtonClicked()
+{
+	if (CGameInstance && CGameInstance->IsLoggedIn())
+	{
+		CGameInstance->RequestCreateAndJoinSession(FName(NewSessionNameText->GetText().ToString()));
+		SwitchToWaitingWidget(FText::FromString(TEXT("创建房间中")), true).AddDynamic(
+			this, &ThisClass::CancelSessionCreation
+		);
+	}
+}
+
+void UMainMenuWidget::CancelSessionCreation()
+{
+	if (CGameInstance)
+	{
+		CGameInstance->CancelSessionCreation();
+	}
+	SwitchToMainWidget();
+}
+
+void UMainMenuWidget::NewSessionNameTextChanged(const FText& NewText)
+{
+	CreateSessionButton->SetIsEnabled(!NewText.IsEmpty());
 }
 
 void UMainMenuWidget::LoginButtonClicked()

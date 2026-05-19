@@ -18,4 +18,9 @@ namespace Debug
 	{
 		Print(FString::Printf(TEXT("%s: %f"), *Msg, InValue));
 	}
+
+	static void Print(const FString& Msg, const FString& InStr)
+	{
+		Print(FString::Printf(TEXT("%s: %s"), *Msg, *InStr));
+	}
 }
