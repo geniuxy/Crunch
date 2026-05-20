@@ -4,10 +4,12 @@
 #include "FrameWork/CGameInstance.h"
 
 #include "CrunchDebugHelper.h"
+#include "HttpModule.h"
 #include "OnlineSessionSettings.h"
 #include "Interfaces/OnlineSessionInterface.h"
 #include "Interfaces/OnlineIdentityInterface.h"
 #include "FunctionLibrary/NetFunctionLibrary.h"
+#include "Interfaces/IHttpRequest.h"
 
 void UCGameInstance::StartMatch()
 {
@@ -103,6 +105,11 @@ void UCGameInstance::LoginCompleted(
 void UCGameInstance::RequestCreateAndJoinSession(const FName& NewSessionName)
 {
 	Debug::Print(TEXT("请求创建并加入房间"), NewSessionName.ToString());
+	FHttpRequestRef Request = FHttpModule::Get().CreateRequest();
+	FGuid SessionSearchID = FGuid::NewGuid();
+
+	FString CoordinatorURL = UNetFunctionLibrary::GetCoordinatorURL();
+	Debug::Print(TEXT("发送创建房间请求至URL"), CoordinatorURL);
 }
 
 void UCGameInstance::CancelSessionCreation()

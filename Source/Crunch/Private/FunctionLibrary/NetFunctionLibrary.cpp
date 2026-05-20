@@ -3,6 +3,7 @@
 
 #include "FunctionLibrary/NetFunctionLibrary.h"
 
+#include "CrunchDebugHelper.h"
 #include "OnlineSessionSettings.h"
 
 FOnlineSessionSettings UNetFunctionLibrary::GenerateOnlineSessionSettings(
@@ -92,6 +93,29 @@ int UNetFunctionLibrary::GetSessionPort()
 FName UNetFunctionLibrary::GetPortKey()
 {
 	return FName("PORT");
+}
+
+FName UNetFunctionLibrary::GetCoordinatorURLKey()
+{
+	return FName("COORDINATOR_URL");
+}
+
+FString UNetFunctionLibrary::GetCoordinatorURL()
+{
+	FString CoordinatorURL = GetCommandLineArgAsString(GetCoordinatorURLKey());
+	if (CoordinatorURL != "")
+	{
+		return CoordinatorURL;
+	}
+	return GetDefaultCoordinatorURL();
+}
+
+FString UNetFunctionLibrary::GetDefaultCoordinatorURL()
+{
+	FString CoordinatorURL = "";
+	GConfig->GetString(TEXT("Crunch.Net"), TEXT("CoordinatorURL"), CoordinatorURL, GGameIni);
+	Debug::Print(TEXT("默认的协调器URL地址"), CoordinatorURL);
+	return CoordinatorURL;
 }
 
 FString UNetFunctionLibrary::GetCommandLineArgAsString(const FName& ParamName)
