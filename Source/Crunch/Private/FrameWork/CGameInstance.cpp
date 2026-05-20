@@ -109,12 +109,45 @@ void UCGameInstance::RequestCreateAndJoinSession(const FName& NewSessionName)
 	FGuid SessionSearchID = FGuid::NewGuid();
 
 	FString CoordinatorURL = UNetFunctionLibrary::GetCoordinatorURL();
-	Debug::Print(TEXT("发送创建房间请求至URL"), CoordinatorURL);
+	FString URL = FString::Printf(TEXT("%s/Sessions"), *CoordinatorURL);
+	Debug::Print(TEXT("发送创建房间请求至URL"), URL);
+
+	Request->SetURL(URL);
+	Request->SetVerb("Post");
+	Request->SetHeader(TEXT("Content-type"), TEXT("application/json"));
+
+	TSharedPtr<FJsonObject> JsonObject = MakeShareable(new FJsonObject);
+	JsonObject->SetStringField(UNetFunctionLibrary::GetSessionNameKey().ToString(), NewSessionName.ToString());
+	JsonObject->SetStringField(UNetFunctionLibrary::GetSessionSearchIDKey().ToString(), SessionSearchID.ToString());
+
+	FString RequestBody;
+	TSharedRef<TJsonWriter<>> Writer = TJsonWriterFactory<>::Create(&RequestBody);
+	FJsonSerializer::Serialize(JsonObject.ToSharedRef(), Writer);
+
+	Request->SetContentAsString(RequestBody);
+	Request->OnProcessRequestComplete().BindUObject(this, &ThisClass::SessionCreationRequestCompleted, SessionSearchID);
+
+	if (!Request->ProcessRequest())
+	{
+		Debug::Print(TEXT("请求创建房间失败！"));
+	}
 }
 
 void UCGameInstance::CancelSessionCreation()
 {
 	Debug::Print(TEXT("取消创建房间"));
+}
+
+void UCGameInstance::SessionCreationRequestCompleted(
+	FHttpRequestPtr Request, FHttpResponsePtr Response, bool bConnectedSuccessfully, FGuid SessionSearchID)
+{
+	if (bConnectedSuccessfully)
+	{
+		Debug::Print(TEXT("连接至协调器地址失败！"));
+		return;
+	}
+
+	Debug::Print(TEXT("连接至协调器地址成功！"));
 }
 
 void UCGameInstance::PlayerJoined(const FUniqueNetIdRepl& UniqueId)
