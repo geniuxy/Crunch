@@ -10,6 +10,7 @@
 #include "Interfaces/OnlineIdentityInterface.h"
 #include "FunctionLibrary/NetFunctionLibrary.h"
 #include "Interfaces/IHttpRequest.h"
+#include "Interfaces/IHttpResponse.h"
 
 void UCGameInstance::StartMatch()
 {
@@ -148,6 +149,79 @@ void UCGameInstance::SessionCreationRequestCompleted(
 	}
 
 	Debug::Print(TEXT("连接至协调器地址成功！"));
+	int32 ResponseCode = Response->GetResponseCode();
+	if (ResponseCode != 200)
+	{
+		Debug::Print(TEXT("房间会话创建失败, 错误代码为"), ResponseCode);
+		return;
+	}
+
+	FString ResponseStr = Response->GetContentAsString();
+
+	TSharedPtr<FJsonObject> JsonObject;
+	TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(ResponseStr);
+	int32 Port = 0;
+
+	if (FJsonSerializer::Deserialize(Reader, JsonObject) && JsonObject.IsValid())
+	{
+		Port = JsonObject->GetIntegerField(*UNetFunctionLibrary::GetPortKey().ToString());
+	}
+
+	Debug::Print(TEXT("连接至协调器地址成功，并且新房间会话创建于端口"), Port);
+	StartFindingCreatedSession(SessionSearchID);
+}
+
+void UCGameInstance::StartFindingCreatedSession(const FGuid& SessionSearchId)
+{
+	if (!SessionSearchId.IsValid())
+	{
+		Debug::Print(TEXT("SessionSearchId（会话搜寻ID）无效，无法开始寻找会话!"));
+		return;
+	}
+	StopAllSessionFindings();
+	Debug::Print(TEXT("开始寻找创建的房间会话，SessionSearchId（会话搜寻ID）为"), SessionSearchId.ToString());
+
+	GetWorld()->GetTimerManager().SetTimer(
+		FindCreatedSessionTimerHandle,
+		FTimerDelegate::CreateUObject(this, &ThisClass::FindCreatedSession, SessionSearchId),
+		FindCreatedSessionSearchInterval,
+		true,
+		0.f
+	);
+
+	GetWorld()->GetTimerManager().SetTimer(
+		FindCreatedSessionTimeoutHandle,
+		this,
+		&ThisClass::FindCreatedSessionTimeout,
+		FindCreatedSessionTimeoutDuration
+	);
+}
+
+void UCGameInstance::StopAllSessionFindings()
+{
+	Debug::Print(TEXT("暂停所有的搜寻会话行为."));
+	StopFindingCreatedSession();
+	StopGlobalSessionSearch();
+}
+
+void UCGameInstance::StopFindingCreatedSession()
+{
+	Debug::Print(TEXT("暂停寻找创建的会话.."));
+}
+
+void UCGameInstance::StopGlobalSessionSearch()
+{
+	Debug::Print(TEXT("暂停搜寻全局会话.."));
+}
+
+void UCGameInstance::FindCreatedSession(FGuid SessionSearchID)
+{
+	Debug::Print(TEXT("尝试搜寻所创建的会话~~~~~~"));
+}
+
+void UCGameInstance::FindCreatedSessionTimeout()
+{
+	Debug::Print(TEXT("搜寻所创建的会话超时......"));
 }
 
 void UCGameInstance::PlayerJoined(const FUniqueNetIdRepl& UniqueId)
