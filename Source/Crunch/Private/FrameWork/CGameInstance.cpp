@@ -141,7 +141,7 @@ void UCGameInstance::CancelSessionCreation()
 void UCGameInstance::SessionCreationRequestCompleted(
 	FHttpRequestPtr Request, FHttpResponsePtr Response, bool bConnectedSuccessfully, FGuid SessionSearchID)
 {
-	if (bConnectedSuccessfully)
+	if (!bConnectedSuccessfully)
 	{
 		Debug::Print(TEXT("连接至协调器地址失败！"));
 		return;
