@@ -23,7 +23,7 @@ public:
 
 private:
 	UPROPERTY(EditDefaultsOnly, Category="Visual")
-	float PlayerTeamWidgetSlotMargin =  5.f;
+	float PlayerTeamWidgetSlotMargin = 5.f;
 
 	UPROPERTY(EditDefaultsOnly, Category="Visual")
 	TSubclassOf<UPlayerTeamSlotWidget> PlayerTeamSlotWidgetClass;
