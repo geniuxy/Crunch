@@ -217,11 +217,54 @@ void UCGameInstance::StopGlobalSessionSearch()
 void UCGameInstance::FindCreatedSession(FGuid SessionSearchID)
 {
 	Debug::Print(TEXT("尝试搜寻所创建的会话~~~~~~"));
+	IOnlineSessionPtr SessionPtr = UNetFunctionLibrary::GetSessionPtr();
+	if (!SessionPtr)
+	{
+		Debug::Print(TEXT("找不到SessionPtr, 取消搜索会话"));
+		return;
+	}
+
+	SessionSearch = MakeShareable(new FOnlineSessionSearch);
+	if (!SessionSearch)
+	{
+		Debug::Print(TEXT("创建SessionSearch失败, 取消搜索会话"));
+		return;
+	}
+
+	SessionSearch->bIsLanQuery = false;
+	SessionSearch->MaxSearchResults = 1;
+	SessionSearch->QuerySettings.Set(
+		UNetFunctionLibrary::GetSessionSearchIDKey(), SessionSearchID.ToString(), EOnlineComparisonOp::Equals
+	);
+
+	SessionPtr->OnFindSessionsCompleteDelegates.RemoveAll(this);
+	SessionPtr->OnFindSessionsCompleteDelegates.AddUObject(this, &ThisClass::FindCreatedSessionCompleted);
+	if (!SessionPtr->FindSessions(0, SessionSearch.ToSharedRef()))
+	{
+		Debug::Print(TEXT("寻找创建会话失败！......"));
+		SessionPtr->OnFindSessionsCompleteDelegates.RemoveAll(this);
+	}
 }
 
 void UCGameInstance::FindCreatedSessionTimeout()
 {
 	Debug::Print(TEXT("搜寻所创建的会话超时......"));
+}
+
+void UCGameInstance::FindCreatedSessionCompleted(bool bWasSuccessful)
+{
+	if (!bWasSuccessful || SessionSearch->SearchResults.Num() == 0)
+	{
+		return;
+	}
+
+	StopFindingCreatedSession();
+	JoinSessionWithSearchResult(SessionSearch->SearchResults[0]);
+}
+
+void UCGameInstance::JoinSessionWithSearchResult(const FOnlineSessionSearchResult& SearchResult)
+{
+	Debug::Print(TEXT("搜寻到会话结果，加入会话！"));
 }
 
 void UCGameInstance::PlayerJoined(const FUniqueNetIdRepl& UniqueId)

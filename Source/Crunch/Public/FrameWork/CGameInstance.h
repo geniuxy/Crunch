@@ -7,6 +7,8 @@
 #include "Interfaces/IHttpRequest.h"
 #include "CGameInstance.generated.h"
 
+class FOnlineSessionSearch;
+
 DECLARE_MULTICAST_DELEGATE_ThreeParams(
 	FOnLoginCompleted, bool /* bWasSuccessful */, const FString& /* PlayerNickName */, const FString& /* ErrorMsg */
 )
@@ -65,6 +67,10 @@ private:
 
 	void FindCreatedSession(FGuid SessionSearchID);
 	void FindCreatedSessionTimeout();
+	void FindCreatedSessionCompleted(bool bWasSuccessful);
+	void JoinSessionWithSearchResult(const FOnlineSessionSearchResult& SearchResult);
+	
+	TSharedPtr<FOnlineSessionSearch> SessionSearch;
 
 	/**********************************************************************/
 	/*                          Session Server                            */
