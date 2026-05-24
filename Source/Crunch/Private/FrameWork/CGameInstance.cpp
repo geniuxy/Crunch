@@ -137,6 +137,20 @@ void UCGameInstance::RequestCreateAndJoinSession(const FName& NewSessionName)
 void UCGameInstance::CancelSessionCreation()
 {
 	Debug::Print(TEXT("取消创建房间"));
+	StopAllSessionFindings();
+
+	if (IOnlineSessionPtr SessionPtr = UNetFunctionLibrary::GetSessionPtr())
+	{
+		SessionPtr->OnFindSessionsCompleteDelegates.RemoveAll(this);
+		SessionPtr->OnJoinSessionCompleteDelegates.RemoveAll(this);
+	}
+
+	StartGlobalSessionSearch();
+}
+
+void UCGameInstance::StartGlobalSessionSearch()
+{
+	Debug::Print(TEXT("开始全局会话搜寻"));
 }
 
 void UCGameInstance::SessionCreationRequestCompleted(
@@ -207,6 +221,14 @@ void UCGameInstance::StopAllSessionFindings()
 void UCGameInstance::StopFindingCreatedSession()
 {
 	Debug::Print(TEXT("暂停寻找创建的会话.."));
+	GetWorld()->GetTimerManager().ClearTimer(FindCreatedSessionTimerHandle);
+	GetWorld()->GetTimerManager().ClearTimer(FindCreatedSessionTimeoutHandle);
+
+	if (IOnlineSessionPtr SessionPtr = UNetFunctionLibrary::GetSessionPtr())
+	{
+		SessionPtr->OnFindSessionsCompleteDelegates.RemoveAll(this);
+		SessionPtr->OnJoinSessionCompleteDelegates.RemoveAll(this);
+	}
 }
 
 void UCGameInstance::StopGlobalSessionSearch()
@@ -249,6 +271,7 @@ void UCGameInstance::FindCreatedSession(FGuid SessionSearchID)
 void UCGameInstance::FindCreatedSessionTimeout()
 {
 	Debug::Print(TEXT("搜寻所创建的会话超时......"));
+	StopFindingCreatedSession();
 }
 
 void UCGameInstance::FindCreatedSessionCompleted(bool bWasSuccessful)
@@ -265,6 +288,22 @@ void UCGameInstance::FindCreatedSessionCompleted(bool bWasSuccessful)
 void UCGameInstance::JoinSessionWithSearchResult(const FOnlineSessionSearchResult& SearchResult)
 {
 	Debug::Print(TEXT("搜寻到会话结果，加入会话！"));
+	IOnlineSessionPtr SessionPtr = UNetFunctionLibrary::GetSessionPtr();
+	if (!SessionPtr)
+	{
+		Debug::Print(TEXT("找不到SessionPtr, 取消加入会话"));
+		return;
+	}
+
+	FString SessionName = "";
+	SearchResult.Session.SessionSettings.Get<FString>(UNetFunctionLibrary::GetSessionNameKey(), SessionName);
+
+	const FOnlineSessionSetting* PortSetting =
+		SearchResult.Session.SessionSettings.Settings.Find(UNetFunctionLibrary::GetPortKey());
+	int64 Port = 7777;
+	PortSetting->Data.GetValue(Port);
+
+	Debug::Print(FString::Printf(TEXT("尝试加入会话：%s, 端口：%lld"), *SessionName, Port));
 }
 
 void UCGameInstance::PlayerJoined(const FUniqueNetIdRepl& UniqueId)

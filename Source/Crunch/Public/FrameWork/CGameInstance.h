@@ -46,6 +46,7 @@ private:
 public:
 	void RequestCreateAndJoinSession(const FName& NewSessionName);
 	void CancelSessionCreation();
+	void StartGlobalSessionSearch();
 
 private:
 	void SessionCreationRequestCompleted(
