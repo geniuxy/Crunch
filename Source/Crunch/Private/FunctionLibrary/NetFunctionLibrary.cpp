@@ -118,6 +118,25 @@ FString UNetFunctionLibrary::GetDefaultCoordinatorURL()
 	return CoordinatorURL;
 }
 
+FString UNetFunctionLibrary::GetTestingURL()
+{
+	FString TestURL = GetCommandLineArgAsString(GetTestingURLKey());
+	Debug::Print(TEXT("获取测试URL"), TestURL);
+	return TestURL;
+}
+
+FName UNetFunctionLibrary::GetTestingURLKey()
+{
+	return FName("TESTING_URL");
+}
+
+void UNetFunctionLibrary::ReplacePort(FString& OutURLStr, int NewPort)
+{
+	FURL URL(nullptr, *OutURLStr, TRAVEL_Absolute);
+	URL.Port = NewPort;
+	OutURLStr = URL.ToString();
+}
+
 FString UNetFunctionLibrary::GetCommandLineArgAsString(const FName& ParamName)
 {
 	FString OutVal = "";

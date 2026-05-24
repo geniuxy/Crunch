@@ -304,6 +304,52 @@ void UCGameInstance::JoinSessionWithSearchResult(const FOnlineSessionSearchResul
 	PortSetting->Data.GetValue(Port);
 
 	Debug::Print(FString::Printf(TEXT("尝试加入会话：%s, 端口：%lld"), *SessionName, Port));
+	SessionPtr->OnJoinSessionCompleteDelegates.RemoveAll(this);
+	SessionPtr->OnJoinSessionCompleteDelegates.AddUObject(this, &ThisClass::JoinSessionCompleted, (int)Port);
+	if (!SessionPtr->JoinSession(0, FName(SessionName), SearchResult))
+	{
+		Debug::Print(TEXT("加入会话失败！......"));
+		SessionPtr->OnJoinSessionCompleteDelegates.RemoveAll(this);
+		OnJoinSessionFailed.Broadcast();
+	}
+}
+
+void UCGameInstance::JoinSessionCompleted(FName SessionName, EOnJoinSessionCompleteResult::Type JoinResult, int Port)
+{
+	IOnlineSessionPtr SessionPtr = UNetFunctionLibrary::GetSessionPtr();
+	if (!SessionPtr)
+	{
+		Debug::Print(TEXT("加入会话完成，但是找不到SessionPtr"));
+		OnJoinSessionFailed.Broadcast();
+		return;
+	}
+
+	if (JoinResult == EOnJoinSessionCompleteResult::Success)
+	{
+		StopAllSessionFindings();
+		Debug::Print(FString::Printf(TEXT("成功加入会话：%s, 端口：%d"), *SessionName.ToString(), Port));
+
+		FString TravelURL = "";
+		SessionPtr->GetResolvedConnectString(SessionName, TravelURL);
+
+		FString TestingURL = UNetFunctionLibrary::GetTestingURL();
+		if (!TestingURL.IsEmpty())
+		{
+			TravelURL = TestingURL;
+		}
+
+		UNetFunctionLibrary::ReplacePort(TravelURL, Port);
+
+		Debug::Print(TEXT("Travel加入会话"), *TravelURL);
+
+		GetFirstLocalPlayerController(GetWorld())->ClientTravel(TravelURL, TRAVEL_Absolute);
+	}
+	else
+	{
+		OnJoinSessionFailed.Broadcast();
+	}
+
+	SessionPtr->OnJoinSessionCompleteDelegates.RemoveAll(this);
 }
 
 void UCGameInstance::PlayerJoined(const FUniqueNetIdRepl& UniqueId)

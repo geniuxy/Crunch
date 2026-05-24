@@ -38,6 +38,10 @@ public:
 	static FString GetCoordinatorURL();
 	static FString GetDefaultCoordinatorURL();
 
+	static FString GetTestingURL();
+	static FName GetTestingURLKey();
+	static void ReplacePort(FString& OutURLStr, int NewPort);
+
 	static FString GetCommandLineArgAsString(const FName& ParamName);
 	static int GetCommandLineArgAsInt(const FName& ParamName);
 };
