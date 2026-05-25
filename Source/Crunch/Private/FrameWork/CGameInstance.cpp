@@ -151,6 +151,9 @@ void UCGameInstance::CancelSessionCreation()
 void UCGameInstance::StartGlobalSessionSearch()
 {
 	Debug::Print(TEXT("开始全局会话搜寻"));
+	GetWorld()->GetTimerManager().SetTimer(
+		GlobalSessionSearchTimerHandle, this, &ThisClass::FindGlobalSessions, GlobalSessionSearchInterval, true
+	);
 }
 
 void UCGameInstance::SessionCreationRequestCompleted(
@@ -234,6 +237,66 @@ void UCGameInstance::StopFindingCreatedSession()
 void UCGameInstance::StopGlobalSessionSearch()
 {
 	Debug::Print(TEXT("暂停搜寻全局会话.."));
+	if (GlobalSessionSearchTimerHandle.IsValid())
+	{
+		GetWorld()->GetTimerManager().ClearTimer(GlobalSessionSearchTimerHandle);
+	}
+
+	IOnlineSessionPtr SessionPtr = UNetFunctionLibrary::GetSessionPtr();
+	if (SessionPtr)
+	{
+		SessionPtr->OnFindSessionsCompleteDelegates.RemoveAll(this);
+	}
+}
+
+void UCGameInstance::FindGlobalSessions()
+{
+	Debug::Print(TEXT("--------- 再次尝试全局房间会话搜索 ---------"));
+
+	IOnlineSessionPtr SessionPtr = UNetFunctionLibrary::GetSessionPtr();
+	if (!SessionPtr)
+	{
+		Debug::Print(TEXT("找不到SessionPtr, 等待下一次全局房间会话搜索"));
+		return;
+	}
+
+	SessionSearch = MakeShareable(new FOnlineSessionSearch);
+	SessionSearch->bIsLanQuery = false;
+	SessionSearch->MaxSearchResults = 20;
+
+	SessionPtr->OnFindSessionsCompleteDelegates.RemoveAll(this);
+	SessionPtr->OnFindSessionsCompleteDelegates.AddUObject(this, &ThisClass::GlobalSessionSearchCompleted);
+	if (!SessionPtr->FindSessions(0, SessionSearch.ToSharedRef()))
+	{
+		Debug::Print(TEXT("寻找全局会话失败！......"));
+		SessionPtr->OnFindSessionsCompleteDelegates.RemoveAll(this);
+	}
+}
+
+void UCGameInstance::GlobalSessionSearchCompleted(bool bWasSuccessful)
+{
+	if (bWasSuccessful)
+	{
+		OnGlobalSessionSearchCompleted.Broadcast(SessionSearch->SearchResults);
+		for (const FOnlineSessionSearchResult& OnlineSessionSearchResult : SessionSearch->SearchResults)
+		{
+			FString SessionName = "Name_None";
+			OnlineSessionSearchResult.Session.SessionSettings.Get<FString>(
+				UNetFunctionLibrary::GetSessionNameKey(), SessionName
+			);
+			Debug::Print(TEXT("在全局会话搜索之后，找到会话"), *SessionName);
+		}
+	}
+	else
+	{
+		Debug::Print(TEXT("寻找全局会话完成，但是失败！"));
+	}
+
+	IOnlineSessionPtr SessionPtr = UNetFunctionLibrary::GetSessionPtr();
+	if (SessionPtr)
+	{
+		SessionPtr->OnFindSessionsCompleteDelegates.RemoveAll(this);
+	}
 }
 
 void UCGameInstance::FindCreatedSession(FGuid SessionSearchID)

@@ -13,6 +13,9 @@ class FOnlineSessionSearch;
 DECLARE_MULTICAST_DELEGATE_ThreeParams(
 	FOnLoginCompleted, bool /* bWasSuccessful */, const FString& /* PlayerNickName */, const FString& /* ErrorMsg */
 )
+DECLARE_MULTICAST_DELEGATE_OneParam(
+	FOnGlobalSessionSearchCompleted, const TArray<FOnlineSessionSearchResult>& /* SearchResults */
+)
 DECLARE_MULTICAST_DELEGATE(FOnJoinSessionFailed)
 
 /**
@@ -52,6 +55,7 @@ public:
 	void StartGlobalSessionSearch();
 
 	FOnJoinSessionFailed OnJoinSessionFailed;
+	FOnGlobalSessionSearchCompleted OnGlobalSessionSearchCompleted;
 
 private:
 	void SessionCreationRequestCompleted(
@@ -61,9 +65,15 @@ private:
 	void StopAllSessionFindings();
 	void StopFindingCreatedSession();
 	void StopGlobalSessionSearch();
+	void FindGlobalSessions();
+	void GlobalSessionSearchCompleted(bool bWasSuccessful);
 
 	FTimerHandle FindCreatedSessionTimerHandle;
 	FTimerHandle FindCreatedSessionTimeoutHandle;
+	FTimerHandle GlobalSessionSearchTimerHandle;
+
+	UPROPERTY(EditDefaultsOnly, Category="Session Search")
+	float GlobalSessionSearchInterval = 2.f;
 
 	UPROPERTY(EditDefaultsOnly, Category="Session Search")
 	float FindCreatedSessionSearchInterval = 1.f;
@@ -76,7 +86,7 @@ private:
 	void FindCreatedSessionCompleted(bool bWasSuccessful);
 	void JoinSessionWithSearchResult(const FOnlineSessionSearchResult& SearchResult);
 	void JoinSessionCompleted(FName SessionName, EOnJoinSessionCompleteResult::Type JoinResult, int Port);
-	
+
 	TSharedPtr<FOnlineSessionSearch> SessionSearch;
 
 	/**********************************************************************/
