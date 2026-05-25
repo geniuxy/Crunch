@@ -50,7 +50,7 @@ private:
 	UEditableText* NewSessionNameText;
 
 	UFUNCTION()
-	void CreateSessuibButtonClicked();
+	void CreateSessionButtonClicked();
 
 	UFUNCTION()
 	void CancelSessionCreation();

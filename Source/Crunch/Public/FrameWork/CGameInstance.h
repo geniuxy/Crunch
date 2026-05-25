@@ -53,6 +53,7 @@ public:
 	void RequestCreateAndJoinSession(const FName& NewSessionName);
 	void CancelSessionCreation();
 	void StartGlobalSessionSearch();
+	bool JoinSessionWithID(const FString& SessionIDStr);
 
 	FOnJoinSessionFailed OnJoinSessionFailed;
 	FOnGlobalSessionSearchCompleted OnGlobalSessionSearchCompleted;

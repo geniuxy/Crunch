@@ -29,12 +29,11 @@ void UMainMenuWidget::NativeConstruct()
 
 		CGameInstance->OnJoinSessionFailed.AddUObject(this, &ThisClass::JoinSessionFailed);
 		CGameInstance->OnGlobalSessionSearchCompleted.AddUObject(this, &ThisClass::UpdateLobbyList);
-		CGameInstance->StartGlobalSessionSearch();
 	}
 
 	LoginButton->OnClicked.AddDynamic(this, &ThisClass::LoginButtonClicked);
 
-	CreateSessionButton->OnClicked.AddDynamic(this, &ThisClass::CreateSessuibButtonClicked);
+	CreateSessionButton->OnClicked.AddDynamic(this, &ThisClass::CreateSessionButtonClicked);
 	CreateSessionButton->SetIsEnabled(false);
 
 	NewSessionNameText->OnTextChanged.AddDynamic(this, &ThisClass::NewSessionNameTextChanged);
@@ -50,7 +49,7 @@ void UMainMenuWidget::SwitchToMainWidget()
 	}
 }
 
-void UMainMenuWidget::CreateSessuibButtonClicked()
+void UMainMenuWidget::CreateSessionButtonClicked()
 {
 	if (CGameInstance && CGameInstance->IsLoggedIn())
 	{
@@ -116,6 +115,10 @@ void UMainMenuWidget::JoinSessionButtonClicked()
 	if (CGameInstance && !CurrentSelectedSessionID.IsEmpty())
 	{
 		Debug::Print(TEXT("尝试加入会话，ID"), *CurrentSelectedSessionID);
+		if (CGameInstance->JoinSessionWithID(CurrentSelectedSessionID))
+		{
+			SwitchToWaitingWidget(FText::FromString(TEXT("加入房间中")));
+		}
 	}
 	else
 	{
@@ -143,6 +146,10 @@ void UMainMenuWidget::LoginCompleted(bool bWasSuccessful, const FString& PlayerN
 	if (bWasSuccessful)
 	{
 		Debug::Print(TEXT("登录成功！"));
+		if (CGameInstance)
+		{
+			CGameInstance->StartGlobalSessionSearch();
+		}
 	}
 	else
 	{

@@ -156,6 +156,29 @@ void UCGameInstance::StartGlobalSessionSearch()
 	);
 }
 
+bool UCGameInstance::JoinSessionWithID(const FString& SessionIDStr)
+{
+	if (SessionSearch.IsValid())
+	{
+		// [=]	按值捕获所有外部变量（拷贝一份）
+		// [&]	按引用捕获所有外部变量
+		const FOnlineSessionSearchResult* SessionSearchResult = SessionSearch->SearchResults.FindByPredicate(
+			[=](const FOnlineSessionSearchResult& Result)
+			{
+				return Result.GetSessionIdStr() == SessionIDStr;
+			}
+		);
+
+		if (SessionSearchResult)
+		{
+			JoinSessionWithSearchResult(*SessionSearchResult);
+			return true;
+		}
+	}
+
+	return false;
+}
+
 void UCGameInstance::SessionCreationRequestCompleted(
 	FHttpRequestPtr Request, FHttpResponsePtr Response, bool bConnectedSuccessfully, FGuid SessionSearchID)
 {
