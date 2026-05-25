@@ -47,6 +47,12 @@ void UMainMenuWidget::SwitchToMainWidget()
 	{
 		MainSwitcher->SetActiveWidget(MainWidgetRoot);
 	}
+
+	// 切换到主界面就开始全局房间会话搜索
+	if (CGameInstance)
+	{
+		CGameInstance->StartGlobalSessionSearch();
+	}
 }
 
 void UMainMenuWidget::CreateSessionButtonClicked()
@@ -146,10 +152,6 @@ void UMainMenuWidget::LoginCompleted(bool bWasSuccessful, const FString& PlayerN
 	if (bWasSuccessful)
 	{
 		Debug::Print(TEXT("登录成功！"));
-		if (CGameInstance)
-		{
-			CGameInstance->StartGlobalSessionSearch();
-		}
 	}
 	else
 	{
