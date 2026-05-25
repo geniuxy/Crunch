@@ -4,11 +4,15 @@
 #include "Widgets/Menu/MainMenuWidget.h"
 
 #include "CrunchDebugHelper.h"
+#include "OnlineSessionSettings.h"
 #include "Components/Button.h"
 #include "Components/EditableText.h"
+#include "Components/ScrollBox.h"
 #include "Components/WidgetSwitcher.h"
 #include "FrameWork/CGameInstance.h"
+#include "FunctionLibrary/NetFunctionLibrary.h"
 #include "Widgets/Menu/WaitingWidget.h"
+#include "Widgets/Session/SessionEntryWidget.h"
 
 void UMainMenuWidget::NativeConstruct()
 {
@@ -22,6 +26,10 @@ void UMainMenuWidget::NativeConstruct()
 		{
 			SwitchToMainWidget();
 		}
+
+		CGameInstance->OnJoinSessionFailed.AddUObject(this, &ThisClass::JoinSessionFailed);
+		CGameInstance->OnGlobalSessionSearchCompleted.AddUObject(this, &ThisClass::UpdateLobbyList);
+		CGameInstance->StartGlobalSessionSearch();
 	}
 
 	LoginButton->OnClicked.AddDynamic(this, &ThisClass::LoginButtonClicked);
@@ -30,6 +38,8 @@ void UMainMenuWidget::NativeConstruct()
 	CreateSessionButton->SetIsEnabled(false);
 
 	NewSessionNameText->OnTextChanged.AddDynamic(this, &ThisClass::NewSessionNameTextChanged);
+	JoinSessionButton->OnClicked.AddDynamic(this, &ThisClass::JoinSessionButtonClicked);
+	JoinSessionButton->SetIsEnabled(false);
 }
 
 void UMainMenuWidget::SwitchToMainWidget()
@@ -63,6 +73,59 @@ void UMainMenuWidget::CancelSessionCreation()
 void UMainMenuWidget::NewSessionNameTextChanged(const FText& NewText)
 {
 	CreateSessionButton->SetIsEnabled(!NewText.IsEmpty());
+}
+
+void UMainMenuWidget::JoinSessionFailed()
+{
+	SwitchToMainWidget();
+}
+
+void UMainMenuWidget::UpdateLobbyList(const TArray<FOnlineSessionSearchResult>& SearchResults)
+{
+	Debug::Print(TEXT("根据搜索会话结果，更新会话列表"));
+
+	SessionScrollBox->ClearChildren();
+
+	bool bCurrentSelectedSessionValid = false;
+	for (const FOnlineSessionSearchResult& SearchResult : SearchResults)
+	{
+		USessionEntryWidget* NewSessionWidget =
+			CreateWidget<USessionEntryWidget>(GetOwningPlayer(), SessionEntryWidgetClass);
+		if (NewSessionWidget)
+		{
+			FString SessionName = "Name_None";
+			SearchResult.Session.SessionSettings.Get<FString>(UNetFunctionLibrary::GetSessionNameKey(), SessionName);
+
+			FString SessionIDStr = SearchResult.Session.GetSessionIdStr();
+			NewSessionWidget->InitializeEntry(SessionName, SessionIDStr);
+			NewSessionWidget->OnSessionEntrySelected.AddUObject(this, &ThisClass::SessionEntrySelected);
+			SessionScrollBox->AddChild(NewSessionWidget);
+			if (CurrentSelectedSessionID == SessionIDStr)
+			{
+				bCurrentSelectedSessionValid = true;
+			}
+		}
+	}
+
+	CurrentSelectedSessionID = bCurrentSelectedSessionValid ? CurrentSelectedSessionID : "";
+	JoinSessionButton->SetIsEnabled(bCurrentSelectedSessionValid);
+}
+
+void UMainMenuWidget::JoinSessionButtonClicked()
+{
+	if (CGameInstance && !CurrentSelectedSessionID.IsEmpty())
+	{
+		Debug::Print(TEXT("尝试加入会话，ID"), *CurrentSelectedSessionID);
+	}
+	else
+	{
+		Debug::Print(TEXT("当前不能加入会话，没有会话被选择"));
+	}
+}
+
+void UMainMenuWidget::SessionEntrySelected(const FString& SelectedEntryIDStr)
+{
+	CurrentSelectedSessionID = SelectedEntryIDStr;
 }
 
 void UMainMenuWidget::LoginButtonClicked()

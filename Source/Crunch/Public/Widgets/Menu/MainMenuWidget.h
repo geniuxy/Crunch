@@ -6,6 +6,8 @@
 #include "Blueprint/UserWidget.h"
 #include "MainMenuWidget.generated.h"
 
+class USessionEntryWidget;
+class UScrollBox;
 class UEditableText;
 class FOnButtonClickedEvent;
 class UWaitingWidget;
@@ -55,6 +57,26 @@ private:
 
 	UFUNCTION()
 	void NewSessionNameTextChanged(const FText& NewText);
+
+	void JoinSessionFailed();
+
+	void UpdateLobbyList(const TArray<FOnlineSessionSearchResult>& SearchResults);
+
+	UPROPERTY(meta=(BindWidget))
+	UScrollBox* SessionScrollBox;
+	
+	UPROPERTY(meta=(BindWidget))
+	UButton* JoinSessionButton;
+
+	UPROPERTY(EditDefaultsOnly, Category="Session")
+	TSubclassOf<USessionEntryWidget> SessionEntryWidgetClass;
+
+	FString CurrentSelectedSessionID = "";
+
+	UFUNCTION()
+	void JoinSessionButtonClicked();
+
+	void SessionEntrySelected(const FString& SelectedEntryIDStr);
 
 	/**********************************************************************/
 	/*                              Login                                 */

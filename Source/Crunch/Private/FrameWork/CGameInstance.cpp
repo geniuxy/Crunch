@@ -152,7 +152,7 @@ void UCGameInstance::StartGlobalSessionSearch()
 {
 	Debug::Print(TEXT("开始全局会话搜寻"));
 	GetWorld()->GetTimerManager().SetTimer(
-		GlobalSessionSearchTimerHandle, this, &ThisClass::FindGlobalSessions, GlobalSessionSearchInterval, true
+		GlobalSessionSearchTimerHandle, this, &ThisClass::FindGlobalSessions, GlobalSessionSearchInterval, true, 0
 	);
 }
 
