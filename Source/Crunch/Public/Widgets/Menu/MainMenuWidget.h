@@ -87,6 +87,8 @@ private:
 
 	UPROPERTY(meta=(BindWidget))
 	UButton* LoginButton;
+	
+	void SwitchToLoginWidget();
 
 	UFUNCTION()
 	void LoginButtonClicked();

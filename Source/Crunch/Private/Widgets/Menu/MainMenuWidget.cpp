@@ -137,6 +137,14 @@ void UMainMenuWidget::SessionEntrySelected(const FString& SelectedEntryIDStr)
 	CurrentSelectedSessionID = SelectedEntryIDStr;
 }
 
+void UMainMenuWidget::SwitchToLoginWidget()
+{
+	if (MainSwitcher)
+	{
+		MainSwitcher->SetActiveWidget(LoginWidgetRoot);
+	}
+}
+
 void UMainMenuWidget::LoginButtonClicked()
 {
 	Debug::Print(TEXT("正在登录中！"));
@@ -152,13 +160,13 @@ void UMainMenuWidget::LoginCompleted(bool bWasSuccessful, const FString& PlayerN
 	if (bWasSuccessful)
 	{
 		Debug::Print(TEXT("登录成功！"));
+		SwitchToMainWidget();
 	}
 	else
 	{
 		Debug::Print(TEXT("登录失败！"));
+		SwitchToLoginWidget();
 	}
-
-	SwitchToMainWidget();
 }
 
 FOnButtonClickedEvent& UMainMenuWidget::SwitchToWaitingWidget(const FText& WaitingInfo, bool bAllowCancel)
