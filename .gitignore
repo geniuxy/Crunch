@@ -7,6 +7,8 @@ Content
 Plugins/DarkerNodes
 Plugins/ElectronicNodes
 
+ServerDeploy/CrunchServer/server/*
+
 .idea
 .vscode
 .vs
