@@ -8,6 +8,15 @@ from consts import PORT_KEY, SESSION_NAME_KEY, SESSION_SEARCH_ID_KEY
 
 app=Flask(__name__)
 
+def GetUsedPorts():
+    # 执行docker ps --format "{{.Ports}}"，并捕获对应的返回内容
+    result = subprocess.run(['docker', 'ps', '--format', '"{{.Ports}}"'], capture_output=True, text=True)
+    output = result.stdout
+    print(output)
+
+def CreateServerImpl(sessionName, sessionSearchID):
+    port = GetUsedPorts()
+
 #TODO: Remove when using docket in the future
 nextAvailablePort = 7777
 
@@ -56,5 +65,5 @@ def CreateServer():
     return jsonify({"status": "success", PORT_KEY: port}), 200
 
 if __name__== "__main__":
-    app.run(host="0.0.0.0", port=80)
-
+    # app.run(host="0.0.0.0", port=5000)
+    CreateServerImpl("", "")
