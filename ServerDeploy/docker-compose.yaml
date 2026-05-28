@@ -1,0 +1,15 @@
+﻿#执行指令： docker compose build
+
+services:
+  server:
+    build: ./CrunchServer
+    image: crunchserver
+
+  coordinator:
+    build: ./Coordinator
+    image: coordinator
+    container_name: servercoordinator
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    ports:
+      - '80:80'

@@ -192,7 +192,7 @@ void UCGameInstance::SessionCreationRequestCompleted(
 	int32 ResponseCode = Response->GetResponseCode();
 	if (ResponseCode != 200)
 	{
-		Debug::Print(TEXT("房间会话创建失败, 错误代码为"), ResponseCode);
+		Debug::PrintWithInt(TEXT("房间会话创建失败, 错误代码为"), ResponseCode);
 		return;
 	}
 
@@ -207,7 +207,7 @@ void UCGameInstance::SessionCreationRequestCompleted(
 		Port = JsonObject->GetIntegerField(*UNetFunctionLibrary::GetPortKey().ToString());
 	}
 
-	Debug::Print(TEXT("连接至协调器地址成功，并且新房间会话创建于端口"), Port);
+	Debug::PrintWithInt(TEXT("连接至协调器地址成功，并且新房间会话创建于端口"), Port);
 	StartFindingCreatedSession(SessionSearchID);
 }
 

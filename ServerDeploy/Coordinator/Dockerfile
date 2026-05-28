@@ -1,5 +1,13 @@
 ﻿FROM python:3.9-slim
 
+# 教程内原版指令 begin
+#RUN apt-get update
+#
+#RUN apt-get install -y curl
+#
+#RUN curl -fsSL https://get.docker.com | sh
+# 教程内原版指令 end
+
 # 1. 换国内 apt 源（加速系统包下载，可选）
 RUN sed -i 's/deb.debian.org/mirrors.aliyun.com/g' /etc/apt/sources.list.d/debian.sources 2>/dev/null || \
     sed -i 's/deb.debian.org/mirrors.aliyun.com/g' /etc/apt/sources.list 2>/dev/null || true
