@@ -21,9 +21,32 @@ def GetUsedPorts():
 
     return usedPorts
 
+def FindNextAvailablePort(start=7777,end=8000):
+    usedPorts = GetUsedPorts()
+    for port in range(start, end+1):
+        if port not in usedPorts:
+            return port
+    return 0
+
 def CreateServerImpl(sessionName, sessionSearchID):
-    ports = GetUsedPorts()
-    print(ports)
+    port = FindNextAvailablePort()
+    print(f"Launching Server: {sessionName}, with ID: {sessionSearchID}, at port: {port}")
+
+    subprocess.Popen([
+        "docker",
+        "run",
+        "--rm",
+        "-p", f"{port}:{port}/tcp",
+        "-p", f"{port}:{port}/udp",
+        "crunchserver",
+        "-server",
+        "-log",
+        '-epicapp="ServerClient"',
+        f'-SESSION_NAME="{sessionName}"',
+        f'-SESSION_SEARCH_ID="{sessionSearchID}"',
+        f'-PORT={port}'
+    ])
+    return port
 
 #TODO: Remove when using docket in the future
 nextAvailablePort = 7777
@@ -69,9 +92,8 @@ def CreateServer():
 
     sessionName = request.get_json().get(SESSION_NAME_KEY)
     sessionSearchID = request.get_json().get(SESSION_SEARCH_ID_KEY)
-    port = CreateServerLocalTest(sessionName, sessionSearchID)
+    port = CreateServerImpl(sessionName, sessionSearchID)
     return jsonify({"status": "success", PORT_KEY: port}), 200
 
 if __name__== "__main__":
-    # app.run(host="0.0.0.0", port=5000)
-    CreateServerImpl("", "")
+    app.run(host="0.0.0.0", port=80)
