@@ -109,6 +109,20 @@ namespace CGameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(
 		Crunch_Ability_Dash_Event_Start, "Crunch.Ability.Dash.Event.Start"
 	);
+	UE_DEFINE_GAMEPLAY_TAG(
+		Crunch_Ability_Dash_Cooldown, "Crunch.Ability.Dash.Cooldown"
+	);
+
+	UE_DEFINE_GAMEPLAY_TAG(
+		Crunch_Ability_Tornado_Cooldown, "Crunch.Ability.Tornado.Cooldown"
+	);
+	
+	UE_DEFINE_GAMEPLAY_TAG(
+		Crunch_Ability_Generic_Event_Damage, "Crunch.Ability.Generic.Event.Damage"
+	);
+	UE_DEFINE_GAMEPLAY_TAG(
+		Crunch_Ability_Generic_Event_Target, "Crunch.Ability.Generic.Event.Target"
+	);
 	
 	UE_DEFINE_GAMEPLAY_TAG(
 		Crunch_SetByCaller_Experience, "Crunch.SetByCaller.Experience"
