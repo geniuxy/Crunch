@@ -4,8 +4,10 @@
 #include "FunctionLibrary/CAbilitySystemFunctionLibrary.h"
 
 #include "AbilitySystemComponent.h"
+#include "AbilitySystemGlobals.h"
 #include "AbilitySystemInterface.h"
 #include "CGameplayTags.h"
+#include "GameplayCueManager.h"
 #include "Abilities/GameplayAbility.h"
 
 float UCAbilitySystemFunctionLibrary::GetStaticCooldownDurationForAbility(const UGameplayAbility* Ability)
@@ -142,4 +144,16 @@ float UCAbilitySystemFunctionLibrary::GetCooldownRemainingFor(
 	}
 
 	return CooldownRemaining;
+}
+
+void UCAbilitySystemFunctionLibrary::SendLocalGameplayCue(
+	AActor* CueTargetActor, const FHitResult& HitResult, const FGameplayTag& GameplayCueTag)
+{
+	FGameplayCueParameters CueParams;
+	CueParams.Location = HitResult.ImpactPoint;
+	CueParams.Normal = HitResult.ImpactNormal;
+
+	UAbilitySystemGlobals::Get().GetGameplayCueManager()->HandleGameplayCue(
+		CueTargetActor, GameplayCueTag, EGameplayCueEvent::Executed, CueParams
+	);
 }

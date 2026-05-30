@@ -65,6 +65,7 @@ private:
 
 	virtual void OnAimStateChanged(bool bIsAiming);
 	void MoveSpeedUpdated(const FOnAttributeChangeData& Data);
+	void MoveSpeedAccelerationUpdated(const FOnAttributeChangeData& Data);
 	void MaxHealthUpdated(const FOnAttributeChangeData& Data);
 	void MaxManaUpdated(const FOnAttributeChangeData& Data);
 
@@ -140,6 +141,13 @@ private:
 protected:
 	virtual void OnStun();
 	virtual void OnRecoverFromStun();
+
+	/**********************************************************************/
+	/*                                Hit                                 */
+	/**********************************************************************/
+protected:
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category="Hit")
+	UAnimMontage* HitMontage;
 
 	/**********************************************************************/
 	/*                                Team                                */

@@ -105,6 +105,10 @@ namespace CGameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(
 		Crunch_Ability_BlackHole_Cooldown, "Crunch.Ability.BlackHole.Cooldown"
 	);
+
+	UE_DEFINE_GAMEPLAY_TAG(
+		Crunch_Ability_Dash_Event_Start, "Crunch.Ability.Dash.Event.Start"
+	);
 	
 	UE_DEFINE_GAMEPLAY_TAG(
 		Crunch_SetByCaller_Experience, "Crunch.SetByCaller.Experience"

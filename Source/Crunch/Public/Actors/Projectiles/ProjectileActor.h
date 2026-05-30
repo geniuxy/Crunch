@@ -57,6 +57,4 @@ private:
 	FTimerHandle ShootTimerHandle;
 	
 	void TravelMaxDistanceReached();
-
-	void SendLocalGameplayCue(AActor* CurTargetActor, const FHitResult& HitResult);
 };

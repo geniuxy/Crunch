@@ -43,6 +43,9 @@ APlayerController* ACGameMode::SpawnPlayerController(ENetRole InRemoteRole, cons
 
 UClass* ACGameMode::GetDefaultPawnClassForController_Implementation(AController* InController)
 {
+#if WITH_EDITOR
+	return Super::GetDefaultPawnClassForController_Implementation(InController);
+#else
 	ACPlayerState* CPlayerState = InController->GetPlayerState<ACPlayerState>();
 	if (CPlayerState && CPlayerState->GetSelectedPawnClass())
 	{
@@ -50,10 +53,14 @@ UClass* ACGameMode::GetDefaultPawnClassForController_Implementation(AController*
 	}
 
 	return BackUpPawn;
+#endif
 }
 
 APawn* ACGameMode::SpawnDefaultPawnFor_Implementation(AController* NewPlayer, AActor* StartSpot)
 {
+#if WITH_EDITOR
+	return Super::SpawnDefaultPawnFor_Implementation(NewPlayer, StartSpot);
+#else
 	if (!NewPlayer)
 	{
 		return nullptr;
@@ -94,15 +101,18 @@ APawn* ACGameMode::SpawnDefaultPawnFor_Implementation(AController* NewPlayer, AA
 	// 确认有效后再赋值和调用父类
 	NewPlayer->StartSpot = FinalStartSpot;
 	return Super::SpawnDefaultPawnFor_Implementation(NewPlayer, FinalStartSpot);
+#endif
 }
 
 FGenericTeamId ACGameMode::GetTeamIDForPlayer(const AController* InController) const
 {
+#if not WITH_EDITOR
 	ACPlayerState* CPlayerState = InController->GetPlayerState<ACPlayerState>();
 	if (CPlayerState && CPlayerState->GetSelectedPawnClass())
 	{
 		return CPlayerState->GetTeamIDBaseOnSlot();
 	}
+#endif
 
 	static int PlayerCount = 0;
 	++PlayerCount;

@@ -17,7 +17,7 @@ class CRUNCH_API UCAbilitySystemFunctionLibrary : public UAbilitySystemBlueprint
 public:
 	static float GetStaticCooldownDurationForAbility(const UGameplayAbility* Ability);
 	static float GetStaticCostForAbility(const UGameplayAbility* Ability);
-	
+
 	static bool IsActorDead(const AActor* ActorToCheck);
 	static bool IsHero(const AActor* ActorToCheck);
 	static bool ActorHasTag(const AActor* ActorToCheck, const FGameplayTag& Tag);
@@ -32,4 +32,8 @@ public:
 		const UGameplayAbility* AbilityCDO, const UAbilitySystemComponent& ASC, int AbilityLevel
 	);
 	static float GetCooldownRemainingFor(const UGameplayAbility* AbilityCDO, const UAbilitySystemComponent& ASC);
+
+	static void SendLocalGameplayCue(
+		AActor* CueTargetActor, const FHitResult& HitResult, const FGameplayTag& GameplayCueTag
+	);
 };

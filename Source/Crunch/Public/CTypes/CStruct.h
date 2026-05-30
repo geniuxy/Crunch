@@ -75,6 +75,9 @@ struct FHeroBaseStats : public FTableRowBase
 
 	UPROPERTY(EditAnywhere)
 	float BaseMoveSpeed = 0.f;
+
+	UPROPERTY(EditAnywhere)
+	float BaseMoveAcceleration = 2048.f;
 };
 
 USTRUCT(BlueprintType)

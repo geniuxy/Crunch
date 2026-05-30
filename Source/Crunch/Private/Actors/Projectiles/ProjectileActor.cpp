@@ -7,6 +7,7 @@
 #include "AbilitySystemComponent.h"
 #include "AbilitySystemGlobals.h"
 #include "GameplayCueManager.h"
+#include "FunctionLibrary/CAbilitySystemFunctionLibrary.h"
 #include "Net/UnrealNetwork.h"
 
 
@@ -95,7 +96,7 @@ void AProjectileActor::NotifyActorBeginOverlap(AActor* OtherActor)
 		HitResult.ImpactPoint = GetActorLocation();
 		HitResult.ImpactNormal = GetActorForwardVector();
 
-		SendLocalGameplayCue(OtherActor, HitResult);
+		UCAbilitySystemFunctionLibrary::SendLocalGameplayCue(OtherActor, HitResult, HitGameplayCueTag);
 
 		Destroy();
 	}
@@ -109,15 +110,4 @@ void AProjectileActor::BeginPlay()
 void AProjectileActor::TravelMaxDistanceReached()
 {
 	Destroy();
-}
-
-void AProjectileActor::SendLocalGameplayCue(AActor* CurTargetActor, const FHitResult& HitResult)
-{
-	FGameplayCueParameters CueParams;
-	CueParams.Location = HitResult.ImpactPoint;
-	CueParams.Normal = HitResult.ImpactNormal;
-
-	UAbilitySystemGlobals::Get().GetGameplayCueManager()->HandleGameplayCue(
-		CurTargetActor, HitGameplayCueTag, EGameplayCueEvent::Executed, CueParams
-	);
 }
