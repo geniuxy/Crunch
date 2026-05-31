@@ -71,6 +71,9 @@ namespace CGameplayTags
 		Crunch_Ability_BasicAttack_Event_Damage, "Crunch.Ability.BasicAttack.Event.Damage"
 	);
 
+	/**********************************************************************/
+	/*                         Crunch-Abilities                           */
+	/**********************************************************************/
 	UE_DEFINE_GAMEPLAY_TAG(
 		Crunch_Ability_UpperCut_Event_Damage, "Crunch.Ability.UpperCut.Event.Damage"
 	);
@@ -85,6 +88,20 @@ namespace CGameplayTags
 		Crunch_Ability_GroundBlast_Cooldown, "Crunch.Ability.GroundBlast.Cooldown"
 	);
 
+	UE_DEFINE_GAMEPLAY_TAG(
+		Crunch_Ability_Dash_Event_Start, "Crunch.Ability.Dash.Event.Start"
+	);
+	UE_DEFINE_GAMEPLAY_TAG(
+		Crunch_Ability_Dash_Cooldown, "Crunch.Ability.Dash.Cooldown"
+	);
+
+	UE_DEFINE_GAMEPLAY_TAG(
+		Crunch_Ability_Tornado_Cooldown, "Crunch.Ability.Tornado.Cooldown"
+	);
+
+	/**********************************************************************/
+	/*                          Abilities-Phase                           */
+	/**********************************************************************/
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(
 		Crunch_Ability_Shoot, "Crunch.Ability.Shoot", "用于在Shoot Ability中，触发子弹的生成"
 	);
@@ -107,14 +124,10 @@ namespace CGameplayTags
 	);
 
 	UE_DEFINE_GAMEPLAY_TAG(
-		Crunch_Ability_Dash_Event_Start, "Crunch.Ability.Dash.Event.Start"
+		Crunch_Ability_Blink_Event_Teleport, "Crunch.Ability.Blink.Event.Teleport"
 	);
 	UE_DEFINE_GAMEPLAY_TAG(
-		Crunch_Ability_Dash_Cooldown, "Crunch.Ability.Dash.Cooldown"
-	);
-
-	UE_DEFINE_GAMEPLAY_TAG(
-		Crunch_Ability_Tornado_Cooldown, "Crunch.Ability.Tornado.Cooldown"
+		Crunch_Ability_Blink_Cooldown, "Crunch.Ability.Blink.Cooldown"
 	);
 	
 	UE_DEFINE_GAMEPLAY_TAG(
