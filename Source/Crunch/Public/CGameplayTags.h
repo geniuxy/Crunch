@@ -55,6 +55,8 @@ namespace CGameplayTags
 
 	CRUNCH_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Crunch_Ability_Blink_Event_Teleport);
 	CRUNCH_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Crunch_Ability_Blink_Cooldown);
+
+	CRUNCH_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Crunch_Ability_Freeze_Cooldown);
 	
 	CRUNCH_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Crunch_Ability_Generic_Event_Damage);
 	CRUNCH_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Crunch_Ability_Generic_Event_Target);
@@ -80,4 +82,7 @@ namespace CGameplayTags
 	CRUNCH_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(GameplayCue_Hit_Impact_GroundBlast);
 	CRUNCH_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(GameplayCue_Hit_Impact_Phase_Projectile);
 	CRUNCH_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(GameplayCue_Blow_Impact_Phase_BlackHole);
+
+	CRUNCH_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(GameplayCue_Hit_Phase_Freeze_Slow);
+	CRUNCH_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(GameplayCue_Hit_Phase_Freeze_Impact);
 }

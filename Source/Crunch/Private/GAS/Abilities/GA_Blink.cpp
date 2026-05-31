@@ -21,12 +21,6 @@ void UGA_Blink::ActivateAbility(
 	const FGameplayAbilityActivationInfo ActivationInfo,
 	const FGameplayEventData* TriggerEventData)
 {
-	if (!K2_CommitAbility())
-	{
-		K2_EndAbility();
-		return;
-	}
-
 	if (!HasAuthorityOrPredictionKey(ActorInfo, &ActivationInfo))
 	{
 		K2_EndAbility();
@@ -59,6 +53,13 @@ void UGA_Blink::ActivateAbility(
 
 void UGA_Blink::GroundPickTargetReceived(const FGameplayAbilityTargetDataHandle& TargetDataHandle)
 {
+	// CommitAbility放在真正需要计算CD的位置
+	if (!K2_CommitAbility())
+	{
+		K2_EndAbility();
+		return;
+	}
+	
 	BlinkTargetDataHandle = TargetDataHandle;
 
 	if (HasAuthorityOrPredictionKey(CurrentActorInfo, &CurrentActivationInfo))

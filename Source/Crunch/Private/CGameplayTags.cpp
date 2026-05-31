@@ -129,6 +129,10 @@ namespace CGameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(
 		Crunch_Ability_Blink_Cooldown, "Crunch.Ability.Blink.Cooldown"
 	);
+
+	UE_DEFINE_GAMEPLAY_TAG(
+		Crunch_Ability_Freeze_Cooldown, "Crunch.Ability.Freeze.Cooldown"
+	);
 	
 	UE_DEFINE_GAMEPLAY_TAG(
 		Crunch_Ability_Generic_Event_Damage, "Crunch.Ability.Generic.Event.Damage"
@@ -179,5 +183,11 @@ namespace CGameplayTags
 	);
 	UE_DEFINE_GAMEPLAY_TAG(
 		GameplayCue_Blow_Impact_Phase_BlackHole, "GameplayCue.Blow.Impact.Phase.BlackHole"
+	);
+	UE_DEFINE_GAMEPLAY_TAG(
+		GameplayCue_Hit_Phase_Freeze_Slow, "GameplayCue.Hit.Phase.Freeze.Slow"
+	);
+	UE_DEFINE_GAMEPLAY_TAG(
+		GameplayCue_Hit_Phase_Freeze_Impact, "GameplayCue.Hit.Phase.Freeze.Impact"
 	);
 }
