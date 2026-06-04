@@ -263,11 +263,6 @@ void UCAbilitySystemComponent::ManaUpdated(const FOnAttributeChangeData& ChangeD
 		if (!HasMatchingGameplayTag(CGameplayTags::Crunch_Stats_Mana_Empty))
 		{
 			AddLooseGameplayTag(CGameplayTags::Crunch_Stats_Mana_Empty);
-
-			if (AbilitySystemGenerics->GetDeathEffect())
-			{
-				AuthApplyGameplayEffect(AbilitySystemGenerics->GetDeathEffect());
-			}
 		}
 	}
 	else
