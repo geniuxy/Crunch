@@ -24,6 +24,7 @@ bool UCGameplayAbilityBase::CanActivateAbility(
 	const FGameplayTagContainer* TargetTags,
 	FGameplayTagContainer* OptionalRelevantTags) const
 {
+	// 当技能为0级(未学习)时，不能使用、触发
 	FGameplayAbilitySpec* AbilitySpec = ActorInfo->AbilitySystemComponent->FindAbilitySpecFromHandle(Handle);
 	if (AbilitySpec && AbilitySpec->Level <= 0)
 	{

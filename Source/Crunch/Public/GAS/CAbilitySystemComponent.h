@@ -49,10 +49,10 @@ private:
 	void ExperienceUpdated(const FOnAttributeChangeData& ChangeData);
 
 	UPROPERTY(EditDefaultsOnly, Category="Gameplay Ability")
-	TMap<ECAbilityInputID, TSubclassOf<UGameplayAbility>> Abilities; // 指代AvatarActor独有的Abilities
+	TMap<ECAbilityInputID, TSubclassOf<UGameplayAbility>> Abilities; // 可学习的Abilities（初始0级）
 
 	UPROPERTY(EditDefaultsOnly, Category="Gameplay Ability")
-	TMap<ECAbilityInputID, TSubclassOf<UGameplayAbility>> BasicAbilities; // 通用的Abilities
+	TMap<ECAbilityInputID, TSubclassOf<UGameplayAbility>> BasicAbilities; // 初始Abilities（初始1级）
 
 	UPROPERTY(EditDefaultsOnly, Category="Gameplay Ability")
 	UPA_AbilitySystemGenerics* AbilitySystemGenerics;
