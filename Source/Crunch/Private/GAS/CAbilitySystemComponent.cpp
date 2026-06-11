@@ -228,6 +228,7 @@ void UCAbilitySystemComponent::HealthUpdated(const FOnAttributeChangeData& Chang
 				DeadAbilityEventData.ContextHandle = ChangeData.GEModData->EffectSpec.GetContext();
 			}
 
+			// TODO: 这里可以试一下把Tag换成Event字样的Tag，和状态类区分开来
 			UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(
 				GetOwner(), CGameplayTags::Crunch_Stats_Dead, DeadAbilityEventData
 			);
