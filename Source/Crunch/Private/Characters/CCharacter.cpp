@@ -200,14 +200,14 @@ void ACCharacter::SetIsAiming(bool bIsAiming)
 	OnAimStateChanged(bIsAiming);
 }
 
-void ACCharacter::FocusTagUpdated(FGameplayTag Tag, int NewCount)
-{
-	bIsInFocusMode = NewCount > 0;
-}
-
 void ACCharacter::OnAimStateChanged(bool bIsAiming)
 {
 	// 在子类中重写该方法
+}
+
+void ACCharacter::FocusTagUpdated(FGameplayTag Tag, int NewCount)
+{
+	bIsInFocusMode = NewCount > 0;
 }
 
 void ACCharacter::MoveSpeedUpdated(const FOnAttributeChangeData& Data)

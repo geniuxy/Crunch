@@ -59,11 +59,11 @@ private:
 
 	void AimTagUpdated(FGameplayTag Tag, int NewCount);
 	void SetIsAiming(bool bIsAiming);
+	virtual void OnAimStateChanged(bool bIsAiming);
 
 	void FocusTagUpdated(FGameplayTag Tag, int NewCount);
 	bool bIsInFocusMode = false;
 
-	virtual void OnAimStateChanged(bool bIsAiming);
 	void MoveSpeedUpdated(const FOnAttributeChangeData& Data);
 	void MoveSpeedAccelerationUpdated(const FOnAttributeChangeData& Data);
 	void MaxHealthUpdated(const FOnAttributeChangeData& Data);
