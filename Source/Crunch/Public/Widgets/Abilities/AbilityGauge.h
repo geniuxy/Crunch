@@ -13,7 +13,7 @@ class UAbilityToolTip;
 struct FGameplayAbilitySpec;
 class UAbilitySystemComponent;
 class UGameplayAbility;
-struct FAbilityWidgetData;
+struct FAbilityData;
 class UTextBlock;
 class UImage;
 /**
@@ -28,7 +28,7 @@ public:
 	virtual void NativeConstruct() override;
 	virtual void NativeOnListItemObjectSet(UObject* ListItemObject) override;
 
-	void ConfigureWithWidgetData(const FAbilityWidgetData* WidgetData);
+	void ConfigureWithWidgetData(const FAbilityData* WidgetData);
 
 private:
 	UPROPERTY(meta=(BindWidget))
@@ -100,5 +100,5 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category="Tool Tip")
 	TSubclassOf<UAbilityToolTip> AbilityToolTipClass;
 
-	void CreateToolTipWidget(const FAbilityWidgetData* AbilityWidgetData);
+	void CreateToolTipWidget(const FAbilityData* AbilityData);
 };
