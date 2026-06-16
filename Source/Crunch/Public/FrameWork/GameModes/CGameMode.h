@@ -19,9 +19,9 @@ class CRUNCH_API ACGameMode : public AGameModeBase
 
 public:
 	ACGameMode();
-
+	
 	virtual void StartPlay() override;
-
+	
 	virtual APlayerController* SpawnPlayerController(ENetRole InRemoteRole, const FString& Options) override;
 	virtual UClass* GetDefaultPawnClassForController_Implementation(AController* InController) override;
 	virtual APawn* SpawnDefaultPawnFor_Implementation(AController* NewPlayer, AActor* StartSpot) override;

@@ -28,8 +28,7 @@ public class Crunch : ModuleRules
 				"OnlineSubsystemUtils",
 				"Networking",
 				"HTTP",
-				"Json",
-				"DeveloperSettings"
+				"Json"
 			}
 		);
 

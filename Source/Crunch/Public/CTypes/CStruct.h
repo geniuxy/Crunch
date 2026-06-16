@@ -2,7 +2,6 @@
 
 #include "CoreMinimal.h"
 #include "GameplayEffect.h"
-#include "GAS/CAttributeSet.h"
 #include "Inventory/Data/PA_ShopItem.h"
 #include "CStruct.generated.h"
 
@@ -25,7 +24,7 @@ struct FGenericDamageEffectDef
 };
 
 USTRUCT(BlueprintType)
-struct FAbilityData : public FTableRowBase
+struct FAbilityWidgetData : public FTableRowBase
 {
 	GENERATED_BODY()
 
@@ -40,18 +39,6 @@ struct FAbilityData : public FTableRowBase
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FText Description;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(Categories="Crunch.Ability"))
-	FGameplayTag CooldownTag;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FScalableFloat CooldownTime;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FGameplayAttribute CostAttributeType;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FScalableFloat CostValue;
 };
 
 USTRUCT(BlueprintType)

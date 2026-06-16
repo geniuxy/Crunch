@@ -15,8 +15,8 @@ class CRUNCH_API UCAbilitySystemFunctionLibrary : public UAbilitySystemBlueprint
 	GENERATED_BODY()
 
 public:
-	static float GetStaticCooldownDurationForAbility(UObject* WorldContextObject, const UGameplayAbility* Ability);
-	static float GetStaticCostForAbility(UObject* WorldContextObject, const UGameplayAbility* Ability);
+	static float GetStaticCooldownDurationForAbility(const UGameplayAbility* Ability);
+	static float GetStaticCostForAbility(const UGameplayAbility* Ability);
 
 	static bool IsActorDead(const AActor* ActorToCheck);
 	static bool IsHero(const AActor* ActorToCheck);
