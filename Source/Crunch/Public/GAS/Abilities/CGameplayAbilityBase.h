@@ -26,6 +26,14 @@ public:
 		FGameplayTagContainer* OptionalRelevantTags = nullptr
 	) const override;
 
+	virtual void PreActivate(
+		const FGameplayAbilitySpecHandle Handle,
+		const FGameplayAbilityActorInfo* ActorInfo,
+		const FGameplayAbilityActivationInfo ActivationInfo,
+		FOnGameplayAbilityEnded::FDelegate* OnGameplayAbilityEndedDelegate,
+		const FGameplayEventData* TriggerEventData = nullptr
+	) override;
+
 protected:
 	UAnimInstance* GetOwnerAnimInstance() const;
 

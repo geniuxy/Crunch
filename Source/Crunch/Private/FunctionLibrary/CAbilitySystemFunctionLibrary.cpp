@@ -9,20 +9,42 @@
 #include "CGameplayTags.h"
 #include "GameplayCueManager.h"
 #include "Abilities/GameplayAbility.h"
+#include "CTypes/CStruct.h"
+#include "FrameWork/GameInstanceSubsystem/CDataSubsystem.h"
 
-float UCAbilitySystemFunctionLibrary::GetStaticCooldownDurationForAbility(const UGameplayAbility* Ability)
+float UCAbilitySystemFunctionLibrary::GetStaticCooldownDurationForAbility(
+	UObject* WorldContextObject, const UGameplayAbility* Ability)
 {
 	if (!Ability) return 0.f;
 
-	UGameplayEffect* CooldownGameplayEffect = Ability->GetCooldownGameplayEffect();
-	if (!CooldownGameplayEffect) return 0.f;
-
 	float CooldownDuration = 0.f;
-	CooldownGameplayEffect->DurationMagnitude.GetStaticMagnitudeIfPossible(1.f, CooldownDuration);
+	UGameplayEffect* CooldownGameplayEffect = Ability->GetCooldownGameplayEffect();
+	if (CooldownGameplayEffect)
+	{
+		CooldownGameplayEffect->DurationMagnitude.GetStaticMagnitudeIfPossible(1.f, CooldownDuration);
+	}
+	else
+	{
+		if (UCDataSubsystem* DataSubsystem = UCDataSubsystem::Get(WorldContextObject))
+		{
+			UDataTable* AbilityDataTable = DataSubsystem->GetAbilityDataTable();
+			for (const auto& AbilityDataRowName : AbilityDataTable->GetRowNames())
+			{
+				FAbilityData* WidgetData = AbilityDataTable->FindRow<FAbilityData>(AbilityDataRowName, "");
+				if (WidgetData->AbilityClass == Ability->GetClass())
+				{
+					CooldownDuration = WidgetData->CooldownTime.AsInteger(1);
+					break;
+				}
+			}
+		}
+	}
+
 	return CooldownDuration;
 }
 
-float UCAbilitySystemFunctionLibrary::GetStaticCostForAbility(const UGameplayAbility* Ability)
+float UCAbilitySystemFunctionLibrary::GetStaticCostForAbility(
+	UObject* WorldContextObject, const UGameplayAbility* Ability)
 {
 	if (!Ability) return 0.f;
 

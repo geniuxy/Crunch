@@ -41,8 +41,8 @@ void UAbilityGauge::NativeOnListItemObjectSet(UObject* ListItemObject)
 	IUserObjectListEntry::NativeOnListItemObjectSet(ListItemObject);
 	AbilityCDO = Cast<UGameplayAbility>(ListItemObject);
 
-	float CooldownDuration = UCAbilitySystemFunctionLibrary::GetStaticCooldownDurationForAbility(AbilityCDO);
-	float Cost = UCAbilitySystemFunctionLibrary::GetStaticCostForAbility(AbilityCDO);
+	float CooldownDuration = UCAbilitySystemFunctionLibrary::GetStaticCooldownDurationForAbility(this, AbilityCDO);
+	float Cost = UCAbilitySystemFunctionLibrary::GetStaticCostForAbility(this, AbilityCDO);
 
 	CooldownDurationText->SetText(FText::AsNumber(CooldownDuration));
 	CostText->SetText(FText::AsNumber(Cost));
@@ -63,7 +63,7 @@ void UAbilityGauge::NativeOnListItemObjectSet(UObject* ListItemObject)
 	}
 }
 
-void UAbilityGauge::ConfigureWithWidgetData(const FAbilityWidgetData* WidgetData)
+void UAbilityGauge::ConfigureWithWidgetData(const FAbilityData* WidgetData)
 {
 	if (Icon && WidgetData)
 	{
@@ -209,19 +209,19 @@ void UAbilityGauge::ManaUpdated(const FOnAttributeChangeData& Data)
 	UpdateCanCast();
 }
 
-void UAbilityGauge::CreateToolTipWidget(const FAbilityWidgetData* AbilityWidgetData)
+void UAbilityGauge::CreateToolTipWidget(const FAbilityData* AbilityData)
 {
-	if (!AbilityWidgetData || !AbilityToolTipClass || !AbilityCDO) return;
+	if (!AbilityData || !AbilityToolTipClass || !AbilityCDO) return;
 
 	UAbilityToolTip* InstantiatedToolTip = CreateWidget<UAbilityToolTip>(GetOwningPlayer(), AbilityToolTipClass);
 	if (InstantiatedToolTip)
 	{
-		float CooldownDuration = UCAbilitySystemFunctionLibrary::GetStaticCooldownDurationForAbility(AbilityCDO);
-		float Cost = UCAbilitySystemFunctionLibrary::GetStaticCostForAbility(AbilityCDO);
+		float CooldownDuration = UCAbilitySystemFunctionLibrary::GetStaticCooldownDurationForAbility(this, AbilityCDO);
+		float Cost = UCAbilitySystemFunctionLibrary::GetStaticCostForAbility(this, AbilityCDO);
 		InstantiatedToolTip->SetAbilityInfo(
-			AbilityWidgetData->AbilityName,
-			AbilityWidgetData->Icon.LoadSynchronous(),
-			AbilityWidgetData->Description,
+			AbilityData->AbilityName,
+			AbilityData->Icon.LoadSynchronous(),
+			AbilityData->Description,
 			CooldownDuration,
 			Cost
 		);
