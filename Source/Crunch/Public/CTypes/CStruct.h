@@ -24,7 +24,7 @@ struct FGenericDamageEffectDef
 };
 
 USTRUCT(BlueprintType)
-struct FAbilityData : public FTableRowBase
+struct FAbilityWidgetData : public FTableRowBase
 {
 	GENERATED_BODY()
 

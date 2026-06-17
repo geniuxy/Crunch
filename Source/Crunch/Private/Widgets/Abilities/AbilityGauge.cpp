@@ -63,7 +63,7 @@ void UAbilityGauge::NativeOnListItemObjectSet(UObject* ListItemObject)
 	}
 }
 
-void UAbilityGauge::ConfigureWithWidgetData(const FAbilityData* WidgetData)
+void UAbilityGauge::ConfigureWithWidgetData(const FAbilityWidgetData* WidgetData)
 {
 	if (Icon && WidgetData)
 	{
@@ -209,9 +209,9 @@ void UAbilityGauge::ManaUpdated(const FOnAttributeChangeData& Data)
 	UpdateCanCast();
 }
 
-void UAbilityGauge::CreateToolTipWidget(const FAbilityData* AbilityData)
+void UAbilityGauge::CreateToolTipWidget(const FAbilityWidgetData* AbilityWidgetData)
 {
-	if (!AbilityData || !AbilityToolTipClass || !AbilityCDO) return;
+	if (!AbilityWidgetData || !AbilityToolTipClass || !AbilityCDO) return;
 
 	UAbilityToolTip* InstantiatedToolTip = CreateWidget<UAbilityToolTip>(GetOwningPlayer(), AbilityToolTipClass);
 	if (InstantiatedToolTip)
@@ -219,9 +219,9 @@ void UAbilityGauge::CreateToolTipWidget(const FAbilityData* AbilityData)
 		float CooldownDuration = UCAbilitySystemFunctionLibrary::GetStaticCooldownDurationForAbility(AbilityCDO);
 		float Cost = UCAbilitySystemFunctionLibrary::GetStaticCostForAbility(AbilityCDO);
 		InstantiatedToolTip->SetAbilityInfo(
-			AbilityData->AbilityName,
-			AbilityData->Icon.LoadSynchronous(),
-			AbilityData->Description,
+			AbilityWidgetData->AbilityName,
+			AbilityWidgetData->Icon.LoadSynchronous(),
+			AbilityWidgetData->Description,
 			CooldownDuration,
 			Cost
 		);

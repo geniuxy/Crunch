@@ -27,14 +27,14 @@ void UAbilityListView::AbilityGaugeGenerated(UUserWidget& Widget)
 	}
 }
 
-const FAbilityData* UAbilityListView::FindWidgetDataForAbility(
+const FAbilityWidgetData* UAbilityListView::FindWidgetDataForAbility(
 	const TSubclassOf<UGameplayAbility>& AbilityClass) const
 {
 	if (!AbilityDataTable) return nullptr;
 
-	for (const auto& AbilityDataRowName : AbilityDataTable->GetRowNames())
+	for (const auto& AbilityWidgetDataRowName : AbilityDataTable->GetRowNames())
 	{
-		FAbilityData* WidgetData = AbilityDataTable->FindRow<FAbilityData>(AbilityDataRowName, "");
+		FAbilityWidgetData* WidgetData = AbilityDataTable->FindRow<FAbilityWidgetData>(AbilityWidgetDataRowName, "");
 		if (WidgetData->AbilityClass == AbilityClass)
 		{
 			return WidgetData;
