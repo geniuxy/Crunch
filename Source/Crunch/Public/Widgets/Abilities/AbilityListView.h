@@ -7,7 +7,7 @@
 #include "CTypes/CEnum.h"
 #include "AbilityListView.generated.h"
 
-struct FAbilityWidgetData;
+struct FAbilityData;
 class UGameplayAbility;
 /**
  * 
@@ -26,5 +26,5 @@ private:
 
 	void AbilityGaugeGenerated(UUserWidget& Widget);
 
-	const FAbilityWidgetData* FindWidgetDataForAbility(const TSubclassOf<UGameplayAbility>& AbilityClass) const;
+	const FAbilityData* FindWidgetDataForAbility(const TSubclassOf<UGameplayAbility>& AbilityClass) const;
 };

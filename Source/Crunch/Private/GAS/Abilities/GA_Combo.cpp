@@ -25,8 +25,6 @@ void UGA_Combo::ActivateAbility(
 	const FGameplayAbilityActivationInfo ActivationInfo,
 	const FGameplayEventData* TriggerEventData)
 {
-	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
-
 	// 用K2_的简化蓝图版本接口，可以简化代码、同时也会调用底层c++方法
 	if (!K2_CommitAbility())
 	{
