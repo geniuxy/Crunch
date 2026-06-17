@@ -41,7 +41,7 @@ struct FAbilityData : public FTableRowBase
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FText Description;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(Categories="Crunch.Ability"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(Categories="Crunch.Ability.Cooldown"))
 	FGameplayTag CooldownTag;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -91,6 +91,12 @@ struct FHeroBaseStats : public FTableRowBase
 
 	UPROPERTY(EditAnywhere)
 	float BaseMoveAcceleration = 2048.f;
+
+	UPROPERTY(EditAnywhere)
+	float BaseCooldownReduction = 0.f;
+
+	UPROPERTY(EditAnywhere)
+	float BaseCostReduction = 0.f;
 };
 
 USTRUCT(BlueprintType)

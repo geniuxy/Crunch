@@ -10,49 +10,58 @@
 #include "GameplayCueManager.h"
 #include "Abilities/GameplayAbility.h"
 #include "CTypes/CStruct.h"
-#include "FrameWork/GameInstanceSubsystem/CDataSubsystem.h"
+#include "FrameWork/EngineSubsystem/CDataSubsystem.h"
 
-float UCAbilitySystemFunctionLibrary::GetStaticCooldownDurationForAbility(
-	UObject* WorldContextObject, const UGameplayAbility* Ability)
+float UCAbilitySystemFunctionLibrary::GetStaticCooldownDurationForAbility(const UGameplayAbility* Ability)
 {
 	if (!Ability) return 0.f;
 
 	float CooldownDuration = 0.f;
-	UGameplayEffect* CooldownGameplayEffect = Ability->GetCooldownGameplayEffect();
-	if (CooldownGameplayEffect)
+	if (UCDataSubsystem* DataSubsystem = UCDataSubsystem::Get())
 	{
-		CooldownGameplayEffect->DurationMagnitude.GetStaticMagnitudeIfPossible(1.f, CooldownDuration);
-	}
-	else
-	{
-		if (UCDataSubsystem* DataSubsystem = UCDataSubsystem::Get(WorldContextObject))
+		UDataTable* AbilityDataTable = DataSubsystem->GetAbilityDataTable();
+		for (const auto& AbilityDataRowName : AbilityDataTable->GetRowNames())
 		{
-			UDataTable* AbilityDataTable = DataSubsystem->GetAbilityDataTable();
-			for (const auto& AbilityDataRowName : AbilityDataTable->GetRowNames())
+			FAbilityData* WidgetData = AbilityDataTable->FindRow<FAbilityData>(AbilityDataRowName, "");
+			if (WidgetData->AbilityClass == Ability->GetClass())
 			{
-				FAbilityData* WidgetData = AbilityDataTable->FindRow<FAbilityData>(AbilityDataRowName, "");
-				if (WidgetData->AbilityClass == Ability->GetClass())
-				{
-					CooldownDuration = WidgetData->CooldownTime.AsInteger(1);
-					break;
-				}
+				CooldownDuration = WidgetData->CooldownTime.AsInteger(1);
+				break;
 			}
 		}
+	}
+	else if (UGameplayEffect* CooldownGameplayEffect = Ability->GetCooldownGameplayEffect())
+	{
+		CooldownGameplayEffect->DurationMagnitude.GetStaticMagnitudeIfPossible(1.f, CooldownDuration);
 	}
 
 	return CooldownDuration;
 }
 
-float UCAbilitySystemFunctionLibrary::GetStaticCostForAbility(
-	UObject* WorldContextObject, const UGameplayAbility* Ability)
+float UCAbilitySystemFunctionLibrary::GetStaticCostForAbility(const UGameplayAbility* Ability)
 {
 	if (!Ability) return 0.f;
 
-	UGameplayEffect* CostGameplayEffect = Ability->GetCostGameplayEffect();
-	if (!CostGameplayEffect || CostGameplayEffect->Modifiers.IsEmpty()) return 0.f;
-
 	float Cost = 0.f;
-	CostGameplayEffect->Modifiers[0].ModifierMagnitude.GetStaticMagnitudeIfPossible(1.f, Cost);
+	UGameplayEffect* CostGameplayEffect = Ability->GetCostGameplayEffect();
+	if (UCDataSubsystem* DataSubsystem = UCDataSubsystem::Get())
+	{
+		UDataTable* AbilityDataTable = DataSubsystem->GetAbilityDataTable();
+		for (const auto& AbilityDataRowName : AbilityDataTable->GetRowNames())
+		{
+			FAbilityData* WidgetData = AbilityDataTable->FindRow<FAbilityData>(AbilityDataRowName, "");
+			if (WidgetData->AbilityClass == Ability->GetClass())
+			{
+				Cost = WidgetData->CostValue.AsInteger(1);
+				break;
+			}
+		}
+	}
+	else if (CostGameplayEffect && !CostGameplayEffect->Modifiers.IsEmpty())
+	{
+		CostGameplayEffect->Modifiers[0].ModifierMagnitude.GetStaticMagnitudeIfPossible(1.f, Cost);
+	}
+
 	return FMath::Abs(Cost);
 }
 
@@ -111,7 +120,20 @@ float UCAbilitySystemFunctionLibrary::GetManaCostFor(
 	float ManaCost = 0.f;
 	if (AbilityCDO)
 	{
-		if (UGameplayEffect* CostGameplayEffect = AbilityCDO->GetCostGameplayEffect())
+		if (UCDataSubsystem* DataSubsystem = UCDataSubsystem::Get())
+		{
+			UDataTable* AbilityDataTable = DataSubsystem->GetAbilityDataTable();
+			for (const auto& AbilityDataRowName : AbilityDataTable->GetRowNames())
+			{
+				FAbilityData* WidgetData = AbilityDataTable->FindRow<FAbilityData>(AbilityDataRowName, "");
+				if (WidgetData->AbilityClass == AbilityCDO->GetClass())
+				{
+					ManaCost = WidgetData->CostValue.AsInteger(AbilityLevel);
+					break;
+				}
+			}
+		}
+		else if (UGameplayEffect* CostGameplayEffect = AbilityCDO->GetCostGameplayEffect())
 		{
 			FGameplayEffectSpecHandle EffectSpecHandle =
 				ASC.MakeOutgoingSpec(CostGameplayEffect->GetClass(), AbilityLevel, ASC.MakeEffectContext());
@@ -130,7 +152,20 @@ float UCAbilitySystemFunctionLibrary::GetCooldownDurationFor(
 	float CooldownDuration = 0.f;
 	if (AbilityCDO)
 	{
-		if (UGameplayEffect* CooldownGameplayEffect = AbilityCDO->GetCooldownGameplayEffect())
+		if (UCDataSubsystem* DataSubsystem = UCDataSubsystem::Get())
+		{
+			UDataTable* AbilityDataTable = DataSubsystem->GetAbilityDataTable();
+			for (const auto& AbilityDataRowName : AbilityDataTable->GetRowNames())
+			{
+				FAbilityData* WidgetData = AbilityDataTable->FindRow<FAbilityData>(AbilityDataRowName, "");
+				if (WidgetData->AbilityClass == AbilityCDO->GetClass())
+				{
+					CooldownDuration = WidgetData->CooldownTime.AsInteger(AbilityLevel);
+					break;
+				}
+			}
+		}
+		else if (UGameplayEffect* CooldownGameplayEffect = AbilityCDO->GetCooldownGameplayEffect())
 		{
 			FGameplayEffectSpecHandle EffectSpecHandle =
 				ASC.MakeOutgoingSpec(CooldownGameplayEffect->GetClass(), AbilityLevel, ASC.MakeEffectContext());

@@ -7,6 +7,7 @@
 #include "Abilities/GameplayAbility.h"
 #include "CGameplayAbilityBase.generated.h"
 
+struct FAbilityData;
 /**
  * 
  */
@@ -26,13 +27,31 @@ public:
 		FGameplayTagContainer* OptionalRelevantTags = nullptr
 	) const override;
 
-	virtual void PreActivate(
+	virtual const FGameplayTagContainer* GetCooldownTags() const override;
+
+	virtual bool CheckCooldown(
 		const FGameplayAbilitySpecHandle Handle,
 		const FGameplayAbilityActorInfo* ActorInfo,
-		const FGameplayAbilityActivationInfo ActivationInfo,
-		FOnGameplayAbilityEnded::FDelegate* OnGameplayAbilityEndedDelegate,
-		const FGameplayEventData* TriggerEventData = nullptr
-	) override;
+		FGameplayTagContainer* OptionalRelevantTags = nullptr
+	) const override;
+
+	virtual bool CheckCost(
+		const FGameplayAbilitySpecHandle Handle,
+		const FGameplayAbilityActorInfo* ActorInfo,
+		FGameplayTagContainer* OptionalRelevantTags = nullptr
+	) const override;
+
+	virtual void ApplyCooldown(
+		const FGameplayAbilitySpecHandle Handle,
+		const FGameplayAbilityActorInfo* ActorInfo,
+		const FGameplayAbilityActivationInfo ActivationInfo
+	) const override;
+
+	virtual void ApplyCost(
+		const FGameplayAbilitySpecHandle Handle,
+		const FGameplayAbilityActorInfo* ActorInfo,
+		const FGameplayAbilityActivationInfo ActivationInfo
+	) const override;
 
 protected:
 	UAnimInstance* GetOwnerAnimInstance() const;
@@ -78,6 +97,20 @@ protected:
 	AActor* GetAimTarget(float AimDistance, ETeamAttitude::Type TeamAttitude) const;
 
 	void SendLocalGameplayEvent(const FGameplayTag& EventTag, const FGameplayEventData& EventData);
+
+private:
+	FAbilityData* FindAbilityData() const;
+
+	float GetBaseCooldownTime() const;
+	float GetBaseCostValue() const;
+
+	bool ValidateCostAttributeConsistency(const FAbilityData* Data) const;
+
+	// 缓存，避免返回局部变量
+	mutable FGameplayTagContainer CachedCooldownTags;
+
+	UPROPERTY()
+	mutable UDataTable* CachedAbilityDataTable;
 
 public:
 	FORCEINLINE bool ShouldDrawDebug() const { return bShouldDrawDebug; }

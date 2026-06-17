@@ -31,6 +31,8 @@ public:
 	ATTRIBUTE_ACCESSORS(UCAttributeSet, Armor)
 	ATTRIBUTE_ACCESSORS(UCAttributeSet, MoveSpeed)
 	ATTRIBUTE_ACCESSORS(UCAttributeSet, MoveAcceleration)
+	ATTRIBUTE_ACCESSORS(UCAttributeSet, CooldownReduction)
+	ATTRIBUTE_ACCESSORS(UCAttributeSet, CostReduction)
 
 	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
 
@@ -63,6 +65,10 @@ private:
 	FGameplayAttributeData CachedHealthPercent;
 	UPROPERTY()
 	FGameplayAttributeData CachedManaPercent;
+	UPROPERTY(ReplicatedUsing = OnRep_CooldownReduction)
+	FGameplayAttributeData CooldownReduction;
+	UPROPERTY(ReplicatedUsing = OnRep_CostReduction)
+	FGameplayAttributeData CostReduction;
 
 	UFUNCTION()
 	void OnRep_Health(const FGameplayAttributeData& OldValue);
@@ -87,4 +93,10 @@ private:
 	
 	UFUNCTION()
 	void OnRep_MoveAcceleration(const FGameplayAttributeData& OldValue);
+
+	UFUNCTION()
+	void OnRep_CooldownReduction(const FGameplayAttributeData& OldValue);
+
+	UFUNCTION()
+	void OnRep_CostReduction(const FGameplayAttributeData& OldValue);
 };

@@ -16,6 +16,8 @@ void UCAttributeSet::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>&
 	DOREPLIFETIME_CONDITION_NOTIFY(UCAttributeSet, Armor, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(UCAttributeSet, MoveSpeed, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(UCAttributeSet, MoveAcceleration, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UCAttributeSet, CooldownReduction, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UCAttributeSet, CostReduction, COND_None, REPNOTIFY_Always);
 }
 
 void UCAttributeSet::PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue)
@@ -102,4 +104,14 @@ void UCAttributeSet::OnRep_MoveSpeed(const FGameplayAttributeData& OldValue)
 void UCAttributeSet::OnRep_MoveAcceleration(const FGameplayAttributeData& OldValue)
 {
 	GAMEPLAYATTRIBUTE_REPNOTIFY(UCAttributeSet, MoveAcceleration, OldValue);
+}
+
+void UCAttributeSet::OnRep_CooldownReduction(const FGameplayAttributeData& OldValue)
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UCAttributeSet, CooldownReduction, OldValue);
+}
+
+void UCAttributeSet::OnRep_CostReduction(const FGameplayAttributeData& OldValue)
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UCAttributeSet, CostReduction, OldValue);
 }

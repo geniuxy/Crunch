@@ -1,20 +1,13 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "FrameWork/GameInstanceSubsystem/CDataSubsystem.h"
+#include "FrameWork/EngineSubsystem/CDataSubsystem.h"
 
 #include "FrameWork/DeveloperSetting/CDataDeveloperSetting.h"
 
-UCDataSubsystem* UCDataSubsystem::Get(const UObject* WorldContextObject)
+UCDataSubsystem* UCDataSubsystem::Get()
 {
-	if (GEngine)
-	{
-		UWorld* World = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::Assert);
-
-		return UGameInstance::GetSubsystem<UCDataSubsystem>(World->GetGameInstance());
-	}
-
-	return nullptr;
+	return GEngine ? GEngine->GetEngineSubsystem<UCDataSubsystem>() : nullptr;
 }
 
 void UCDataSubsystem::Initialize(FSubsystemCollectionBase& Collection)

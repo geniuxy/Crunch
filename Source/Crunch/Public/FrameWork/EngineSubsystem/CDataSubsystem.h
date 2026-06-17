@@ -3,20 +3,20 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Subsystems/GameInstanceSubsystem.h"
 #include "CDataSubsystem.generated.h"
 
 /**
- * UGameInstanceSubsystem 本质上不适用于网络同步场景，但是Client和Server上都存在，适合存放静态的数据
- * 需要网络同步时：AGameState全局游戏状态 / APlayerState玩家相关状态
+ * UEngineSubsystem相比UGameInstanceSubsystem的好处：
+ * 1. UEngineSubsystem 没有 World 依赖，CDO 上也能正常访问。
+ * 2. 目前我只存放静态的数据
  */
 UCLASS()
-class CRUNCH_API UCDataSubsystem : public UGameInstanceSubsystem
+class CRUNCH_API UCDataSubsystem : public UEngineSubsystem
 {
 	GENERATED_BODY()
 
 public:
-	static UCDataSubsystem* Get(const UObject* WorldContextObject);
+	static UCDataSubsystem* Get();
 
 	//~Begin USubsystem Function
 	virtual void Initialize(FSubsystemCollectionBase& Collection) override;

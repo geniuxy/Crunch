@@ -41,8 +41,8 @@ void UAbilityGauge::NativeOnListItemObjectSet(UObject* ListItemObject)
 	IUserObjectListEntry::NativeOnListItemObjectSet(ListItemObject);
 	AbilityCDO = Cast<UGameplayAbility>(ListItemObject);
 
-	float CooldownDuration = UCAbilitySystemFunctionLibrary::GetStaticCooldownDurationForAbility(this, AbilityCDO);
-	float Cost = UCAbilitySystemFunctionLibrary::GetStaticCostForAbility(this, AbilityCDO);
+	float CooldownDuration = UCAbilitySystemFunctionLibrary::GetStaticCooldownDurationForAbility(AbilityCDO);
+	float Cost = UCAbilitySystemFunctionLibrary::GetStaticCostForAbility(AbilityCDO);
 
 	CooldownDurationText->SetText(FText::AsNumber(CooldownDuration));
 	CostText->SetText(FText::AsNumber(Cost));
@@ -216,8 +216,8 @@ void UAbilityGauge::CreateToolTipWidget(const FAbilityData* AbilityData)
 	UAbilityToolTip* InstantiatedToolTip = CreateWidget<UAbilityToolTip>(GetOwningPlayer(), AbilityToolTipClass);
 	if (InstantiatedToolTip)
 	{
-		float CooldownDuration = UCAbilitySystemFunctionLibrary::GetStaticCooldownDurationForAbility(this, AbilityCDO);
-		float Cost = UCAbilitySystemFunctionLibrary::GetStaticCostForAbility(this, AbilityCDO);
+		float CooldownDuration = UCAbilitySystemFunctionLibrary::GetStaticCooldownDurationForAbility(AbilityCDO);
+		float Cost = UCAbilitySystemFunctionLibrary::GetStaticCostForAbility(AbilityCDO);
 		InstantiatedToolTip->SetAbilityInfo(
 			AbilityData->AbilityName,
 			AbilityData->Icon.LoadSynchronous(),

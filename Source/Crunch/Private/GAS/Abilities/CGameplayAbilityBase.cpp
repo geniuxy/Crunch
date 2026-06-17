@@ -7,6 +7,8 @@
 #include "AbilitySystemComponent.h"
 #include "CGameplayTags.h"
 #include "CrunchDebugHelper.h"
+#include "CTypes/CStruct.h"
+#include "FrameWork/EngineSubsystem/CDataSubsystem.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/KismetSystemLibrary.h"
@@ -34,19 +36,142 @@ bool UCGameplayAbilityBase::CanActivateAbility(
 	return Super::CanActivateAbility(Handle, ActorInfo, SourceTags, TargetTags, OptionalRelevantTags);
 }
 
-void UCGameplayAbilityBase::PreActivate(
+const FGameplayTagContainer* UCGameplayAbilityBase::GetCooldownTags() const
+{
+	UGameplayEffect* CDGE = GetCooldownGameplayEffect();
+	if (CDGE && !CDGE->GetGrantedTags().IsEmpty())
+	{
+		return &CDGE->GetGrantedTags();
+	}
+
+	CachedCooldownTags.Reset();
+	if (const FAbilityData* Data = FindAbilityData())
+	{
+		CachedCooldownTags.AddTag(Data->CooldownTag);
+		return &CachedCooldownTags;
+	}
+
+	return nullptr;
+}
+
+bool UCGameplayAbilityBase::CheckCooldown(
 	const FGameplayAbilitySpecHandle Handle,
 	const FGameplayAbilityActorInfo* ActorInfo,
-	const FGameplayAbilityActivationInfo ActivationInfo,
-	FOnGameplayAbilityEnded::FDelegate* OnGameplayAbilityEndedDelegate,
-	const FGameplayEventData* TriggerEventData)
+	FGameplayTagContainer* OptionalRelevantTags) const
 {
-	Super::PreActivate(Handle, ActorInfo, ActivationInfo, OnGameplayAbilityEndedDelegate, TriggerEventData);
+	const FGameplayTagContainer* CooldownTags = GetCooldownTags();
 
-	if (!IsValid(GetCooldownGameplayEffect()))
+	if (CooldownTags && !CooldownTags->IsEmpty())
 	{
-		
+		return !ActorInfo->AbilitySystemComponent->HasAnyMatchingGameplayTags(*CooldownTags);
 	}
+
+	return Super::CheckCooldown(Handle, ActorInfo, OptionalRelevantTags);
+}
+
+bool UCGameplayAbilityBase::CheckCost(
+	const FGameplayAbilitySpecHandle Handle,
+	const FGameplayAbilityActorInfo* ActorInfo,
+	FGameplayTagContainer* OptionalRelevantTags) const
+{
+	if (!CostGameplayEffectClass) return true;
+    
+	const FAbilityData* Data = FindAbilityData();
+	if (!Data) return true;
+
+	if (!ValidateCostAttributeConsistency(Data))
+	{
+		Debug::Print(TEXT("CostGameplayEffectClass 的 Attribute 与 FAbilityData 不一致!"));
+		return false;
+	}
+	
+	UAbilitySystemComponent* ASC = ActorInfo->AbilitySystemComponent.Get();
+    
+	// 1. 读取当前属性
+	float CurrentValue = ASC->GetNumericAttributeBase(Data->CostAttributeType);
+    
+	// 2. 计算最终 Cost
+	float BaseCost = Data->CostValue.GetValueAtLevel(GetAbilityLevel());
+	float CostReduction = ASC->GetNumericAttribute(UCAttributeSet::GetCostReductionAttribute());
+	float FinalCost = BaseCost * (1.0f - FMath::Clamp(CostReduction, 0.0f, 1.0f));
+    
+	// 3. 检查
+	return CurrentValue + FinalCost >= 0.f;
+}
+
+void UCGameplayAbilityBase::ApplyCooldown(
+	const FGameplayAbilitySpecHandle Handle,
+	const FGameplayAbilityActorInfo* ActorInfo,
+	const FGameplayAbilityActivationInfo ActivationInfo) const
+{
+	if (!CooldownGameplayEffectClass)
+	{
+		return;
+	}
+
+	// 创建 Cooldown Spec
+	FGameplayEffectSpecHandle SpecHandle = MakeOutgoingGameplayEffectSpec(
+		CooldownGameplayEffectClass, GetAbilityLevel()
+	);
+
+	if (!SpecHandle.IsValid())
+	{
+		return;
+	}
+
+	// 注入基础冷却时间
+	float BaseCooldown = GetBaseCooldownTime();
+	if (BaseCooldown > 0.0f)
+	{
+		static const FGameplayTag BaseCooldownTag = CGameplayTags::Crunch_SetByCaller_BaseCooldown;
+
+		SpecHandle.Data->SetSetByCallerMagnitude(BaseCooldownTag, BaseCooldown);
+	}
+
+	// 注入 Cooldown Tag
+	if (const FAbilityData* Data = FindAbilityData())
+	{
+		SpecHandle.Data->DynamicGrantedTags.AddTag(Data->CooldownTag);
+	}
+
+	// 应用 GE
+	ApplyGameplayEffectSpecToOwner(Handle, ActorInfo, ActivationInfo, SpecHandle);
+}
+
+void UCGameplayAbilityBase::ApplyCost(
+	const FGameplayAbilitySpecHandle Handle,
+	const FGameplayAbilityActorInfo* ActorInfo,
+	const FGameplayAbilityActivationInfo ActivationInfo) const
+{
+	if (!CostGameplayEffectClass)
+	{
+		return;
+	}
+
+	FGameplayEffectSpecHandle SpecHandle = MakeOutgoingGameplayEffectSpec(
+		CostGameplayEffectClass,
+		GetAbilityLevel()
+	);
+
+	if (!SpecHandle.IsValid())
+	{
+		return;
+	}
+
+	// 注入基础消耗值
+	float BaseCostValue = GetBaseCostValue();
+	if (BaseCostValue < 0.0f)
+	{
+		static const FGameplayTag BaseCostTag = CGameplayTags::Crunch_SetByCaller_BaseCost;
+
+		SpecHandle.Data->SetSetByCallerMagnitude(BaseCostTag, BaseCostValue);
+	}
+	else
+	{
+		Debug::Print(TEXT("基础消耗值大于0, 请检查"));
+	}
+
+	ApplyGameplayEffectSpecToOwner(Handle, ActorInfo, ActivationInfo, SpecHandle);
 }
 
 UAnimInstance* UCGameplayAbilityBase::GetOwnerAnimInstance() const
@@ -311,4 +436,65 @@ void UCGameplayAbilityBase::SendLocalGameplayEvent(const FGameplayTag& EventTag,
 	{
 		OwnerASC->HandleGameplayEvent(EventTag, &EventData);
 	}
+}
+
+FAbilityData* UCGameplayAbilityBase::FindAbilityData() const
+{
+	if (UDataTable* AbilityDataTable = UCDataSubsystem::Get()->GetAbilityDataTable())
+	{
+		for (const auto& AbilityDataRowName : AbilityDataTable->GetRowNames())
+		{
+			FAbilityData* AbilityData = AbilityDataTable->FindRow<FAbilityData>(AbilityDataRowName, "");
+			if (AbilityData->AbilityClass == GetClass())
+			{
+				return AbilityData;
+			}
+		}
+	}
+	return nullptr;
+}
+
+float UCGameplayAbilityBase::GetBaseCooldownTime() const
+{
+	if (const FAbilityData* Data = FindAbilityData())
+	{
+		return Data->CooldownTime.GetValueAtLevel(GetAbilityLevel());
+	}
+	return 0.0f;
+}
+
+float UCGameplayAbilityBase::GetBaseCostValue() const
+{
+	if (const FAbilityData* Data = FindAbilityData())
+	{
+		return Data->CostValue.GetValueAtLevel(GetAbilityLevel());
+	}
+	return 0.0f;
+}
+
+bool UCGameplayAbilityBase::ValidateCostAttributeConsistency(const FAbilityData* Data) const
+{
+	if (!CostGameplayEffectClass || !Data)
+	{
+		return false;
+	}
+
+	const UGameplayEffect* CostGE = CostGameplayEffectClass->GetDefaultObject<UGameplayEffect>();
+	if (!CostGE)
+	{
+		return false;
+	}
+
+	// 遍历 CostGE 的 Modifiers，找到对应的 Attribute
+	for (const FGameplayModifierInfo& Modifier : CostGE->Modifiers)
+	{
+		if (Modifier.ModifierOp != EGameplayModOp::Additive) continue;
+		
+		if (Modifier.Attribute == Data->CostAttributeType)
+		{
+			return true;
+		}
+	}
+
+	return false;
 }

@@ -34,35 +34,35 @@ namespace CGameplayTags
 	CRUNCH_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Crunch_Ability_BasicAttack_Event_Damage);
 
 	CRUNCH_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Crunch_Ability_UpperCut_Event_Damage);
-	CRUNCH_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Crunch_Ability_UpperCut_Cooldown);
 	CRUNCH_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Crunch_Ability_Passive_Launched_Event_Activate);
 
-	CRUNCH_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Crunch_Ability_GroundBlast_Cooldown);
-
 	CRUNCH_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Crunch_Ability_Dash_Event_Start);
-	CRUNCH_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Crunch_Ability_Dash_Cooldown);
-	
-	CRUNCH_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Crunch_Ability_Tornado_Cooldown);
 
 	CRUNCH_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Crunch_Ability_Shoot);
 	CRUNCH_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Crunch_Ability_Shoot_Handl);
 	CRUNCH_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Crunch_Ability_Shoot_Handr);
 	
 	CRUNCH_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Crunch_Ability_Laser_Event_Shoot);
-	CRUNCH_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Crunch_Ability_Laser_Cooldown);
 	
-	CRUNCH_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Crunch_Ability_BlackHole_Cooldown);
-
 	CRUNCH_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Crunch_Ability_Blink_Event_Teleport);
-	CRUNCH_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Crunch_Ability_Blink_Cooldown);
-
-	CRUNCH_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Crunch_Ability_Freeze_Cooldown);
 	
 	CRUNCH_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Crunch_Ability_Generic_Event_Damage);
 	CRUNCH_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Crunch_Ability_Generic_Event_Target);
-	
+
+	CRUNCH_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Crunch_Ability_Cooldown);
+	CRUNCH_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Crunch_Ability_Cooldown_UpperCut);
+	CRUNCH_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Crunch_Ability_Cooldown_GroundBlast);
+	CRUNCH_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Crunch_Ability_Cooldown_Dash);
+	CRUNCH_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Crunch_Ability_Cooldown_Tornado);
+	CRUNCH_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Crunch_Ability_Cooldown_Laser);
+	CRUNCH_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Crunch_Ability_Cooldown_BlackHole);
+	CRUNCH_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Crunch_Ability_Cooldown_Blink);
+	CRUNCH_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Crunch_Ability_Cooldown_Freeze);
+
 	CRUNCH_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Crunch_SetByCaller_Experience);
 	CRUNCH_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Crunch_SetByCaller_Gold);
+	CRUNCH_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Crunch_SetByCaller_BaseCooldown);
+	CRUNCH_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Crunch_SetByCaller_BaseCost);
 	
 	// CRUNCH_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Crunch_Event_Target_Updated);
 

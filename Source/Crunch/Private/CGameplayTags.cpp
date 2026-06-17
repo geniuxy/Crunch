@@ -66,37 +66,22 @@ namespace CGameplayTags
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(
 		Crunch_Ability_BasicAttack_Event_Released, "Crunch.Ability.BasicAttack.Event.Released",
 		"检测普攻键的松开事件，可以用于比如标志Shooting动作的结束"
-	); 
+	);
 	UE_DEFINE_GAMEPLAY_TAG(
 		Crunch_Ability_BasicAttack_Event_Damage, "Crunch.Ability.BasicAttack.Event.Damage"
 	);
 
 	/**********************************************************************/
-	/*                         Crunch-Abilities                           */
+	/*                         Abilities-Crunch                           */
 	/**********************************************************************/
 	UE_DEFINE_GAMEPLAY_TAG(
 		Crunch_Ability_UpperCut_Event_Damage, "Crunch.Ability.UpperCut.Event.Damage"
 	);
 	UE_DEFINE_GAMEPLAY_TAG(
-		Crunch_Ability_UpperCut_Cooldown, "Crunch.Ability.UpperCut.Cooldown"
-	);
-	UE_DEFINE_GAMEPLAY_TAG(
 		Crunch_Ability_Passive_Launched_Event_Activate, "Crunch.Ability.Passive.Launched.Event.Activate"
 	);
-
-	UE_DEFINE_GAMEPLAY_TAG(
-		Crunch_Ability_GroundBlast_Cooldown, "Crunch.Ability.GroundBlast.Cooldown"
-	);
-
 	UE_DEFINE_GAMEPLAY_TAG(
 		Crunch_Ability_Dash_Event_Start, "Crunch.Ability.Dash.Event.Start"
-	);
-	UE_DEFINE_GAMEPLAY_TAG(
-		Crunch_Ability_Dash_Cooldown, "Crunch.Ability.Dash.Cooldown"
-	);
-
-	UE_DEFINE_GAMEPLAY_TAG(
-		Crunch_Ability_Tornado_Cooldown, "Crunch.Ability.Tornado.Cooldown"
 	);
 
 	/**********************************************************************/
@@ -111,58 +96,84 @@ namespace CGameplayTags
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(
 		Crunch_Ability_Shoot_Handr, "Crunch.Ability.Shoot.hand_r", "用于在Shoot Ability中，表示子弹是从右手生成"
 	);
-	
-	UE_DEFINE_GAMEPLAY_TAG(
-		Crunch_Ability_Laser_Event_Shoot, "Crunch.Ability.Laser.Event.Shoot"
-	);
-	UE_DEFINE_GAMEPLAY_TAG(
-		Crunch_Ability_Laser_Cooldown, "Crunch.Ability.Laser.Cooldown"
-	);
 
 	UE_DEFINE_GAMEPLAY_TAG(
-		Crunch_Ability_BlackHole_Cooldown, "Crunch.Ability.BlackHole.Cooldown"
+		Crunch_Ability_Laser_Event_Shoot, "Crunch.Ability.Laser.Event.Shoot"
 	);
 
 	UE_DEFINE_GAMEPLAY_TAG(
 		Crunch_Ability_Blink_Event_Teleport, "Crunch.Ability.Blink.Event.Teleport"
 	);
-	UE_DEFINE_GAMEPLAY_TAG(
-		Crunch_Ability_Blink_Cooldown, "Crunch.Ability.Blink.Cooldown"
-	);
 
-	UE_DEFINE_GAMEPLAY_TAG(
-		Crunch_Ability_Freeze_Cooldown, "Crunch.Ability.Freeze.Cooldown"
-	);
-	
 	UE_DEFINE_GAMEPLAY_TAG(
 		Crunch_Ability_Generic_Event_Damage, "Crunch.Ability.Generic.Event.Damage"
 	);
 	UE_DEFINE_GAMEPLAY_TAG(
 		Crunch_Ability_Generic_Event_Target, "Crunch.Ability.Generic.Event.Target"
 	);
-	
+
+	/**********************************************************************/
+	/*                        Abilities-Cooldown                          */
+	/**********************************************************************/
+	UE_DEFINE_GAMEPLAY_TAG(
+		Crunch_Ability_Cooldown, "Crunch.Ability.Cooldown"
+	);
+	UE_DEFINE_GAMEPLAY_TAG(
+		Crunch_Ability_Cooldown_UpperCut, "Crunch.Ability.Cooldown.UpperCut"
+	);
+	UE_DEFINE_GAMEPLAY_TAG(
+		Crunch_Ability_Cooldown_GroundBlast, "Crunch.Ability.Cooldown.GroundBlast"
+	);
+	UE_DEFINE_GAMEPLAY_TAG(
+		Crunch_Ability_Cooldown_Laser, "Crunch.Ability.Cooldown.Laser"
+	);
+	UE_DEFINE_GAMEPLAY_TAG(
+		Crunch_Ability_Cooldown_BlackHole, "Crunch.Ability.Cooldown.BlackHole"
+	);
+	UE_DEFINE_GAMEPLAY_TAG(
+		Crunch_Ability_Cooldown_Dash, "Crunch.Ability.Cooldown.Dash"
+	);
+	UE_DEFINE_GAMEPLAY_TAG(
+		Crunch_Ability_Cooldown_Tornado, "Crunch.Ability.Cooldown.Tornado"
+	);
+	UE_DEFINE_GAMEPLAY_TAG(
+		Crunch_Ability_Cooldown_Blink, "Crunch.Ability.Cooldown.Blink"
+	);
+	UE_DEFINE_GAMEPLAY_TAG(
+		Crunch_Ability_Cooldown_Freeze, "Crunch.Ability.Cooldown.Freeze"
+	);
+
+	/**********************************************************************/
+	/*                            SetByCaller                             */
+	/**********************************************************************/
 	UE_DEFINE_GAMEPLAY_TAG(
 		Crunch_SetByCaller_Experience, "Crunch.SetByCaller.Experience"
 	);
 	UE_DEFINE_GAMEPLAY_TAG(
 		Crunch_SetByCaller_Gold, "Crunch.SetByCaller.Gold"
 	);
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(
+		Crunch_SetByCaller_BaseCooldown, "Crunch.SetByCaller.BaseCooldown", "用于向MMC_CooldownDuration中传递基础冷却时间"
+	);
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(
+		Crunch_SetByCaller_BaseCost, "Crunch.SetByCaller.BaseCost", "用于向MMC_CostValue中传递基础消耗值"
+	);
 
 	// UE_DEFINE_GAMEPLAY_TAG_COMMENT(
 	// 	Crunch_Event_Target_Updated, "Crunch.Event.Target.Updated", "表示瞄准目标的变化事件"
 	// );
 
-	/*
-	 * Items
-	 */
+	/**********************************************************************/
+	/*                               Items                                */
+	/**********************************************************************/
 
 	UE_DEFINE_GAMEPLAY_TAG(
 		Crunch_Ability_Items_Shoes_Cooldown, "Crunch.Ability.Items.Shoes.Cooldown"
 	);
 
-	/*
-	 * GameplayCue Tags
-	 */
+	/**********************************************************************/
+	/*                            GameplayCue                             */
+	/**********************************************************************/
 	UE_DEFINE_GAMEPLAY_TAG(
 		GameplayCue_CameraShake, "GameplayCue.CameraShake"
 	);

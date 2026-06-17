@@ -131,6 +131,8 @@ void UCAbilitySystemComponent::InitializeBaseAttributes()
 		SetNumericAttributeBase(UCAttributeSet::GetArmorAttribute(), BaseStats->BaseArmor);
 		SetNumericAttributeBase(UCAttributeSet::GetMoveSpeedAttribute(), BaseStats->BaseMoveSpeed);
 		SetNumericAttributeBase(UCAttributeSet::GetMoveAccelerationAttribute(), BaseStats->BaseMoveAcceleration);
+		SetNumericAttributeBase(UCAttributeSet::GetCooldownReductionAttribute(), BaseStats->BaseCooldownReduction);
+		SetNumericAttributeBase(UCAttributeSet::GetCostReductionAttribute(), BaseStats->BaseCostReduction);
 
 		SetNumericAttributeBase(UCHeroAttributeSet::GetStrengthAttribute(), BaseStats->Strength);
 		SetNumericAttributeBase(UCHeroAttributeSet::GetStrengthGrowthRateAttribute(), BaseStats->StrengthGrowthRate);
@@ -217,6 +219,7 @@ void UCAbilitySystemComponent::HealthUpdated(const FOnAttributeChangeData& Chang
 		{
 			AddLooseGameplayTag(CGameplayTags::Crunch_Stats_Health_Empty);
 
+			// 这一步给角色施加了Crunch_Stats_Dead的Tag
 			if (AbilitySystemGenerics->GetDeathEffect())
 			{
 				AuthApplyGameplayEffect(AbilitySystemGenerics->GetDeathEffect());
