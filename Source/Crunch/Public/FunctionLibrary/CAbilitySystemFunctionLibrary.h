@@ -25,13 +25,16 @@ public:
 
 	static bool CheckAbilityCost(const FGameplayAbilitySpec& AbilitySpec, const UAbilitySystemComponent& ASC);
 	static bool CheckAbilityCostStatic(const UGameplayAbility* AbilityCDO, const UAbilitySystemComponent& ASC);
-	static float GetManaCostFor(
+	static float GetCostValueFor(
 		const UGameplayAbility* AbilityCDO, const UAbilitySystemComponent& ASC, int AbilityLevel
 	);
 	static float GetCooldownDurationFor(
 		const UGameplayAbility* AbilityCDO, const UAbilitySystemComponent& ASC, int AbilityLevel
 	);
 	static float GetCooldownRemainingFor(const UGameplayAbility* AbilityCDO, const UAbilitySystemComponent& ASC);
+	static float GetCooldownRemainingFor(const UGameplayEffect* CooldownEffect, const UAbilitySystemComponent& ASC);
+	static FGameplayTag GetCooldownTagFor(const FActiveGameplayEffect* CooldownEffect);
+	static FGameplayTag GetCooldownTagFor(const UGameplayAbility* CooldownGA);
 
 	static void SendLocalGameplayCue(
 		AActor* CueTargetActor, const FHitResult& HitResult, const FGameplayTag& GameplayCueTag

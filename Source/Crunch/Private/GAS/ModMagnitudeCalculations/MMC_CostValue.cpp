@@ -23,9 +23,9 @@ float UMMC_CostValue::CalculateBaseMagnitude_Implementation(const FGameplayEffec
 	float CostReduction = 0.f;
 	GetCapturedAttributeMagnitude(CostReductionDef, Spec, EvalParams, CostReduction);
 
-	float BaseCooldown = Spec.GetSetByCallerMagnitude(CGameplayTags::Crunch_SetByCaller_BaseCost, false, 0.0f);
+	float BaseCost = Spec.GetSetByCallerMagnitude(CGameplayTags::Crunch_SetByCaller_BaseCost, false, 0.0f);
 
-	float EffectiveCost = BaseCooldown * (1.0f - FMath::Clamp(CostReduction, 0.f, 1.0f));
+	float EffectiveCost = BaseCost * (1.0f - FMath::Clamp(CostReduction, 0.f, 1.0f));
         
 	return FMath::Min(0.0f, EffectiveCost);
 }

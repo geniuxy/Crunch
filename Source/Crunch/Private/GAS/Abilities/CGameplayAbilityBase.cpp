@@ -127,14 +127,19 @@ void UCGameplayAbilityBase::ApplyCooldown(
 
 		SpecHandle.Data->SetSetByCallerMagnitude(BaseCooldownTag, BaseCooldown);
 	}
+	else
+	{
+		Debug::Print(TEXT("基础冷却时间小于0, 请检查"));
+		return;
+	}
 
 	// 注入 Cooldown Tag
 	if (const FAbilityData* Data = FindAbilityData())
 	{
+		SpecHandle.Data->AddDynamicAssetTag(Data->CooldownTag);
 		SpecHandle.Data->DynamicGrantedTags.AddTag(Data->CooldownTag);
 	}
 
-	// 应用 GE
 	ApplyGameplayEffectSpecToOwner(Handle, ActorInfo, ActivationInfo, SpecHandle);
 }
 
@@ -169,6 +174,7 @@ void UCGameplayAbilityBase::ApplyCost(
 	else
 	{
 		Debug::Print(TEXT("基础消耗值大于0, 请检查"));
+		return;
 	}
 
 	ApplyGameplayEffectSpecToOwner(Handle, ActorInfo, ActivationInfo, SpecHandle);

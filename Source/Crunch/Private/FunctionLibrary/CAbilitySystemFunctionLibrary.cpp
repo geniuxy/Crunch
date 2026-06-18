@@ -114,10 +114,10 @@ bool UCAbilitySystemFunctionLibrary::CheckAbilityCostStatic(
 	return false;
 }
 
-float UCAbilitySystemFunctionLibrary::GetManaCostFor(
+float UCAbilitySystemFunctionLibrary::GetCostValueFor(
 	const UGameplayAbility* AbilityCDO, const UAbilitySystemComponent& ASC, int AbilityLevel)
 {
-	float ManaCost = 0.f;
+	float CostValue = 0.f;
 	if (AbilityCDO)
 	{
 		if (UCDataSubsystem* DataSubsystem = UCDataSubsystem::Get())
@@ -128,7 +128,9 @@ float UCAbilitySystemFunctionLibrary::GetManaCostFor(
 				FAbilityData* WidgetData = AbilityDataTable->FindRow<FAbilityData>(AbilityDataRowName, "");
 				if (WidgetData->AbilityClass == AbilityCDO->GetClass())
 				{
-					ManaCost = WidgetData->CostValue.AsInteger(AbilityLevel);
+					float CostReduction = ASC.GetNumericAttribute(UCAttributeSet::GetCostReductionAttribute());
+					CostValue = WidgetData->CostValue.AsInteger(AbilityLevel) *
+						(1.0f - FMath::Clamp(CostReduction, 0.f, 1.0f));
 					break;
 				}
 			}
@@ -138,12 +140,12 @@ float UCAbilitySystemFunctionLibrary::GetManaCostFor(
 			FGameplayEffectSpecHandle EffectSpecHandle =
 				ASC.MakeOutgoingSpec(CostGameplayEffect->GetClass(), AbilityLevel, ASC.MakeEffectContext());
 			CostGameplayEffect->Modifiers[0].ModifierMagnitude.AttemptCalculateMagnitude(
-				*EffectSpecHandle.Data.Get(), ManaCost
+				*EffectSpecHandle.Data.Get(), CostValue
 			);
 		}
 	}
 
-	return FMath::Abs(ManaCost);
+	return FMath::Abs(CostValue);
 }
 
 float UCAbilitySystemFunctionLibrary::GetCooldownDurationFor(
@@ -160,7 +162,9 @@ float UCAbilitySystemFunctionLibrary::GetCooldownDurationFor(
 				FAbilityData* WidgetData = AbilityDataTable->FindRow<FAbilityData>(AbilityDataRowName, "");
 				if (WidgetData->AbilityClass == AbilityCDO->GetClass())
 				{
-					CooldownDuration = WidgetData->CooldownTime.AsInteger(AbilityLevel);
+					float CooldownReduction = ASC.GetNumericAttribute(UCAttributeSet::GetCooldownReductionAttribute());
+					CooldownDuration = WidgetData->CooldownTime.AsInteger(AbilityLevel) *
+						(1.0f - FMath::Clamp(CooldownReduction, -1.0f, 1.0f));
 					break;
 				}
 			}
@@ -201,6 +205,65 @@ float UCAbilitySystemFunctionLibrary::GetCooldownRemainingFor(
 	}
 
 	return CooldownRemaining;
+}
+
+float UCAbilitySystemFunctionLibrary::GetCooldownRemainingFor(
+	const UGameplayEffect* CooldownEffect, const UAbilitySystemComponent& ASC)
+{
+	if (!CooldownEffect) return 0.f;
+
+	FGameplayEffectQuery CooldownEffectQuery;
+	CooldownEffectQuery.EffectDefinition = CooldownEffect->GetClass();
+
+	float CooldownRemaining = 0.f;
+	FJsonSerializableArrayFloat CooldownTimeRemainings = ASC.GetActiveEffectsTimeRemaining(CooldownEffectQuery);
+
+	for (const float Remaining : CooldownTimeRemainings)
+	{
+		if (Remaining > CooldownRemaining)
+		{
+			CooldownRemaining = Remaining;
+		}
+	}
+
+	return CooldownRemaining;
+}
+
+FGameplayTag UCAbilitySystemFunctionLibrary::GetCooldownTagFor(const FActiveGameplayEffect* CooldownEffect)
+{
+	FGameplayTag OutTag;
+	if (CooldownEffect)
+	{
+		FGameplayTagContainer CooldownTags = CooldownEffect->Spec.GetDynamicAssetTags();
+		for (const FGameplayTag& CooldownTag : CooldownTags.GetGameplayTagArray())
+		{
+			if (CooldownTag.MatchesTag(CGameplayTags::Crunch_Ability_Cooldown))
+			{
+				OutTag = CooldownTag;
+				break;
+			}
+		}
+	}
+	return OutTag;
+}
+
+FGameplayTag UCAbilitySystemFunctionLibrary::GetCooldownTagFor(const UGameplayAbility* CooldownGA)
+{
+	FGameplayTag OutTag;
+	if (UCDataSubsystem* DataSubsystem = UCDataSubsystem::Get())
+	{
+		UDataTable* AbilityDataTable = DataSubsystem->GetAbilityDataTable();
+		for (const auto& AbilityDataRowName : AbilityDataTable->GetRowNames())
+		{
+			FAbilityData* WidgetData = AbilityDataTable->FindRow<FAbilityData>(AbilityDataRowName, "");
+			if (WidgetData->AbilityClass == CooldownGA->GetClass())
+			{
+				OutTag = WidgetData->CooldownTag;
+				break;
+			}
+		}
+	}
+	return OutTag;
 }
 
 void UCAbilitySystemFunctionLibrary::SendLocalGameplayCue(

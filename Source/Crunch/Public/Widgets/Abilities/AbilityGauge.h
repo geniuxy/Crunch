@@ -58,6 +58,7 @@ private:
 
 	float CachedCooldownDuration;
 	float CachedCooldownTimeRemaining;
+	float CachedCooldownReduction;
 
 	FTimerHandle CooldownTimerHandle;
 	FTimerHandle CooldownTimerUpdateHandle;
@@ -78,10 +79,15 @@ private:
 	void UpdateCanCast();
 	void UpgradePointUpdated(const FOnAttributeChangeData& Data);
 	void ManaUpdated(const FOnAttributeChangeData& Data);
-	
+	void CooldownReductionUpdated(const FOnAttributeChangeData& Data);
+	void CostReduction(const FOnAttributeChangeData& Data);
+	void CooldownTimeUpdated(
+		UGameplayAbility* Ability, float NewRemainingTime, float NewDuration
+	);
+
 	UPROPERTY(EditDefaultsOnly, Category="Cooldown")
 	float CooldownUpdateInterval = 0.1f;
-	
+
 	UPROPERTY(EditDefaultsOnly, Category="Visual")
 	FName IconMaterialParamName = "Icon";
 

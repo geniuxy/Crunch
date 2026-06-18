@@ -193,7 +193,7 @@ float UInventoryItem::GetAbilityManaCost() const
 {
 	if (!IsGrantingAnyAbility()) return 0.f;
 
-	return UCAbilitySystemFunctionLibrary::GetManaCostFor(
+	return UCAbilitySystemFunctionLibrary::GetCostValueFor(
 		ShopItem->GetGrantedAbilityCDO(), *OwnerAbilitySystemComponent, 1
 	);
 }

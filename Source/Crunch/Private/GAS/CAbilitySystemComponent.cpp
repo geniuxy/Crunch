@@ -25,6 +25,9 @@ UCAbilitySystemComponent::UCAbilitySystemComponent()
 	GetGameplayAttributeValueChangeDelegate(UCHeroAttributeSet::GetExperienceAttribute()).AddUObject(
 		this, &ThisClass::ExperienceUpdated
 	);
+	GetGameplayAttributeValueChangeDelegate(UCAttributeSet::GetCooldownReductionAttribute()).AddUObject(
+		this, &ThisClass::CooldownReductionUpdated
+	);
 
 	GenericConfirmInputID = (int32)ECAbilityInputID::Confirm;
 	GenericCancelInputID = (int32)ECAbilityInputID::Cancel;
@@ -72,7 +75,7 @@ bool UCAbilitySystemComponent::IsAtMaxLevel() const
 void UCAbilitySystemComponent::Server_UpgradeAbilityWithID_Implementation(ECAbilityInputID InputID)
 {
 	if (InputID < ECAbilityInputID::AbilityOne || InputID > ECAbilityInputID::AbilitySix) return;
-	
+
 	bool bFound;
 	float UpgradePoint = GetGameplayAttributeValue(UCHeroAttributeSet::GetUpgradePointAttribute(), bFound);
 	if (!bFound || UpgradePoint <= 0.f) return;
@@ -313,6 +316,16 @@ void UCAbilitySystemComponent::ExperienceUpdated(const FOnAttributeChangeData& C
 	SetNumericAttributeBase(UCHeroAttributeSet::GetUpgradePointAttribute(), NewUpgradePoint);
 }
 
+void UCAbilitySystemComponent::CooldownReductionUpdated(const FOnAttributeChangeData& ChangeData)
+{
+	if (!GetOwner() || !GetOwner()->HasAuthority()) return;
+
+	float OldReduction = ChangeData.OldValue;
+	float NewReduction = ChangeData.NewValue;
+
+	ModifyAllCooldownEffectsRemainingTime(NewReduction, OldReduction);
+}
+
 void UCAbilitySystemComponent::Server_SetAimTarget_Implementation(AActor* NewTarget)
 {
 	AimTarget = NewTarget;
@@ -336,4 +349,111 @@ void UCAbilitySystemComponent::SetAimTarget(AActor* NewAimTarget)
 {
 	AimTarget = NewAimTarget;
 	Server_SetAimTarget(NewAimTarget);
+}
+
+void UCAbilitySystemComponent::ModifyAllCooldownEffectsRemainingTime(float NewReduction, float OldReduction)
+{
+	// 在 ActiveEffects 中查找这个 GE 的实例
+	const FActiveGameplayEffectsContainer& ActiveGEContainer = GetActiveGameplayEffects();
+	for (const FActiveGameplayEffectHandle& ActiveGEHandle : ActiveGEContainer.GetAllActiveEffectHandles())
+	{
+		if (const FActiveGameplayEffect* ActiveGE = GetActiveGameplayEffect(ActiveGEHandle))
+		{
+			bool bCooldownGE = false;
+			FGameplayTagContainer CooldownTags = ActiveGE->Spec.GetDynamicAssetTags();
+			for (const FGameplayTag& CooldownTag : CooldownTags.GetGameplayTagArray())
+			{
+				if (CooldownTag.MatchesTag(CGameplayTags::Crunch_Ability_Cooldown))
+				{
+					bCooldownGE = true;
+				}
+			}
+			if (!bCooldownGE) continue;
+			if (UCAbilitySystemFunctionLibrary::GetCooldownRemainingFor(ActiveGE->Spec.Def, *this) <= 0.f) continue;
+
+			ModifyActiveEffectRemainingTime(ActiveGE->Handle, NewReduction, OldReduction);
+		}
+	}
+}
+
+void UCAbilitySystemComponent::ModifyActiveEffectRemainingTime(
+	FActiveGameplayEffectHandle Handle, float NewReduction, float OldReduction)
+{
+	float OldMultiplier = FMath::Max(KINDA_SMALL_NUMBER, 1.0f - OldReduction);
+	float NewMultiplier = 1.0f - NewReduction;
+
+	// 计算缩放比例
+	float ScaleFactor = NewMultiplier / OldMultiplier;
+
+	float CurrentWorldTime = ActiveGameplayEffects.GetWorldTime();
+
+	// 获取可变的 ActiveGameplayEffect
+	FActiveGameplayEffect* ActiveEffect = ActiveGameplayEffects.GetActiveGameplayEffect(Handle);
+	if (!ActiveEffect)
+	{
+		return;
+	}
+
+	float CurrentDuration = ActiveEffect->GetDuration();
+	float CurrentRemaining = UCAbilitySystemFunctionLibrary::GetCooldownRemainingFor(ActiveEffect->Spec.Def, *this);
+
+	if (CurrentDuration <= 0.0f || CurrentRemaining <= 0.0f)
+	{
+		return;
+	}
+
+	// 4. 计算新的 Duration 和 RemainingTime（同比例缩放）
+	float NewDuration = CurrentDuration * ScaleFactor;
+	float NewRemaining = CurrentRemaining * ScaleFactor;
+
+	NewDuration = FMath::Max(0.001f, NewDuration); // 最小保留一点，避免 0
+	NewRemaining = FMath::Clamp(NewRemaining, 0.0f, NewDuration);
+
+	// 5. 计算新的 StartWorldTime，使得 RemainingTime 正确
+	// Remaining = Duration - (CurrentTime - StartTime)
+	// => StartTime = CurrentTime - (Duration - Remaining)
+	float NewStartTime = CurrentWorldTime - (NewDuration - NewRemaining);
+
+	// 6. 应用修改
+	ActiveEffect->Spec.bDurationLocked = false;
+
+	// 先设置 Duration
+	ActiveEffect->Spec.SetDuration(NewDuration, true);
+
+	// 再调整 StartTime 来保证 RemainingTime
+	ActiveEffect->StartWorldTime = NewStartTime;
+	
+	// 7. 同步
+	ActiveGameplayEffects.MarkItemDirty(*ActiveEffect);
+	ActiveGameplayEffects.CheckDuration(ActiveEffect->Handle);
+
+	Debug::Print(
+		FString::Printf(
+			TEXT("Cooldown GE: Duration %.2f -> %.2f, Remaining %.2f -> %.2f"),
+			CurrentDuration, NewDuration, CurrentRemaining, NewRemaining
+		)
+	);
+
+	UGameplayAbility* Ability = nullptr;
+	for (const FGameplayAbilitySpec& AbilitySpec : GetActivatableAbilities())
+	{
+		if (!AbilitySpec.Ability) continue;
+		FGameplayTag ActiveEffectCooldownTag = UCAbilitySystemFunctionLibrary::GetCooldownTagFor(ActiveEffect);
+		FGameplayTag ActiveGACooldownTag = UCAbilitySystemFunctionLibrary::GetCooldownTagFor(AbilitySpec.Ability);
+		if (ActiveGACooldownTag == ActiveEffectCooldownTag)
+		{
+			Ability = AbilitySpec.Ability;
+			break;
+		}
+	}
+	if (!Ability) return;
+
+	OnCooldownTimeUpdated.Broadcast(Ability, NewRemaining, NewDuration);
+	Client_OnCooldownTimeUpdated(Ability, NewRemaining, NewDuration);
+}
+
+void UCAbilitySystemComponent::Client_OnCooldownTimeUpdated_Implementation(
+	UGameplayAbility* Ability, float NewRemaining, float NewDuration)
+{
+	OnCooldownTimeUpdated.Broadcast(Ability, NewRemaining, NewDuration);
 }

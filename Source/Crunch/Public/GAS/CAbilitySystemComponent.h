@@ -8,6 +8,11 @@
 #include "CAbilitySystemComponent.generated.h"
 
 class UPA_AbilitySystemGenerics;
+
+DECLARE_MULTICAST_DELEGATE_ThreeParams(
+	FOnCooldownTimeUpdated,
+	UGameplayAbility* /*Handle*/, float /*NewRemaining*/, float /*NewDuration*/
+)
 /**
  * 
  */
@@ -47,6 +52,7 @@ private:
 	void HealthUpdated(const FOnAttributeChangeData& ChangeData);
 	void ManaUpdated(const FOnAttributeChangeData& ChangeData);
 	void ExperienceUpdated(const FOnAttributeChangeData& ChangeData);
+	void CooldownReductionUpdated(const FOnAttributeChangeData& ChangeData);
 
 	UPROPERTY(EditDefaultsOnly, Category="Gameplay Ability")
 	TMap<ECAbilityInputID, TSubclassOf<UGameplayAbility>> Abilities; // 可学习的Abilities（初始0级）
@@ -72,7 +78,23 @@ private:
 
 public:
 	void ClearAimTarget();
-	
+
 	FORCEINLINE AActor* GetAimTarget() const { return AimTarget; }
 	void SetAimTarget(AActor* NewAimTarget);
+
+	/**********************************************************************/
+	/*                       Modify Cooldown Time                         */
+	/**********************************************************************/
+public:
+	FOnCooldownTimeUpdated OnCooldownTimeUpdated;
+
+private:
+	// 修改所有冷却 GE 的剩余时间
+	void ModifyAllCooldownEffectsRemainingTime(float NewReduction, float OldReduction);
+
+	// 修改单个 GE 的剩余时间
+	void ModifyActiveEffectRemainingTime(FActiveGameplayEffectHandle Handle, float NewReduction, float OldReduction);
+
+	UFUNCTION(Client, Reliable)
+	void Client_OnCooldownTimeUpdated(UGameplayAbility* Ability, float NewRemaining, float NewDuration);
 };

@@ -29,7 +29,8 @@ public class Crunch : ModuleRules
 				"Networking",
 				"HTTP",
 				"Json",
-				"DeveloperSettings"
+				"DeveloperSettings",
+				"NetCore"
 			}
 		);
 

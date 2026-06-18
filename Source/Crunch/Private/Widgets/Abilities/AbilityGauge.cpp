@@ -9,6 +9,7 @@
 #include "Components/TextBlock.h"
 #include "CTypes/CStruct.h"
 #include "FunctionLibrary/CAbilitySystemFunctionLibrary.h"
+#include "GAS/CAbilitySystemComponent.h"
 #include "GAS/CAttributeSet.h"
 #include "GAS/CHeroAttributeSet.h"
 #include "Widgets/Abilities/AbilityToolTip.h"
@@ -30,6 +31,16 @@ void UAbilityGauge::NativeConstruct()
 		OwnerAbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(
 			UCAttributeSet::GetManaAttribute()).AddUObject(this, &ThisClass::ManaUpdated
 		);
+		OwnerAbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(
+			UCAttributeSet::GetCooldownReductionAttribute()).AddUObject(this, &ThisClass::CooldownReductionUpdated
+		);
+		OwnerAbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(
+			UCAttributeSet::GetCostReductionAttribute()).AddUObject(this, &ThisClass::CostReduction
+		);
+		if (UCAbilitySystemComponent* OwnerASC = Cast<UCAbilitySystemComponent>(OwnerAbilitySystemComponent))
+		{
+			OwnerASC->OnCooldownTimeUpdated.AddUObject(this, &ThisClass::CooldownTimeUpdated);
+		}
 	}
 
 	WholeNumberFormattingOptions.MaximumFractionalDigits = 0;
@@ -99,9 +110,6 @@ void UAbilityGauge::StartCooldown(float CooldownTimeRemaining, float CooldownDur
 	CooldownCounterText->SetVisibility(ESlateVisibility::Visible);
 
 	GetWorld()->GetTimerManager().SetTimer(
-		CooldownTimerHandle, this, &ThisClass::CooldownFinished, CooldownTimeRemaining
-	);
-	GetWorld()->GetTimerManager().SetTimer(
 		CooldownTimerUpdateHandle, this, &ThisClass::UpdateCooldown, CooldownUpdateInterval, true, 0.f
 	);
 }
@@ -110,6 +118,7 @@ void UAbilityGauge::CooldownFinished()
 {
 	CachedCooldownDuration = 0.f;
 	CachedCooldownTimeRemaining = 0.f;
+	CachedCooldownReduction = 0.f;
 	CooldownCounterText->SetVisibility(ESlateVisibility::Hidden);
 	GetWorld()->GetTimerManager().ClearTimer(CooldownTimerUpdateHandle);
 	Icon->GetDynamicMaterial()->SetScalarParameterValue(CooldownPercentParamName, 1.f);
@@ -123,6 +132,10 @@ void UAbilityGauge::UpdateCooldown()
 	if (CachedCooldownTimeRemaining >= 0.05f)
 	{
 		CooldownCounterText->SetText(FText::AsNumber(CachedCooldownTimeRemaining, FormattingOptions));
+	}
+	else
+	{
+		CooldownFinished();
 	}
 	Icon->GetDynamicMaterial()->SetScalarParameterValue(
 		CooldownPercentParamName, 1.f - CachedCooldownTimeRemaining / CachedCooldownDuration
@@ -157,7 +170,7 @@ void UAbilityGauge::AbilitySpecUpdated(const FGameplayAbilitySpec& AbilitySpec)
 	float NewCooldownDuration = UCAbilitySystemFunctionLibrary::GetCooldownDurationFor(
 		AbilityCDO, *OwnerAbilitySystemComponent, AbilitySpec.Level
 	);
-	float NewCost = UCAbilitySystemFunctionLibrary::GetManaCostFor(
+	float NewCost = UCAbilitySystemFunctionLibrary::GetCostValueFor(
 		AbilityCDO, *OwnerAbilitySystemComponent, AbilitySpec.Level
 	);
 	CooldownDurationText->SetText(FText::AsNumber(NewCooldownDuration));
@@ -207,6 +220,43 @@ void UAbilityGauge::UpgradePointUpdated(const FOnAttributeChangeData& Data)
 void UAbilityGauge::ManaUpdated(const FOnAttributeChangeData& Data)
 {
 	UpdateCanCast();
+}
+
+void UAbilityGauge::CooldownReductionUpdated(const FOnAttributeChangeData& Data)
+{
+	if (const FGameplayAbilitySpec* AbilitySpec = GetAbilitySpec())
+	{
+		float NewCooldownDuration = UCAbilitySystemFunctionLibrary::GetCooldownDurationFor(
+			AbilityCDO, *OwnerAbilitySystemComponent, AbilitySpec->Level
+		);
+		CooldownDurationText->SetText(FText::AsNumber(NewCooldownDuration));
+	}
+}
+
+void UAbilityGauge::CostReduction(const FOnAttributeChangeData& Data)
+{
+	if (const FGameplayAbilitySpec* AbilitySpec = GetAbilitySpec())
+	{
+		float NewCostDuration = UCAbilitySystemFunctionLibrary::GetCostValueFor(
+			AbilityCDO, *OwnerAbilitySystemComponent, AbilitySpec->Level
+		);
+		CostText->SetText(FText::AsNumber(NewCostDuration));
+
+		UpdateCanCast();
+	}
+}
+
+void UAbilityGauge::CooldownTimeUpdated(
+	UGameplayAbility* Ability, float NewRemainingTime, float NewDuration)
+{
+	const FGameplayAbilitySpec* AbilitySpec = GetAbilitySpec();
+	if (!AbilitySpec) return;
+	if (AbilitySpec->Ability != Ability) return;
+
+	if (CachedCooldownTimeRemaining == 0.f) return;
+
+	CachedCooldownTimeRemaining = NewRemainingTime;
+	CachedCooldownDuration = NewDuration;
 }
 
 void UAbilityGauge::CreateToolTipWidget(const FAbilityData* AbilityData)
