@@ -247,11 +247,12 @@ void UAbilityGauge::CostReduction(const FOnAttributeChangeData& Data)
 }
 
 void UAbilityGauge::CooldownTimeUpdated(
-	UGameplayAbility* Ability, float NewRemainingTime, float NewDuration)
+	FGameplayTag InCooldownTag, float NewRemainingTime, float NewDuration)
 {
 	const FGameplayAbilitySpec* AbilitySpec = GetAbilitySpec();
 	if (!AbilitySpec) return;
-	if (AbilitySpec->Ability != Ability) return;
+	FGameplayTag GACooldownTag = UCAbilitySystemFunctionLibrary::GetCooldownTagFor(AbilitySpec->Ability);
+	if (GACooldownTag != InCooldownTag) return;
 
 	if (CachedCooldownTimeRemaining == 0.f) return;
 

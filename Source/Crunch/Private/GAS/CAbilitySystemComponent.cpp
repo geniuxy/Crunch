@@ -433,27 +433,15 @@ void UCAbilitySystemComponent::ModifyActiveEffectRemainingTime(
 			CurrentDuration, NewDuration, CurrentRemaining, NewRemaining
 		)
 	);
+	
+	FGameplayTag ActiveEffectCooldownTag = UCAbilitySystemFunctionLibrary::GetCooldownTagFor(ActiveEffect);
 
-	UGameplayAbility* Ability = nullptr;
-	for (const FGameplayAbilitySpec& AbilitySpec : GetActivatableAbilities())
-	{
-		if (!AbilitySpec.Ability) continue;
-		FGameplayTag ActiveEffectCooldownTag = UCAbilitySystemFunctionLibrary::GetCooldownTagFor(ActiveEffect);
-		FGameplayTag ActiveGACooldownTag = UCAbilitySystemFunctionLibrary::GetCooldownTagFor(AbilitySpec.Ability);
-		if (ActiveGACooldownTag == ActiveEffectCooldownTag)
-		{
-			Ability = AbilitySpec.Ability;
-			break;
-		}
-	}
-	if (!Ability) return;
-
-	OnCooldownTimeUpdated.Broadcast(Ability, NewRemaining, NewDuration);
-	Client_OnCooldownTimeUpdated(Ability, NewRemaining, NewDuration);
+	OnCooldownTimeUpdated.Broadcast(ActiveEffectCooldownTag, NewRemaining, NewDuration);
+	Client_OnCooldownTimeUpdated(ActiveEffectCooldownTag, NewRemaining, NewDuration);
 }
 
 void UCAbilitySystemComponent::Client_OnCooldownTimeUpdated_Implementation(
-	UGameplayAbility* Ability, float NewRemaining, float NewDuration)
+	FGameplayTag CooldownTag, float NewRemaining, float NewDuration)
 {
-	OnCooldownTimeUpdated.Broadcast(Ability, NewRemaining, NewDuration);
+	OnCooldownTimeUpdated.Broadcast(CooldownTag, NewRemaining, NewDuration);
 }

@@ -11,7 +11,7 @@ class UPA_AbilitySystemGenerics;
 
 DECLARE_MULTICAST_DELEGATE_ThreeParams(
 	FOnCooldownTimeUpdated,
-	UGameplayAbility* /*Handle*/, float /*NewRemaining*/, float /*NewDuration*/
+	FGameplayTag /*CooldownTag*/, float /*NewRemaining*/, float /*NewDuration*/
 )
 /**
  * 
@@ -96,5 +96,5 @@ private:
 	void ModifyActiveEffectRemainingTime(FActiveGameplayEffectHandle Handle, float NewReduction, float OldReduction);
 
 	UFUNCTION(Client, Reliable)
-	void Client_OnCooldownTimeUpdated(UGameplayAbility* Ability, float NewRemaining, float NewDuration);
+	void Client_OnCooldownTimeUpdated(FGameplayTag CooldownTag, float NewRemaining, float NewDuration);
 };

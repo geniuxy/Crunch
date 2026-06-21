@@ -254,7 +254,7 @@ void ACCharacter::ConfigureOverHeadStatsWidget()
 	if (OverHeadStatsGauge)
 	{
 		OverHeadStatsGauge->ConfigureWithASC(GetAbilitySystemComponent());
-		OverHeadWidgetComponent->SetHiddenInGame(false);
+		OverHeadWidgetComponent->SetHiddenInGame(true);
 		GetWorldTimerManager().ClearTimer(HeadStatsGaugeVisibilityUpdateTimerHandle);
 		GetWorldTimerManager().SetTimer(
 			HeadStatsGaugeVisibilityUpdateTimerHandle, this, &ACCharacter::UpdateHeadGaugeVisibility,

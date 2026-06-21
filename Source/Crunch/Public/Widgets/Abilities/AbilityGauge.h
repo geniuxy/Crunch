@@ -82,7 +82,7 @@ private:
 	void CooldownReductionUpdated(const FOnAttributeChangeData& Data);
 	void CostReduction(const FOnAttributeChangeData& Data);
 	void CooldownTimeUpdated(
-		UGameplayAbility* Ability, float NewRemainingTime, float NewDuration
+		FGameplayTag InCooldownTag, float NewRemainingTime, float NewDuration
 	);
 
 	UPROPERTY(EditDefaultsOnly, Category="Cooldown")
